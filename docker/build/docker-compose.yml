@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  amazonlinux2:
+    container_name: amazonlinux2
+    build:
+      context: .
+    volumes:
+      - ../../:/volume
+    command:
+      - /bin/sh
+      - -c
+      - |
+        /root/.cargo/bin/cargo build --release && \
+        /bin/chmod -R go=u /volume/target/release

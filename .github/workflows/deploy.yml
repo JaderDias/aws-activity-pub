@@ -1,0 +1,45 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ "deploy" ]
+
+env:
+  AWS_REGION: eu-central-1                   # set this to your preferred AWS region, e.g. us-west-1
+  CARGO_TERM_COLOR: always
+  S3_BUCKET: cf-templates-jbywbbl8iz9d-eu-central-1 # needs to be in the same AWS region as the deployment
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+      - name: Build
+        run: cargo build --release
+      - name: Package
+        run: |
+          docker-compose -f docker/build/docker-compose.yml up \
+                         --exit-code-from amazonlinux2
+          mkdir -p dist/amazonlinux2
+          cp target/release/rust_lambda dist/amazonlinux2/bootstrap
+          zip -jr dist/amazonlinux2.zip dist/amazonlinux2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Upload
+        run: |
+          LAMBDA_CODE_OBJECT_KEY=`md5sum dist/amazonlinux2.zip | cut -d' ' -f1`
+          aws s3 cp dist/amazonlinux2.zip "s3://$S3_BUCKET/$LAMBDA_CODE_OBJECT_KEY"
+      - name: Deploy to AWS CloudFormation
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: rust-lambda
+          template: cloudformation.yml
+          parameter-overrides: "LambdaCodeObjectKey=${{ env.S3_BUCKET }},LambdaCodeBucket=${{ env.LAMBDA_CODE_OBJECT_KEY }}"
