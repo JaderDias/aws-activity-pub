@@ -1,5 +1,9 @@
 [package]
 name = "rust_lambda"
+description = "Example minimal ActivityPub serverless implementation in Rust using AWS infrastructure"
+repository = "https://github.com/JaderDias/aws-activity-pub"
+categories = ["webservice"]
+keywords = ["aws", "aws-lambda", "amazon dynamodb"]
 version = "0.1.0"
 edition = "2021"
 license-file = "LICENSE"
