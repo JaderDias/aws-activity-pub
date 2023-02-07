@@ -94,15 +94,15 @@ async fn main() {
 
 fn assert_body_matches_with_replacement(test: &TestCase, actual_body_text: &String) -> String {
     let uuid_re = Regex::new(r"[a-f0-9]{32}").unwrap();
-    for capture in uuid_re.captures_iter(actual_body_text.as_str()) {
+    if let Some(capture) = uuid_re.captures_iter(actual_body_text.as_str()).next() {
         let replaced_text = uuid_re
-            .replace_all(&actual_body_text, UUID_PLACEHOLDER)
+            .replace_all(actual_body_text, UUID_PLACEHOLDER)
             .to_string();
-        assert_body_matches(&test, &replaced_text);
+        assert_body_matches(test, &replaced_text);
         return capture[0].to_owned();
     }
 
-    assert_body_matches(&test, actual_body_text);
+    assert_body_matches(test, actual_body_text);
     String::new()
 }
 
@@ -135,7 +135,7 @@ fn assert_body_matches(test: &TestCase, actual_body_text: &String) {
 
 async fn table_exists(client: &aws_sdk_dynamodb::Client, table: &str) -> bool {
     let table_list = client.list_tables().send().await.unwrap();
-    println!("tables {:?}", table_list);
+    println!("tables {table_list:?}");
     table_list
         .table_names()
         .as_ref()
