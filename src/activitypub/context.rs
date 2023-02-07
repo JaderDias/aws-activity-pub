@@ -30,7 +30,7 @@ pub struct Context {
 
 #[derive(Deserialize, Serialize)]
 #[serde(untagged)]
-pub enum StringOrContext {
+pub enum Extension {
     String(String),
     Context(Box<Context>),
 }

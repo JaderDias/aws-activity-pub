@@ -1,4 +1,4 @@
-use super::context::StringOrContext;
+use super::context::Extension;
 use serde::{Deserialize, Serialize};
 
 // TODO: use activitystreams = "0.6.2"
@@ -20,7 +20,7 @@ pub struct Object {
     pub content: Option<String>,
     #[serde(rename = "@context")]
     #[serde(skip_deserializing)]
-    pub context: Option<Vec<StringOrContext>>,
+    pub context: Option<Vec<Extension>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub conversation: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
