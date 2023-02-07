@@ -7,7 +7,7 @@ pub fn routes() -> Vec<rocket::Route> {
 }
 
 #[rocket::get("/users/<_username>/statuses/<status_id>")]
-pub async fn user_statuses(
+async fn user_statuses(
     _username: String,
     status_id: String,
     db_settings: &rocket::State<DbSettings>,

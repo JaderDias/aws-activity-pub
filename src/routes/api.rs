@@ -7,7 +7,7 @@ pub fn routes() -> Vec<rocket::Route> {
 }
 
 #[rocket::post("/api/v1/statuses", data = "<status>")]
-pub async fn status(
+async fn status(
     status: rocket::serde::json::Json<Object>,
     db_settings: &rocket::State<DbSettings>,
 ) -> Option<String> {

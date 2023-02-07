@@ -3,10 +3,13 @@
     "request": {
       "version": "2.0",
       "routeKey": "$default",
-      "rawPath": "/nodeinfo/2.0",
-      "rawQueryString": "",
+      "rawPath": "/.well-known/webfinger",
+      "rawQueryString": "resource=acct:test_username@example.com",
       "cookies": [],
       "headers": {},
+      "queryStringParameters": {
+        "resource": "acct:test_username@example.com"
+      },
       "requestContext": {
         "accountId": "123456789012",
         "apiId": "api-id",
@@ -38,7 +41,7 @@
         "domainPrefix": "id",
         "http": {
           "method": "GET",
-          "path": "/nodeinfo/2.0",
+          "path": "/.well-known/webfinger",
           "protocol": "HTTP/1.1",
           "sourceIp": "192.0.2.1",
           "userAgent": "agent"
@@ -50,6 +53,7 @@
         "timeEpoch": 1583348638390
       },
       "pathParameters": {
+        "resource": "acct:test_username@example.com"
       },
       "isBase64Encoded": false,
       "stageVariables": {
@@ -69,25 +73,12 @@
       "statusCode": 200
     },
     "expected_body_json": {
-      "openRegistrations": true,
-      "protocols": [
-        "activitypub"
-      ],
-      "services": {
-        "inbound": [],
-        "outbound": []
-      },
-      "software": {
-        "name": "rust_lambda",
-        "version": 1
-      },
-      "usage": {
-        "localPosts": 1,
-        "users": {
-          "total": 1
-        }
-      },
-      "version": 2.0
+      "subject": "acct:test_username@example.com",
+      "links": [{
+        "rel": "self",
+        "type": "application/activity+json",
+        "href": "https://example.com/test_username"
+      }]
     }
   }
 ]

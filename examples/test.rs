@@ -39,6 +39,7 @@ async fn main() {
 
     for path in paths {
         let path_value = path.unwrap().path();
+        println!("Testing: {}", path_value.display());
         let file = File::open(path_value).unwrap();
         let mut file_deserializer = serde_json::Deserializer::from_reader(file);
         let test_cases = TestCases::deserialize(&mut file_deserializer).unwrap();
@@ -69,6 +70,10 @@ async fn main() {
                     .unwrap();
             } else {
                 url = url.replace(UUID_PLACEHOLDER, last_uuid.as_str());
+                let query_string = &request.raw_query_string;
+                if query_string.is_some() {
+                    url = format!("{}?{}", url, query_string.as_ref().unwrap());
+                }
                 println!("{} {}", &request.request_context.http.method, &url);
                 actual_response = http_client.get(url).send().await.unwrap();
             }

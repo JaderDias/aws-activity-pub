@@ -10,7 +10,7 @@ pub enum NodeInfo {
 }
 
 #[rocket::get("/nodeinfo/2.0")]
-pub fn nodeinfo() -> NodeInfo {
+fn nodeinfo() -> NodeInfo {
     let doc = serde_json::json!({
         "version": 2.0,
         "software": {
