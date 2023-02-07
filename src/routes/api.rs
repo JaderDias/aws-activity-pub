@@ -2,12 +2,8 @@ use crate::activitypub::object::Object;
 use crate::dynamodb::DbSettings;
 use aws_sdk_dynamodb::model::AttributeValue;
 
-pub fn routes() -> Vec<rocket::Route> {
-    rocket::routes![status]
-}
-
 #[rocket::post("/api/v1/statuses", data = "<status>")]
-async fn status(
+pub async fn statuses(
     status: rocket::serde::json::Json<Object>,
     db_settings: &rocket::State<DbSettings>,
 ) -> Option<String> {

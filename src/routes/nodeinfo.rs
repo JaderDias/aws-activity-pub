@@ -1,16 +1,12 @@
 use rocket::http::ContentType;
 
-pub fn routes() -> Vec<rocket::Route> {
-    rocket::routes![nodeinfo]
-}
-
 #[derive(rocket::Responder)]
 pub enum NodeInfo {
     A(String, ContentType),
 }
 
 #[rocket::get("/nodeinfo/2.0")]
-fn nodeinfo() -> NodeInfo {
+pub fn handler() -> NodeInfo {
     let doc = serde_json::json!({
         "version": 2.0,
         "software": {
