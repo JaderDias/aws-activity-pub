@@ -3,10 +3,14 @@
     "request": {
       "version": "2.0",
       "routeKey": "$default",
-      "rawPath": "/@test_username",
+      "rawPath": "/users/test_username/followers",
       "rawQueryString": "",
       "cookies": [],
-      "headers": {},
+      "headers": {
+        "Accept": ["application/activity+json, application/ld+json"],
+        "Accept-Encoding": ["gzip"],
+        "Signature": ["keyId=\"https://mastodon.social/actor#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date accept\",signature=\"wUAArkeEJh4yXkstcC8IgrnSlsRcledOUjo63nqRZrXI0RtoKo369/+j5K7bEFDoJ8psuCnnY9cW+KDgog7Gg2mQjAb1cZa2ffeqFY3PPXqpO+5entfRkAEyYBsrd3CiVn5wz0LEwbOs3XHe1w2wVgoIbSunCE/DN0Ra5tQLriITzBA5YzI26QuQSJzb5sMmMjiTiVocF/i0djqXfLmnjvhyaxsS0i0O8LfPHVPzSSGFHaqzawIL28MZu8J42ha//baJmPozQQquFHKs7lcDcSSGtrvMGjfJYoFy4cMSsSqLH / 8 VRzNR0nXs47ydDwQ9XRpT55LPWL7uRQoeYBAkwA == \""]
+      },
       "queryStringParameters": {
       },
       "requestContext": {
@@ -40,7 +44,7 @@
         "domainPrefix": "id",
         "http": {
           "method": "GET",
-          "path": "/@test_username",
+          "path": "/users/test_username/followers",
           "protocol": "HTTP/1.1",
           "sourceIp": "192.0.2.1",
           "userAgent": "agent"
@@ -71,22 +75,11 @@
       "statusCode": 200
     },
     "expected_body_json": {
-      "@context": [
-        "https://www.w3.org/ns/activitystreams",
-        "https://w3id.org/security/v1"
-      ],
-      "id": "https://example.com/@test_username",
-      "type": "Person",
-      "following": "https://example.com/following",
-      "followers": "https://example.com/followers",
-      "inbox": "https://example.com/inbox",
-      "preferredUsername": "test_username",
-      "name": "Example user",
-      "summary": "Activity Pub server example.",
-      "url": "https://example.com",
-      "manuallyApprovesFollowers": false,
-      "discoverable": true,
-      "published": "2000-01-01T00:00:00Z"
+      "@context": "https://www.w3.org/ns/activitystreams",
+      "id": "https://example.com/users/test_username/followers",
+      "type": "OrderedCollection",
+      "totalItems": 1,
+      "first": "https://example.com/users/test_username/followers?page=1"
     }
   }
 ]
