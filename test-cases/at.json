@@ -3,12 +3,11 @@
     "request": {
       "version": "2.0",
       "routeKey": "$default",
-      "rawPath": "/.well-known/webfinger",
-      "rawQueryString": "resource=acct:test_username@example.com",
+      "rawPath": "/@test_username",
+      "rawQueryString": "",
       "cookies": [],
       "headers": {},
       "queryStringParameters": {
-        "resource": "acct:test_username@example.com"
       },
       "requestContext": {
         "accountId": "123456789012",
@@ -41,7 +40,7 @@
         "domainPrefix": "id",
         "http": {
           "method": "GET",
-          "path": "/.well-known/webfinger",
+          "path": "/@test_username",
           "protocol": "HTTP/1.1",
           "sourceIp": "192.0.2.1",
           "userAgent": "agent"
@@ -53,7 +52,6 @@
         "timeEpoch": 1583348638390
       },
       "pathParameters": {
-        "resource": "acct:test_username@example.com"
       },
       "isBase64Encoded": false,
       "stageVariables": {
@@ -73,12 +71,22 @@
       "statusCode": 200
     },
     "expected_body_json": {
-      "subject": "acct:test_username@example.com",
-      "links": [{
-        "rel": "self",
-        "type": "application/activity+json",
-        "href": "https://example.com/@test_username"
-      }]
+      "@context": [
+        "https://www.w3.org/ns/activitystreams",
+        "https://w3id.org/security/v1"
+      ],
+      "id": "https://example.com/@test_username",
+      "type": "Person",
+      "following": "https://example.com/following",
+      "followers": "https://example.com/followers",
+      "inbox": "https://example.com/inbox",
+      "preferredUsername": "test_username",
+      "name": "Example user",
+      "summary": "Activity Pub server example.",
+      "url": "https://example.com",
+      "manuallyApprovesFollowers": false,
+      "discoverable": true,
+      "published": "2000-01-01T00:00:00Z"
     }
   }
 ]

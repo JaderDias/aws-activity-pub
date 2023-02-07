@@ -15,6 +15,7 @@ async fn main() -> Result<(), LambdaError> {
         .init();
 
     let rocket = rocket::build()
+        .mount("/", routes::at::routes())
         .mount("/", routes::api::routes())
         .mount("/", routes::nodeinfo::routes())
         .mount("/", routes::users::routes())
