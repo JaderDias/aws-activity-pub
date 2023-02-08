@@ -26,7 +26,7 @@ lambda-web = { version = "0.2.1", features = ["rocket05"] }
 rocket = { version = "0.5.0-rc.2", features = ["json"] }
 serde = { version = "1.0.152", features = ["derive"] }
 serde_dynamo = { version = "4.0.12", features = ["aws-sdk-dynamodb+0_24"] }
-serde_json = { version = "1.0.92", features = ["raw_value"] }
+serde_json = { version = "1.0.93", features = ["raw_value"] }
 tracing = { version = "0.1", features = ["log"] }
 tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt"] }
 uuid = { version = "1.2.2", features = ["v4"] }
