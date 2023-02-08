@@ -14,7 +14,11 @@ deploy an ActivityPub server to AWS
 * gcc
 * Rust toolchain 
 
-### macOS with Apple Silicon additional requirements
+### additional deployment requirements
+
+* AWS Command Line Interface
+
+### additional macOS with Apple Silicon requirements
 
 * musl-cross with x86_64
 ```bash
