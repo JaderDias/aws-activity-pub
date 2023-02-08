@@ -1,0 +1,108 @@
+[
+  {
+    "request": {
+      "version": "2.0",
+      "routeKey": "$default",
+      "rawPath": "/users/test_username/inbox",
+      "rawQueryString": "",
+      "cookies": [],
+      "headers": {
+        "Content-Type": ["application/activity+json"],
+        "Digest": ["SHA-256=8we9H5V74oUdQr8R5vay/dyQEi0I2up5wwI7+9e8T70="],
+        "Signature": ["keyId=\"https://mastodon.social/users/jgarr#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date digest content-type\",signature=\"hx1jRjCGyBfnI/Cak8ujAlfau5G1Ph+9niCFyRdm5J7b9wQGxbk+SbUhG0kV2L7W0h54JBc6htQhR8V+fFqxX+UiLXe1l7jRoBZOYSKq7UKqtogJwLLvS89DeDgWLWDPqbZ6W1FzU9MLUqJLTqFNnhgtOH+m+YhKEfjE35+65d5vmPUNjR8TRDAjXjMugMi3NmeaeA789NV3gs7GaGyfI734kGwvPDHcLp9MyDHqBivdDqmPAzXRP4gyrjqXHQRpxCdX7iinA/aqgnsNf2CoY/uH7M+z+zPWohlTvVDU2L+xeT2N7pXFc6WxREPV4ojZ+VxMzmIuzHkxW8TVpVNwMw==\""],
+        "Accept-Encoding": ["gzip"]
+      },
+      "requestContext": {
+        "accountId": "123456789012",
+        "apiId": "api-id",
+        "authentication": {
+          "clientCert": {
+            "clientCertPem": "CERT_CONTENT",
+            "subjectDN": "www.example.com",
+            "issuerDN": "Example issuer",
+            "serialNumber": "a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1",
+            "validity": {
+              "notBefore": "May 28 12:30:02 2019 GMT",
+              "notAfter": "Aug  5 09:36:04 2021 GMT"
+            }
+          }
+        },
+        "authorizer": {
+          "jwt": {
+            "claims": {
+              "claim1": "value1",
+              "claim2": "value2"
+            },
+            "scopes": [
+              "scope1",
+              "scope2"
+            ]
+          }
+        },
+        "domainName": "id.execute-api.us-east-1.amazonaws.com",
+        "domainPrefix": "id",
+        "http": {
+          "method": "POST",
+          "path": "/users/test_username/inbox",
+          "protocol": "HTTP/1.1",
+          "sourceIp": "192.0.2.1",
+          "userAgent": "agent"
+        },
+        "requestId": "id",
+        "routeKey": "$default",
+        "stage": "$default",
+        "time": "12/Mar/2020:19:03:58 +0000",
+        "timeEpoch": 1583348638390
+      },
+      "pathParameters": {
+        "parameter1": "value1"
+      },
+      "isBase64Encoded": false,
+      "stageVariables": {
+        "stageVariable1": "value1",
+        "stageVariable2": "value2"
+      }
+    },
+    "request_body_json": {
+      "@context": [
+        "https://www.w3.org/ns/activitystreams",
+        {
+          "ostatus": "http://ostatus.org#",
+          "atomUri": "ostatus:atomUri",
+          "in_reply_to_atom_uri": "ostatus:in_reply_to_atom_uri",
+          "conversation": "ostatus:conversation",
+          "sensitive": "as:sensitive",
+          "Hashtag": "as:Hashtag",
+          "toot": "http://joinmastodon.org/ns#",
+          "Emoji": "toot:Emoji",
+          "focalPoint": {
+            "@container": "@list",
+            "@id": "toot:focalPoint"
+          }
+        }
+      ],
+      "id": "https://mastodon.social/users/admin/statuses/101005808819117231",
+      "type": "Follow",
+      "summary": null,
+      "inReplyTo": null,
+      "published": "2019-04-28T20:58:40Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "sensitive": false,
+      "in_reply_to_atom_uri": null,
+      "conversation": "tag:mastodon.social,2019-04-28:objectId=1754000:objectType=Conversation",
+      "content": "test_content",
+      "attachment": [],
+      "tag": []
+    },
+    "expected_response": {
+      "body": "abcdef1234567890abcdef1234567890",
+      "cookies": [],
+      "headers": {"content-type": "text/plain; charset=utf-8"},
+      "isBase64Encoded": false,
+      "multiValueHeaders": {},
+      "statusCode": 200
+    }
+  }
+]
