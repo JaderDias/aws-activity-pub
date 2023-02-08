@@ -6,6 +6,8 @@ then
     exit 1
 fi
 
+mkdir -p dist/amazonlinux2 \
+|| exit 1
 if uname -a | grep x86_64; then
   docker-compose -f docker/build/docker-compose.yml up \
     --exit-code-from amazonlinux2 \
@@ -20,10 +22,15 @@ else
   || exit 1
   cp target/x86_64-unknown-linux-musl/release/rust_lambda dist/amazonlinux2/bootstrap
 fi
-rm dist/amazonlinux2.zip \
-&& zip -jr dist/amazonlinux2.zip dist/amazonlinux2 \
-&& LAMBDA_CODE_OBJECT_KEY=`md5sum dist/amazonlinux2.zip | cut -d' ' -f1` \
-&& aws s3 cp dist/amazonlinux2.zip "s3://$S3_BUCKET/$LAMBDA_CODE_OBJECT_KEY" \
+rm dist/amazonlinux2.zip
+zip -jr dist/amazonlinux2.zip dist/amazonlinux2 \
+|| exit 1
+if uname -a | grep Darwin; then
+  LAMBDA_CODE_OBJECT_KEY=`md5 dist/amazonlinux2.zip | cut -d' ' -f4`
+else
+  LAMBDA_CODE_OBJECT_KEY=`md5sum dist/amazonlinux2.zip | cut -d' ' -f1`
+fi
+aws s3 cp dist/amazonlinux2.zip "s3://$S3_BUCKET/$LAMBDA_CODE_OBJECT_KEY" \
 && aws cloudformation deploy \
   --template-file cloudformation.yml \
   --stack-name "rust-lambda" \
