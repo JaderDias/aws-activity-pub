@@ -2,26 +2,31 @@ use crate::activitypub::object::Object;
 use crate::dynamodb::DbSettings;
 use aws_sdk_dynamodb::model::AttributeValue;
 
-#[rocket::post("/api/v1/statuses", data = "<status>")]
-pub async fn statuses(
-    status: rocket::serde::json::Json<Object>,
+#[rocket::post("/api/v1/users", data = "<user>")]
+pub async fn handler(
+    user: rocket::serde::json::Json<Object>,
     db_settings: &rocket::State<DbSettings>,
 ) -> Option<String> {
-    let object = status.into_inner();
+    let object = user.into_inner();
     let object_type = object.r#type.as_str();
-    if object_type != "Note" {
+    if object_type != "Person" {
         return None;
     }
 
     let partition = crate::dynamodb::get_uuid();
-    let content = object.content.unwrap();
-    let published = object.published.unwrap();
-    let sensitive = object.sensitive.unwrap();
+    let preferred_username = object.preferred_username.unwrap();
+    let name = object.name.unwrap();
     let fields = std::collections::HashMap::from([
         ("type".to_owned(), AttributeValue::S(object_type.to_owned())),
-        ("content".to_owned(), AttributeValue::S(content)),
-        ("published".to_owned(), AttributeValue::S(published)),
-        ("sensitive".to_owned(), AttributeValue::Bool(sensitive)),
+        (
+            "@context".to_owned(),
+            AttributeValue::S(serde_json::json!(object.context).to_string()),
+        ),
+        (
+            "preferred_username".to_owned(),
+            AttributeValue::S(preferred_username),
+        ),
+        ("name".to_owned(), AttributeValue::S(name)),
     ]);
     crate::dynamodb::put_item(
         &db_settings.client,

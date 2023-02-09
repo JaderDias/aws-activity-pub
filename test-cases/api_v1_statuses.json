@@ -76,7 +76,6 @@
           }
         }
       ],
-      "id": "https://mastodon.social/users/admin/statuses/101005808819117231",
       "type": "Note",
       "summary": null,
       "inReplyTo": null,
@@ -92,7 +91,7 @@
       "tag": []
     },
     "expected_response": {
-      "body": "abcdef1234567890abcdef1234567890",
+      "body": "users/test_username/statuses/abcdef1234567890abcdef1234567890",
       "cookies": [],
       "headers": {"content-type": "text/plain; charset=utf-8"},
       "isBase64Encoded": false,
@@ -161,21 +160,42 @@
     },
     "expected_response": {
       "cookies": [],
-      "headers": {"content-type": "application/json"},
+      "headers": {
+        "content-type": "application/json"
+      },
       "isBase64Encoded": false,
-      "multiValueHeaders": {"content-type": "application/json"},
+      "multiValueHeaders": {
+        "content-type": "application/json"
+      },
       "statusCode": 200
     },
     "expected_body_json": {
-      "@context": null,
-      "atomUri": null,
-      "content": "test_content",
-      "inReplyTo": null,
-      "inReplyToAtomUri": null,
+      "@context": [
+        "https://www.w3.org/ns/activitystreams",
+        {
+          "ostatus": "http://ostatus.org#",
+          "atomUri": "ostatus:atomUri",
+          "in_reply_to_atom_uri": "ostatus:in_reply_to_atom_uri",
+          "conversation": "ostatus:conversation",
+          "sensitive": "as:sensitive",
+          "Hashtag": "as:Hashtag",
+          "toot": "http://joinmastodon.org/ns#",
+          "Emoji": "toot:Emoji",
+          "focalPoint": {
+            "@container": "@list",
+            "@id": "toot:focalPoint"
+          }
+        }
+      ],
+      "id": "https://example.com/users/test_username/statuses/abcdef1234567890abcdef1234567890",
+      "type": "Note",
       "published": "2019-04-28T20:58:40Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
       "sensitive": false,
-      "summary": null,
-      "type": "Note"
+      "conversation": "tag:mastodon.social,2019-04-28:objectId=1754000:objectType=Conversation",
+      "content": "test_content"
     }
   }
 ]

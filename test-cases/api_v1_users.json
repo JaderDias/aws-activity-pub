@@ -3,6 +3,92 @@
     "request": {
       "version": "2.0",
       "routeKey": "$default",
+      "rawPath": "/api/v1/users",
+      "rawQueryString": "",
+      "cookies": [],
+      "headers": {},
+      "requestContext": {
+        "accountId": "123456789012",
+        "apiId": "api-id",
+        "authentication": {
+          "clientCert": {
+            "clientCertPem": "CERT_CONTENT",
+            "subjectDN": "www.example.com",
+            "issuerDN": "Example issuer",
+            "serialNumber": "a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1",
+            "validity": {
+              "notBefore": "May 28 12:30:02 2019 GMT",
+              "notAfter": "Aug  5 09:36:04 2021 GMT"
+            }
+          }
+        },
+        "authorizer": {
+          "jwt": {
+            "claims": {
+              "claim1": "value1",
+              "claim2": "value2"
+            },
+            "scopes": [
+              "scope1",
+              "scope2"
+            ]
+          }
+        },
+        "domainName": "id.execute-api.us-east-1.amazonaws.com",
+        "domainPrefix": "id",
+        "http": {
+          "method": "POST",
+          "path": "/api/v1/users",
+          "protocol": "HTTP/1.1",
+          "sourceIp": "192.0.2.1",
+          "userAgent": "agent"
+        },
+        "requestId": "id",
+        "routeKey": "$default",
+        "stage": "$default",
+        "time": "12/Mar/2020:19:03:58 +0000",
+        "timeEpoch": 1583348638390
+      },
+      "pathParameters": {
+        "parameter1": "value1"
+      },
+      "isBase64Encoded": false,
+      "stageVariables": {
+        "stageVariable1": "value1",
+        "stageVariable2": "value2"
+      }
+    },
+    "request_body_json": {
+      "@context": [
+        "https://www.w3.org/ns/activitystreams",
+        "https://w3id.org/security/v1"
+      ],
+      "id": "https://example.com/@test_username",
+      "type": "Person",
+      "following": "https://example.com/users/test_username/following",
+      "followers": "https://example.com/users/test_username/followers",
+      "inbox": "https://example.com/users/test_username/inbox",
+      "preferredUsername": "test_username",
+      "name": "Example user",
+      "summary": "Activity Pub server example.",
+      "url": "https://example.com",
+      "manuallyApprovesFollowers": false,
+      "discoverable": true,
+      "published": "2000-01-01T00:00:00Z"
+    },
+    "expected_response": {
+      "body": "abcdef1234567890abcdef1234567890",
+      "cookies": [],
+      "headers": {"content-type": "text/plain; charset=utf-8"},
+      "isBase64Encoded": false,
+      "multiValueHeaders": {},
+      "statusCode": 200
+    }
+  },
+  {
+    "request": {
+      "version": "2.0",
+      "routeKey": "$default",
       "rawPath": "/@test_username",
       "rawQueryString": "",
       "cookies": [],
