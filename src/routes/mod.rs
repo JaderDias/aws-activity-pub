@@ -14,11 +14,14 @@ pub fn routes() -> Vec<rocket::Route> {
 }
 
 #[rocket::get("/<path>")]
-fn handler(path: &str) -> Option<Json<serde_json::Value>> {
+fn handler(
+    path: &str,
+    settings: &rocket::State<crate::Settings>,
+) -> Option<Json<serde_json::Value>> {
     if path.len() < 2 || !path.starts_with('@') {
         return None;
     }
-    let domain = "example.com";
+    let domain = settings.domain_name.as_str();
     let username = &path[1..];
     let user_uri = format!("https://{domain}/users/{username}");
     Some(Json(serde_json::json!({

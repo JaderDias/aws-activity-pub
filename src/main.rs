@@ -4,6 +4,12 @@ mod activitypub;
 mod dynamodb;
 mod routes;
 
+pub struct Settings {
+    pub db_client: aws_sdk_dynamodb::Client,
+    pub domain_name: String,
+    pub table_name: String,
+}
+
 #[rocket::main]
 async fn main() -> Result<(), LambdaError> {
     tracing_subscriber::fmt()
@@ -16,8 +22,9 @@ async fn main() -> Result<(), LambdaError> {
 
     let rocket = rocket::build()
         .mount("/", routes::routes())
-        .manage(dynamodb::DbSettings {
-            client: dynamodb::get_client().await,
+        .manage(Settings {
+            db_client: dynamodb::get_client().await,
+            domain_name: std::env::var("CUSTOM_DOMAIN").unwrap(),
             table_name: std::env::var("DYNAMODB_TABLE").unwrap(),
         });
 

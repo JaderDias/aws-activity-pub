@@ -1,17 +1,16 @@
 use crate::activitypub::object::Object;
-use crate::dynamodb::DbSettings;
 use rocket::serde::json::Json;
 
 #[rocket::get("/users/<username>/statuses/<status_id>")]
 pub async fn handler(
     username: &str,
     status_id: &str,
-    db_settings: &rocket::State<DbSettings>,
+    settings: &rocket::State<crate::Settings>,
 ) -> Option<Json<Object>> {
     let partition = format!("users/{username}/statuses/{status_id}");
     let get_item_output = crate::dynamodb::get_item(
-        &db_settings.client,
-        &db_settings.table_name,
+        &settings.db_client,
+        &settings.table_name,
         partition.as_str(),
     )
     .await

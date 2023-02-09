@@ -8,11 +8,6 @@ pub const PARTITION_KEY_NAME: &str = "partition";
 pub type GetItemResult = Result<aws_sdk_dynamodb::output::GetItemOutput, SdkError<GetItemError>>;
 pub type PutItemResult = Result<aws_sdk_dynamodb::output::PutItemOutput, SdkError<PutItemError>>;
 
-pub struct DbSettings {
-    pub client: Client,
-    pub table_name: String,
-}
-
 /// # Errors
 ///
 /// Will return `Err` if a connection to the database is no properly established.
