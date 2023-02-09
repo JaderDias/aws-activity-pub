@@ -15,20 +15,12 @@ pub async fn handler(
     }
 
     let partition = crate::dynamodb::get_uuid();
-    let content = object.content.unwrap();
-    let published = object.published.unwrap();
-    let sensitive = object.sensitive.unwrap();
-    let fields = std::collections::HashMap::from([
-        ("type".to_owned(), AttributeValue::S(object_type.to_owned())),
-        ("content".to_owned(), AttributeValue::S(content)),
-        ("published".to_owned(), AttributeValue::S(published)),
-        ("sensitive".to_owned(), AttributeValue::Bool(sensitive)),
-    ]);
+    let values = serde_dynamo::to_item(object).unwrap();
     crate::dynamodb::put_item(
         &db_settings.client,
         &db_settings.table_name,
         partition.as_str(),
-        fields,
+        values,
     )
     .await
     .unwrap();

@@ -187,6 +187,7 @@
           }
         }
       ],
+      "attachment": [],
       "id": "https://example.com/users/test_username/statuses/abcdef1234567890abcdef1234567890",
       "type": "Note",
       "published": "2019-04-28T20:58:40Z",
@@ -195,7 +196,8 @@
       ],
       "sensitive": false,
       "conversation": "tag:mastodon.social,2019-04-28:objectId=1754000:objectType=Conversation",
-      "content": "test_content"
+      "content": "test_content",
+      "tag": []
     }
   }
 ]

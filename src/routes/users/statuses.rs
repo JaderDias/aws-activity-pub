@@ -17,7 +17,6 @@ pub async fn handler(
     .await
     .unwrap();
     let item = get_item_output.item.unwrap();
-    let mut object: Object = serde_dynamo::from_item(item).unwrap();
-    object.context = serde_json::from_str(object.context.as_str().unwrap()).unwrap();
+    let object: Object = serde_dynamo::from_item(item).unwrap();
     Some(Json(object))
 }

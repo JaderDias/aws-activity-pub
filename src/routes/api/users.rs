@@ -14,25 +14,12 @@ pub async fn handler(
     }
 
     let partition = crate::dynamodb::get_uuid();
-    let preferred_username = object.preferred_username.unwrap();
-    let name = object.name.unwrap();
-    let fields = std::collections::HashMap::from([
-        ("type".to_owned(), AttributeValue::S(object_type.to_owned())),
-        (
-            "@context".to_owned(),
-            AttributeValue::S(serde_json::json!(object.context).to_string()),
-        ),
-        (
-            "preferred_username".to_owned(),
-            AttributeValue::S(preferred_username),
-        ),
-        ("name".to_owned(), AttributeValue::S(name)),
-    ]);
+    let values = serde_dynamo::to_item(object).unwrap();
     crate::dynamodb::put_item(
         &db_settings.client,
         &db_settings.table_name,
         partition.as_str(),
-        fields,
+        values,
     )
     .await
     .unwrap();
