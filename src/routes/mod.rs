@@ -6,10 +6,11 @@ mod well_known;
 use rocket::serde::json::Json;
 
 pub fn routes() -> Vec<rocket::Route> {
-    rocket::routes![handler, nodeinfo::handler, well_known::webfinger,]
+    rocket::routes![handler, nodeinfo::handler]
         .into_iter()
         .chain(api::routes().into_iter())
         .chain(users::routes().into_iter())
+        .chain(well_known::routes().into_iter())
         .collect()
 }
 

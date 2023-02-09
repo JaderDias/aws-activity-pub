@@ -1,5 +1,4 @@
 use crate::activitypub::object::Object;
-use aws_sdk_dynamodb::model::AttributeValue;
 
 #[rocket::post("/api/v1/users", data = "<user>")]
 pub async fn handler(

@@ -1,6 +1,5 @@
 use crate::activitypub::object::Object;
 use crate::Settings;
-use aws_sdk_dynamodb::model::AttributeValue;
 
 #[rocket::post("/users/<_username>/inbox", data = "<wrapper>")]
 pub async fn handler(

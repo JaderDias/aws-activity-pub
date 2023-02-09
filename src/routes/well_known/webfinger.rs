@@ -1,7 +1,7 @@
 use rocket::serde::json::Json;
 
 #[rocket::get("/.well-known/webfinger?<resource>")]
-pub fn webfinger(resource: &str) -> Option<Json<serde_json::Value>> {
+pub fn handler(resource: &str) -> Option<Json<serde_json::Value>> {
     let split = resource.split(':').collect::<Vec<&str>>();
     if split[0] != "acct" || split.len() < 2 {
         return None;
