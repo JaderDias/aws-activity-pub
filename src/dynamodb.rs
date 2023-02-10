@@ -38,10 +38,8 @@ pub async fn put_item<S: std::hash::BuildHasher>(
     let mut table = client
         .put_item()
         .table_name(dynamodb_table_name)
+        .set_item(Some(values))
         .item(PARTITION_KEY_NAME, value);
-    for (key, value) in values {
-        table = table.item(key, value);
-    }
     table.send().await
 }
 
