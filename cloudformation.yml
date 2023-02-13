@@ -15,11 +15,15 @@ Resources:
     Properties:
       TableName: "MyTable"
       AttributeDefinitions:
-        - AttributeName: "partition"
-          AttributeType: "S"
+        - AttributeName: partition_key
+          AttributeType: S
+        - AttributeName: sort_key
+          AttributeType: S
       KeySchema:
-        - AttributeName: "partition"
-          KeyType: "HASH"
+        - AttributeName: partition_key
+          KeyType: HASH
+        - AttributeName: sort_key
+          KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1

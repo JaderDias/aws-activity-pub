@@ -91,7 +91,7 @@
       "tag": []
     },
     "expected_response": {
-      "body": "users/test_username/statuses/abcdef1234567890abcdef1234567890",
+      "body": "abcdef1234567890abcdef1234567890",
       "cookies": [],
       "headers": {"content-type": "text/plain; charset=utf-8"},
       "isBase64Encoded": false,

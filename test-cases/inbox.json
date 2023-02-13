@@ -81,7 +81,7 @@
           }
         }
       ],
-      "id": "https://mastodon.social/users/admin/statuses/101005808819117231",
+      "actor": "https://mastodon.social/users/example_follower",
       "type": "Follow",
       "summary": null,
       "inReplyTo": null,
@@ -97,7 +97,7 @@
       "tag": []
     },
     "expected_response": {
-      "body": "abcdef1234567890abcdef1234567890",
+      "body": "",
       "cookies": [],
       "headers": {"content-type": "text/plain; charset=utf-8"},
       "isBase64Encoded": false,

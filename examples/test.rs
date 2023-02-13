@@ -148,16 +148,27 @@ async fn create_table_if_not_exists(client: &aws_sdk_dynamodb::Client) {
         return;
     }
 
-    let a_name: String = rust_lambda::dynamodb::PARTITION_KEY_NAME.to_owned();
+    let partition_key = rust_lambda::dynamodb::PARTITION_KEY_NAME;
+    let sort_key = "sort_key";
 
-    let ad = AttributeDefinition::builder()
-        .attribute_name(&a_name)
+    let pad = AttributeDefinition::builder()
+        .attribute_name(partition_key)
         .attribute_type(ScalarAttributeType::S)
         .build();
 
-    let ks = KeySchemaElement::builder()
-        .attribute_name(&a_name)
+    let sad = AttributeDefinition::builder()
+        .attribute_name(sort_key)
+        .attribute_type(ScalarAttributeType::S)
+        .build();
+
+    let pks = KeySchemaElement::builder()
+        .attribute_name(partition_key)
         .key_type(KeyType::Hash)
+        .build();
+
+    let sks = KeySchemaElement::builder()
+        .attribute_name(sort_key)
+        .key_type(KeyType::Range)
         .build();
 
     let pt = ProvisionedThroughput::builder()
@@ -168,8 +179,10 @@ async fn create_table_if_not_exists(client: &aws_sdk_dynamodb::Client) {
     client
         .create_table()
         .table_name(TABLE_NAME)
-        .key_schema(ks)
-        .attribute_definitions(ad)
+        .key_schema(pks)
+        .key_schema(sks)
+        .attribute_definitions(pad)
+        .attribute_definitions(sad)
         .provisioned_throughput(pt)
         .send()
         .await

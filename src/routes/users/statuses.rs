@@ -7,11 +7,12 @@ pub async fn handler(
     status_id: &str,
     settings: &rocket::State<crate::Settings>,
 ) -> Option<Json<Object>> {
-    let partition = format!("users/{username}/statuses/{status_id}");
+    let partition = format!("users/{username}/statuses");
     let get_item_output = crate::dynamodb::get_item(
         &settings.db_client,
         &settings.table_name,
         partition.as_str(),
+        status_id,
     )
     .await
     .unwrap();

@@ -13,11 +13,12 @@ pub async fn handler(
 
     let status_id = crate::dynamodb::get_uuid();
     let username = "test_username"; // TODO: replace with authenticated username
-    let partition = format!("users/{username}/statuses/{status_id}");
+    let partition = format!("users/{username}/statuses");
     object.id = Some(format!(
-        "https://{}/{}",
+        "https://{}/{}/{}",
         settings.domain_name,
-        partition.as_str()
+        partition.as_str(),
+        status_id,
     ));
 
     let values = serde_dynamo::to_item(object).unwrap();
@@ -25,9 +26,10 @@ pub async fn handler(
         &settings.db_client,
         &settings.table_name,
         partition.as_str(),
+        status_id.as_str(),
         values,
     )
     .await
     .unwrap();
-    Some(partition.to_string())
+    Some(status_id.to_string())
 }

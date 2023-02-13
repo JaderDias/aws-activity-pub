@@ -3,7 +3,8 @@ use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::types::SdkError;
 use aws_sdk_dynamodb::Client;
 
-pub const PARTITION_KEY_NAME: &str = "partition";
+pub const PARTITION_KEY_NAME: &str = "partition_key";
+pub const SORT_KEY_NAME: &str = "sort_key";
 
 pub type GetItemResult = Result<aws_sdk_dynamodb::output::GetItemOutput, SdkError<GetItemError>>;
 pub type PutItemResult = Result<aws_sdk_dynamodb::output::PutItemOutput, SdkError<PutItemError>>;
@@ -15,12 +16,13 @@ pub async fn get_item(
     client: &Client,
     dynamodb_table_name: &str,
     partition: &str,
+    sort_value: &str,
 ) -> GetItemResult {
-    let value = AttributeValue::S(partition.to_owned());
     client
         .get_item()
         .table_name(dynamodb_table_name)
-        .key(PARTITION_KEY_NAME, value)
+        .key(PARTITION_KEY_NAME, AttributeValue::S(partition.to_owned()))
+        .key(SORT_KEY_NAME, AttributeValue::S(sort_value.to_owned()))
         .send()
         .await
 }
@@ -32,20 +34,24 @@ pub async fn put_item<S: std::hash::BuildHasher>(
     client: &Client,
     dynamodb_table_name: &str,
     partition: &str,
+    sort_value: &str,
     values: std::collections::HashMap<String, AttributeValue, S>,
 ) -> PutItemResult {
-    let value = AttributeValue::S(partition.to_owned());
     let mut table = client
         .put_item()
         .table_name(dynamodb_table_name)
-        .set_item(Some(values))
-        .item(PARTITION_KEY_NAME, value);
+        .item(PARTITION_KEY_NAME, AttributeValue::S(partition.to_owned()))
+        .item(SORT_KEY_NAME, AttributeValue::S(sort_value.to_owned()));
+    for (key, value) in values {
+        table = table.item(key, value);
+    }
+
     table.send().await
 }
 
 #[must_use]
 pub fn get_uuid() -> String {
-    let id = uuid::Uuid::new_v4();
+    let id = uuid::Uuid::now_v1(&[1, 2, 3, 4, 5, 6]);
     let mut buffer: [u8; 32] = [b'!'; 32];
     String::from(id.simple().encode_lower(&mut buffer))
 }

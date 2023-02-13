@@ -11,12 +11,13 @@ pub async fn handler(
         return None;
     }
 
-    let partition = crate::dynamodb::get_uuid();
+    let partition = format!("users/{}", object.preferred_username.as_ref().unwrap());
     let values = serde_dynamo::to_item(object).unwrap();
     crate::dynamodb::put_item(
         &settings.db_client,
         &settings.table_name,
         partition.as_str(),
+        "user",
         values,
     )
     .await

@@ -13,15 +13,16 @@ pub async fn handler(
         return None;
     }
 
-    let partition = crate::dynamodb::get_uuid();
-    let values = serde_dynamo::to_item(object).unwrap();
+    let partition = format!("users/{}/followers", object.actor.as_ref().unwrap());
+    let values = serde_dynamo::to_item(&object).unwrap();
     crate::dynamodb::put_item(
         &settings.db_client,
         &settings.table_name,
         partition.as_str(),
+        object.actor.as_ref().unwrap(),
         values,
     )
     .await
     .unwrap();
-    Some(partition.to_string())
+    Some(String::new())
 }
