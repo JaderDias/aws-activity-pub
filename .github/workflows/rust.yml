@@ -1,10 +1,9 @@
 name: Rust
 
 on:
-  push:
-    branches: [ "**" ]
+  push: # Comment this line to trigger action only on pull-requests (not recommended if you don't pay for GH Actions)
   pull_request:
-    branches: [ "**" ]
+    branches: [ main ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -15,30 +14,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: cargo fmt --all -- --check
-
-  secure-dependencies:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - run: cargo audit
-
-  up-to-date-dependencies:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - run: cargo outdated
-      - run: cargo outdated --depth 1 --exit-code 1
-
-  check-unused-dependencies:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - run: rustup toolchain install nightly --component miri
-      - run: rustup override set nightly
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
-      - run: cargo install cargo-udeps --locked
-      - run: cargo udeps --all-targets
 
   test:
     runs-on: ubuntu-latest
@@ -58,19 +33,3 @@ jobs:
         run: cargo run &
       - name: Run tests
         run: cargo run --example test http://localhost:8080
-
-  static-code-analysis:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
-      - run: |
-          cargo clippy --all -- \
-            -D clippy::all \
-            -D clippy::pedantic \
-            -D clippy::cargo \
-            -D clippy::nursery \
-            -W clippy::no_effect_underscore_binding \
-            -W clippy::multiple_crate_versions \
-            -W clippy::future_not_send

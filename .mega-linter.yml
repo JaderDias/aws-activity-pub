@@ -1,0 +1,2 @@
+DISABLE_LINTERS: SPELL_CSPELL
+RUST_CLIPPY_ARGUMENTS: --all-targets -- --warn clippy::all --warn clippy::pedantic

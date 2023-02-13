@@ -35,7 +35,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
       - name: Upload
         run: |
-          LAMBDA_CODE_OBJECT_KEY=`md5sum dist/amazonlinux2.zip | cut -d' ' -f1`
+          LAMBDA_CODE_OBJECT_KEY=$(md5sum dist/amazonlinux2.zip | cut -d' ' -f1)
           aws s3 cp dist/amazonlinux2.zip "s3://$S3_BUCKET/$LAMBDA_CODE_OBJECT_KEY"
       - name: Deploy to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1

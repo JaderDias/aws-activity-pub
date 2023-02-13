@@ -1,0 +1,36 @@
+[advisories]
+vulnerability = "deny"
+unmaintained = "deny"
+yanked = "deny"
+notice = "deny"
+
+[licenses]
+unlicensed = "deny"
+copyleft = "allow"
+allow = [
+    "MIT",
+    "Unicode-DFS-2016",
+    "Apache-2.0",
+    "Zlib",
+    "ISC",
+    "BSD-3-Clause",
+    "MPL-2.0",
+    "LicenseRef-ring",
+]
+default = "deny"
+
+[[licenses.clarify]]
+name = "ring"
+expression = "LicenseRef-ring"
+license-files = [
+    { path = "LICENSE", hash = 0xbd0eed23 },
+]
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+highlight = "all"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
