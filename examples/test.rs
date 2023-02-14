@@ -1,9 +1,6 @@
 use aws_lambda_events::apigw::ApiGatewayV2httpRequest;
 use aws_lambda_events::apigw::ApiGatewayV2httpResponse;
 use aws_lambda_events::encodings::Body;
-use aws_sdk_dynamodb::model::{
-    AttributeDefinition, KeySchemaElement, KeyType, ProvisionedThroughput, ScalarAttributeType,
-};
 use regex::Regex;
 use serde::Deserialize;
 use serde_json::{json, Value};
@@ -13,7 +10,6 @@ use std::fs::File;
 type TestCases = Vec<TestCase>;
 
 const DB_URL: &str = "http://localhost:8000";
-const TABLE_NAME: &str = "table_name";
 
 #[derive(Deserialize)]
 struct TestCase {
@@ -31,7 +27,7 @@ async fn main() {
     let test_target_url = &args[1];
     if test_target_url.contains("localhost") {
         let db_client = rust_lambda::dynamodb::get_local_client(DB_URL.to_owned()).await;
-        create_table_if_not_exists(&db_client).await;
+        rust_lambda::dynamodb::create_table_if_not_exists(&db_client).await;
     }
 
     let paths = std::fs::read_dir("./test-cases").unwrap();
@@ -138,60 +134,4 @@ fn assert_body_matches(test: &TestCase, actual_body_text: &String) {
 
     assert!(test.expected_response.body.is_none());
     assert!(test.expected_body_json.is_none());
-}
-
-async fn table_exists(client: &aws_sdk_dynamodb::Client, table: &str) -> bool {
-    let table_list = client.list_tables().send().await.unwrap();
-    println!("tables {table_list:?}");
-    table_list
-        .table_names()
-        .as_ref()
-        .unwrap()
-        .contains(&table.into())
-}
-
-async fn create_table_if_not_exists(client: &aws_sdk_dynamodb::Client) {
-    if table_exists(client, TABLE_NAME).await {
-        return;
-    }
-
-    let partition_key = rust_lambda::dynamodb::PARTITION_KEY_NAME;
-    let sort_key = "sort_key";
-
-    let pad = AttributeDefinition::builder()
-        .attribute_name(partition_key)
-        .attribute_type(ScalarAttributeType::S)
-        .build();
-
-    let sad = AttributeDefinition::builder()
-        .attribute_name(sort_key)
-        .attribute_type(ScalarAttributeType::S)
-        .build();
-
-    let pks = KeySchemaElement::builder()
-        .attribute_name(partition_key)
-        .key_type(KeyType::Hash)
-        .build();
-
-    let sks = KeySchemaElement::builder()
-        .attribute_name(sort_key)
-        .key_type(KeyType::Range)
-        .build();
-
-    let pt = ProvisionedThroughput::builder()
-        .read_capacity_units(10)
-        .write_capacity_units(5)
-        .build();
-
-    client
-        .create_table()
-        .table_name(TABLE_NAME)
-        .key_schema(pks)
-        .key_schema(sks)
-        .attribute_definitions(pad)
-        .attribute_definitions(sad)
-        .provisioned_throughput(pt)
-        .send()
-        .await
-        .unwrap();
 }

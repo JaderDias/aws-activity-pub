@@ -31,6 +31,8 @@ serde_json = { version = "1.0.93", features = ["raw_value"] }
 tracing = { version = "0.1", features = ["log"] }
 tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt"] }
 rand = "0.8.5"
+openssl = "0.10.45"
+serde_bytes = "0.11.9"
 # TODO: use activitystreams = "0.6.2"
 
 [dev-dependencies]
