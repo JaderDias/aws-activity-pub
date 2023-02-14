@@ -31,10 +31,7 @@
               "claim1": "value1",
               "claim2": "value2"
             },
-            "scopes": [
-              "scope1",
-              "scope2"
-            ]
+            "scopes": ["scope1", "scope2"]
           }
         },
         "domainName": "id.execute-api.us-east-1.amazonaws.com",
@@ -74,11 +71,13 @@
     },
     "expected_body_json": {
       "subject": "acct:test_username@example.com",
-      "links": [{
-        "rel": "self",
-        "type": "application/activity+json",
-        "href": "https://example.com/@test_username"
-      }]
+      "links": [
+        {
+          "rel": "self",
+          "type": "application/activity+json",
+          "href": "https://example.com/@test_username"
+        }
+      ]
     }
   }
 ]

@@ -28,10 +28,7 @@
               "claim1": "value1",
               "claim2": "value2"
             },
-            "scopes": [
-              "scope1",
-              "scope2"
-            ]
+            "scopes": ["scope1", "scope2"]
           }
         },
         "domainName": "id.execute-api.us-east-1.amazonaws.com",
@@ -80,9 +77,7 @@
       "summary": null,
       "inReplyTo": null,
       "published": "2019-04-28T20:58:40Z",
-      "to": [
-        "https://www.w3.org/ns/activitystreams#Public"
-      ],
+      "to": ["https://www.w3.org/ns/activitystreams#Public"],
       "sensitive": false,
       "in_reply_to_atom_uri": null,
       "conversation": "tag:mastodon.social,2019-04-28:objectId=1754000:objectType=Conversation",
@@ -93,7 +88,9 @@
     "expected_response": {
       "body": "abcdef1234567890abcdef1234567890",
       "cookies": [],
-      "headers": {"content-type": "text/plain; charset=utf-8"},
+      "headers": {
+        "content-type": "text/plain; charset=utf-8"
+      },
       "isBase64Encoded": false,
       "multiValueHeaders": {},
       "statusCode": 200
@@ -128,10 +125,7 @@
               "claim1": "value1",
               "claim2": "value2"
             },
-            "scopes": [
-              "scope1",
-              "scope2"
-            ]
+            "scopes": ["scope1", "scope2"]
           }
         },
         "domainName": "id.execute-api.us-east-1.amazonaws.com",
@@ -191,9 +185,7 @@
       "id": "https://example.com/users/test_username/statuses/abcdef1234567890abcdef1234567890",
       "type": "Note",
       "published": "2019-04-28T20:58:40Z",
-      "to": [
-        "https://www.w3.org/ns/activitystreams#Public"
-      ],
+      "to": ["https://www.w3.org/ns/activitystreams#Public"],
       "sensitive": false,
       "conversation": "tag:mastodon.social,2019-04-28:objectId=1754000:objectType=Conversation",
       "content": "test_content",

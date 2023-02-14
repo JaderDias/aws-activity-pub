@@ -4,12 +4,11 @@ on:
   # Trigger mega-linter at every push. Action will also be visible from Pull Requests to main
   push: # Comment this line to trigger action only on pull-requests (not recommended if you don't pay for GH Actions)
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 env: # Comment env block if you do not want to apply fixes
   # Apply linter fixes configuration
-  APPLY_FIXES: all # When active, APPLY_FIXES must also be defined as environment variable (in github/workflows/mega-linter.yml or other CI tool)
-  APPLY_FIXES_EVENT: pull_request # Decide which event triggers application of fixes in a commit or a PR (pull_request, push, all)
+  APPLY_FIXES_EVENT: all # Decide which event triggers application of fixes in a commit or a PR (pull_request, push, all)
   APPLY_FIXES_MODE: commit # If APPLY_FIXES is used, defines if the fixes are directly committed (commit) or posted in a PR (pull_request)
 
 concurrency:
@@ -17,8 +16,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: MegaLinter
+  cargo-clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+      - run: |
+          cargo clippy --all -- \
+            -D clippy::all \
+            -D clippy::pedantic \
+            -D clippy::cargo \
+            -D clippy::nursery \
+            -W clippy::no_effect_underscore_binding \
+            -W clippy::multiple_crate_versions \
+            -W clippy::future_not_send
+
+  mega-linter:
     runs-on: ubuntu-latest
     steps:
       # Git Checkout

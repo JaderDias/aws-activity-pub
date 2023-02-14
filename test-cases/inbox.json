@@ -9,7 +9,9 @@
       "headers": {
         "Content-Type": ["application/activity+json"],
         "Digest": ["SHA-256=8we9H5V74oUdQr8R5vay/dyQEi0I2up5wwI7+9e8T70="],
-        "Signature": ["keyId=\"https://mastodon.social/users/jgarr#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date digest content-type\",signature=\"hx1jRjCGyBfnI/Cak8ujAlfau5G1Ph+9niCFyRdm5J7b9wQGxbk+SbUhG0kV2L7W0h54JBc6htQhR8V+fFqxX+UiLXe1l7jRoBZOYSKq7UKqtogJwLLvS89DeDgWLWDPqbZ6W1FzU9MLUqJLTqFNnhgtOH+m+YhKEfjE35+65d5vmPUNjR8TRDAjXjMugMi3NmeaeA789NV3gs7GaGyfI734kGwvPDHcLp9MyDHqBivdDqmPAzXRP4gyrjqXHQRpxCdX7iinA/aqgnsNf2CoY/uH7M+z+zPWohlTvVDU2L+xeT2N7pXFc6WxREPV4ojZ+VxMzmIuzHkxW8TVpVNwMw==\""],
+        "Signature": [
+          "keyId=\"https://mastodon.social/users/jgarr#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date digest content-type\",signature=\"hx1jRjCGyBfnI/Cak8ujAlfau5G1Ph+9niCFyRdm5J7b9wQGxbk+SbUhG0kV2L7W0h54JBc6htQhR8V+fFqxX+UiLXe1l7jRoBZOYSKq7UKqtogJwLLvS89DeDgWLWDPqbZ6W1FzU9MLUqJLTqFNnhgtOH+m+YhKEfjE35+65d5vmPUNjR8TRDAjXjMugMi3NmeaeA789NV3gs7GaGyfI734kGwvPDHcLp9MyDHqBivdDqmPAzXRP4gyrjqXHQRpxCdX7iinA/aqgnsNf2CoY/uH7M+z+zPWohlTvVDU2L+xeT2N7pXFc6WxREPV4ojZ+VxMzmIuzHkxW8TVpVNwMw==\""
+        ],
         "Accept-Encoding": ["gzip"]
       },
       "requestContext": {
@@ -33,10 +35,7 @@
               "claim1": "value1",
               "claim2": "value2"
             },
-            "scopes": [
-              "scope1",
-              "scope2"
-            ]
+            "scopes": ["scope1", "scope2"]
           }
         },
         "domainName": "id.execute-api.us-east-1.amazonaws.com",
@@ -86,9 +85,7 @@
       "summary": null,
       "inReplyTo": null,
       "published": "2019-04-28T20:58:40Z",
-      "to": [
-        "https://www.w3.org/ns/activitystreams#Public"
-      ],
+      "to": ["https://www.w3.org/ns/activitystreams#Public"],
       "sensitive": false,
       "in_reply_to_atom_uri": null,
       "conversation": "tag:mastodon.social,2019-04-28:objectId=1754000:objectType=Conversation",
@@ -99,7 +96,9 @@
     "expected_response": {
       "body": "",
       "cookies": [],
-      "headers": {"content-type": "text/plain; charset=utf-8"},
+      "headers": {
+        "content-type": "text/plain; charset=utf-8"
+      },
       "isBase64Encoded": false,
       "multiValueHeaders": {},
       "statusCode": 200

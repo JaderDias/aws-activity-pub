@@ -1,5 +1,5 @@
 ---
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Description: Lambda function with dynamodb table.
 Parameters:
   LambdaCodeBucket:
@@ -41,7 +41,7 @@ Resources:
             Action:
               - "sts:AssumeRole"
       ManagedPolicyArns:
-        - 'arn:aws:iam::aws:policy/AWSLambdaExecute'
+        - "arn:aws:iam::aws:policy/AWSLambdaExecute"
       Policies:
         - PolicyName: "dynamodb-access"
           PolicyDocument:

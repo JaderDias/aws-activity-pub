@@ -9,10 +9,11 @@
       "headers": {
         "Accept": ["application/activity+json, application/ld+json"],
         "Accept-Encoding": ["gzip"],
-        "Signature": ["keyId=\"https://mastodon.social/actor#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date accept\",signature=\"wUAArkeEJh4yXkstcC8IgrnSlsRcledOUjo63nqRZrXI0RtoKo369/+j5K7bEFDoJ8psuCnnY9cW+KDgog7Gg2mQjAb1cZa2ffeqFY3PPXqpO+5entfRkAEyYBsrd3CiVn5wz0LEwbOs3XHe1w2wVgoIbSunCE/DN0Ra5tQLriITzBA5YzI26QuQSJzb5sMmMjiTiVocF/i0djqXfLmnjvhyaxsS0i0O8LfPHVPzSSGFHaqzawIL28MZu8J42ha//baJmPozQQquFHKs7lcDcSSGtrvMGjfJYoFy4cMSsSqLH / 8 VRzNR0nXs47ydDwQ9XRpT55LPWL7uRQoeYBAkwA == \""]
+        "Signature": [
+          "keyId=\"https://mastodon.social/actor#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date accept\",signature=\"wUAArkeEJh4yXkstcC8IgrnSlsRcledOUjo63nqRZrXI0RtoKo369/+j5K7bEFDoJ8psuCnnY9cW+KDgog7Gg2mQjAb1cZa2ffeqFY3PPXqpO+5entfRkAEyYBsrd3CiVn5wz0LEwbOs3XHe1w2wVgoIbSunCE/DN0Ra5tQLriITzBA5YzI26QuQSJzb5sMmMjiTiVocF/i0djqXfLmnjvhyaxsS0i0O8LfPHVPzSSGFHaqzawIL28MZu8J42ha//baJmPozQQquFHKs7lcDcSSGtrvMGjfJYoFy4cMSsSqLH / 8 VRzNR0nXs47ydDwQ9XRpT55LPWL7uRQoeYBAkwA == \""
+        ]
       },
-      "queryStringParameters": {
-      },
+      "queryStringParameters": {},
       "requestContext": {
         "accountId": "123456789012",
         "apiId": "api-id",
@@ -34,10 +35,7 @@
               "claim1": "value1",
               "claim2": "value2"
             },
-            "scopes": [
-              "scope1",
-              "scope2"
-            ]
+            "scopes": ["scope1", "scope2"]
           }
         },
         "domainName": "id.execute-api.us-east-1.amazonaws.com",
@@ -55,8 +53,7 @@
         "time": "12/Mar/2020:19:03:58 +0000",
         "timeEpoch": 1583348638390
       },
-      "pathParameters": {
-      },
+      "pathParameters": {},
       "isBase64Encoded": false,
       "stageVariables": {
         "stageVariable1": "value1",
