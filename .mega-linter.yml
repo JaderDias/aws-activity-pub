@@ -5,5 +5,6 @@ EXCLUDED_DIRECTORIES:
   - megalinter-reports
   - target
 DISABLE_LINTERS:
+  - REPOSITORY_TRIVY
   - RUST_CLIPPY
   - SPELL_CSPELL
