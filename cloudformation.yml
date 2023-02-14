@@ -12,6 +12,8 @@ Resources:
   # DynamoDB Table
   DynamoDBTable:
     Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       TableName: "MyTable"
       AttributeDefinitions:
