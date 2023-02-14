@@ -14,7 +14,6 @@ type TestCases = Vec<TestCase>;
 
 const DB_URL: &str = "http://localhost:8000";
 const TABLE_NAME: &str = "table_name";
-const UUID_PLACEHOLDER: &str = "abcdef1234567890abcdef1234567890";
 
 #[derive(Deserialize)]
 struct TestCase {
@@ -22,6 +21,8 @@ struct TestCase {
     request_body_json: Option<Value>,
     expected_response: ApiGatewayV2httpResponse,
     expected_body_json: Option<Value>,
+    regex: Option<String>,
+    placeholder: Option<String>,
 }
 
 #[tokio::main]
@@ -43,7 +44,7 @@ async fn main() {
         let file = File::open(path_value).unwrap();
         let mut file_deserializer = serde_json::Deserializer::from_reader(file);
         let test_cases = TestCases::deserialize(&mut file_deserializer).unwrap();
-        let mut last_uuid = String::new();
+        let mut last_regex_capture = String::new();
         for mut test in test_cases {
             match &test.request_body_json {
                 Some(body) => {
@@ -57,19 +58,23 @@ async fn main() {
             let mut url = format!("{test_target_url}{}", &request.raw_path.as_ref().unwrap());
             if &request.request_context.http.method == "POST" {
                 println!("{} {}", &request.request_context.http.method, &url);
-                let request_body = json!(&test.request_body_json);
-                let body = request_body
-                    .to_string()
-                    .replace(UUID_PLACEHOLDER, last_uuid.as_str());
+                let mut request_body = json!(&test.request_body_json).to_string();
+                if let Some(placeholder) = &test.placeholder {
+                    request_body = request_body
+                        .to_string()
+                        .replace(placeholder, last_regex_capture.as_str());
+                }
                 actual_response = http_client
                     .post(url)
-                    .body(body)
+                    .body(request_body)
                     .headers(request.headers.to_owned())
                     .send()
                     .await
                     .unwrap();
             } else {
-                url = url.replace(UUID_PLACEHOLDER, last_uuid.as_str());
+                if let Some(placeholder) = &test.placeholder {
+                    url = url.replace(placeholder, last_regex_capture.as_str());
+                }
                 let query_string = &request.raw_query_string;
                 if query_string.is_some() {
                     url = format!("{}?{}", url, query_string.as_ref().unwrap());
@@ -87,19 +92,21 @@ async fn main() {
             );
 
             let actual_body_text = actual_response.text().await.unwrap();
-            last_uuid = assert_body_matches_with_replacement(&test, &actual_body_text);
+            last_regex_capture = assert_body_matches_with_replacement(&test, &actual_body_text);
         }
     }
 }
 
 fn assert_body_matches_with_replacement(test: &TestCase, actual_body_text: &String) -> String {
-    let uuid_re = Regex::new(r"[a-f0-9]{32}").unwrap();
-    if let Some(capture) = uuid_re.captures_iter(actual_body_text.as_str()).next() {
-        let replaced_text = uuid_re
-            .replace_all(actual_body_text, UUID_PLACEHOLDER)
-            .to_string();
-        assert_body_matches(test, &replaced_text);
-        return capture[0].to_owned();
+    if let Some(regex) = &test.regex {
+        let compiled_regex = Regex::new(regex).unwrap();
+        if let Some(r#match) = compiled_regex.find(actual_body_text) {
+            let replaced_text = compiled_regex
+                .replace_all(actual_body_text, test.placeholder.as_ref().unwrap())
+                .to_string();
+            assert_body_matches(test, &replaced_text);
+            return r#match.as_str().to_owned();
+        }
     }
 
     assert_body_matches(test, actual_body_text);

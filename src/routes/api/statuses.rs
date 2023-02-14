@@ -11,14 +11,14 @@ pub async fn handler(
         return None;
     }
 
-    let status_id = crate::dynamodb::get_uuid();
+    let status_id = crate::snowflake::get_id(settings.node_id).to_string();
     let username = "test_username"; // TODO: replace with authenticated username
     let partition = format!("users/{username}/statuses");
     object.id = Some(format!(
         "https://{}/{}/{}",
         settings.domain_name,
         partition.as_str(),
-        status_id,
+        status_id.as_str(),
     ));
 
     let values = serde_dynamo::to_item(object).unwrap();

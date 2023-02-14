@@ -49,13 +49,6 @@ pub async fn put_item<S: std::hash::BuildHasher>(
     table.send().await
 }
 
-#[must_use]
-pub fn get_uuid() -> String {
-    let id = uuid::Uuid::now_v1(&[1, 2, 3, 4, 5, 6]);
-    let mut buffer: [u8; 32] = [b'!'; 32];
-    String::from(id.simple().encode_lower(&mut buffer))
-}
-
 pub async fn get_client() -> Client {
     if let Ok(url) = std::env::var("LOCAL_DYNAMODB_URL") {
         println!("Using local dynamodb at {url}");

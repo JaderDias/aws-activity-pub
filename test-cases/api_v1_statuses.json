@@ -86,7 +86,7 @@
       "tag": []
     },
     "expected_response": {
-      "body": "abcdef1234567890abcdef1234567890",
+      "body": "1234567890123456789",
       "cookies": [],
       "headers": {
         "content-type": "text/plain; charset=utf-8"
@@ -94,13 +94,15 @@
       "isBase64Encoded": false,
       "multiValueHeaders": {},
       "statusCode": 200
-    }
+    },
+    "regex": "[0-9]{19}",
+    "placeholder": "1234567890123456789"
   },
   {
     "request": {
       "version": "2.0",
       "routeKey": "$default",
-      "rawPath": "/users/test_username/statuses/abcdef1234567890abcdef1234567890",
+      "rawPath": "/users/test_username/statuses/1234567890123456789",
       "rawQueryString": "",
       "cookies": [],
       "headers": {},
@@ -132,7 +134,7 @@
         "domainPrefix": "id",
         "http": {
           "method": "GET",
-          "path": "/users/test_username/statuses/abcdef1234567890abcdef1234567890",
+          "path": "/users/test_username/statuses/1234567890123456789",
           "protocol": "HTTP/1.1",
           "sourceIp": "192.0.2.1",
           "userAgent": "agent"
@@ -182,7 +184,7 @@
         }
       ],
       "attachment": [],
-      "id": "https://example.com/users/test_username/statuses/abcdef1234567890abcdef1234567890",
+      "id": "https://example.com/users/test_username/statuses/1234567890123456789",
       "type": "Note",
       "published": "2019-04-28T20:58:40Z",
       "to": ["https://www.w3.org/ns/activitystreams#Public"],
@@ -190,6 +192,8 @@
       "conversation": "tag:mastodon.social,2019-04-28:objectId=1754000:objectType=Conversation",
       "content": "test_content",
       "tag": []
-    }
+    },
+    "regex": "[0-9]{19}",
+    "placeholder": "1234567890123456789"
   }
 ]
