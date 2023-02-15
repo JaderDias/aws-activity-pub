@@ -26,7 +26,7 @@ pub async fn handler(
     .await
     .unwrap();
     if let Some(item) = get_item_output.item {
-        let user: User = serde_dynamo::from_item(item).unwrap();
+        let _: User = serde_dynamo::from_item(item).unwrap();
         return Some(Json(serde_json::json!({
           "subject": resource,
           "links": [{

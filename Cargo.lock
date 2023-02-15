@@ -841,12 +841,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "flaken"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d99750797d02869221d2e18496b135622206ec92125f9fa87f2b8b7a938c59cb"
-
-[[package]]
 name = "flate2"
 version = "1.0.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1930,7 +1924,6 @@ dependencies = [
  "aws-config",
  "aws-sdk-dynamodb",
  "aws_lambda_events",
- "flaken",
  "lambda-web",
  "openssl",
  "rand",

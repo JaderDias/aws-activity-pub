@@ -1,11 +1,10 @@
 use lambda_web::{is_running_on_lambda, launch_rocket_on_lambda, LambdaError};
-use rand::prelude::*;
 
 mod activitypub;
 mod dynamodb;
+mod faas_snowflake_id;
 mod model;
 mod routes;
-mod snowflake;
 
 pub struct Settings {
     pub db_client: aws_sdk_dynamodb::Client,
@@ -24,18 +23,12 @@ async fn main() -> Result<(), LambdaError> {
         .without_time()
         .init();
 
-    let node_id: u64;
-    {
-        let mut rng = rand::thread_rng();
-        node_id = rng.gen_range(0..1024);
-    }
-
     let rocket = rocket::build()
         .mount("/", routes::routes())
         .manage(Settings {
             db_client: dynamodb::get_client().await,
             domain_name: std::env::var("CUSTOM_DOMAIN").unwrap(),
-            node_id,
+            node_id: faas_snowflake_id::get_node_id(),
             table_name: std::env::var("DYNAMODB_TABLE").unwrap(),
         });
 

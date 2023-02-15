@@ -11,7 +11,7 @@ pub async fn handler(
         return None;
     }
 
-    let status_id = crate::snowflake::get_id(settings.node_id).to_string();
+    let status_id = crate::faas_snowflake_id::get_id(settings.node_id).to_string();
     let username = "test_username"; // TODO: replace with authenticated username
     let partition = format!("users/{username}/statuses");
     object.id = Some(format!(
