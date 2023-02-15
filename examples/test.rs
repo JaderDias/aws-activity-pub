@@ -127,11 +127,8 @@ fn assert_body_matches(test: &TestCase, actual_body_text: &String) {
                 return;
             }
             None => {
-                assert!(false);
+                assert_eq!(actual_body_text, &String::new());
             }
         },
     }
-
-    assert!(test.expected_response.body.is_none());
-    assert!(test.expected_body_json.is_none());
 }

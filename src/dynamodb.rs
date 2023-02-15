@@ -83,30 +83,30 @@ async fn table_exists(client: &aws_sdk_dynamodb::Client, table: &str) -> bool {
         .contains(&table.into())
 }
 
+/// # Panics
+///
+/// Will panic if can´t create the table.
 pub async fn create_table_if_not_exists(client: &aws_sdk_dynamodb::Client) {
     if table_exists(client, DEFAULT_TABLE_NAME).await {
         return;
     }
 
-    let partition_key = PARTITION_KEY_NAME;
-    let sort_key = SORT_KEY_NAME;
-
-    let pad = AttributeDefinition::builder()
-        .attribute_name(partition_key)
+    let partition_attribute_definition = AttributeDefinition::builder()
+        .attribute_name(PARTITION_KEY_NAME)
         .attribute_type(ScalarAttributeType::S)
         .build();
 
-    let sad = AttributeDefinition::builder()
+    let sort_attribute_definition = AttributeDefinition::builder()
         .attribute_name(SORT_KEY_NAME)
         .attribute_type(ScalarAttributeType::S)
         .build();
 
-    let pks = KeySchemaElement::builder()
-        .attribute_name(partition_key)
+    let partition_schema_element = KeySchemaElement::builder()
+        .attribute_name(PARTITION_KEY_NAME)
         .key_type(KeyType::Hash)
         .build();
 
-    let sks = KeySchemaElement::builder()
+    let sort_schema_element = KeySchemaElement::builder()
         .attribute_name(SORT_KEY_NAME)
         .key_type(KeyType::Range)
         .build();
@@ -119,10 +119,10 @@ pub async fn create_table_if_not_exists(client: &aws_sdk_dynamodb::Client) {
     client
         .create_table()
         .table_name(DEFAULT_TABLE_NAME)
-        .key_schema(pks)
-        .key_schema(sks)
-        .attribute_definitions(pad)
-        .attribute_definitions(sad)
+        .key_schema(partition_schema_element)
+        .key_schema(sort_schema_element)
+        .attribute_definitions(partition_attribute_definition)
+        .attribute_definitions(sort_attribute_definition)
         .provisioned_throughput(pt)
         .send()
         .await

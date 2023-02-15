@@ -1,0 +1,37 @@
+.PHONY: run
+run:
+	docker-compose -f docker/test/docker-compose.yml kill
+	docker-compose -f docker/test/docker-compose.yml up --build --detach
+	cargo build --all-targets
+	CUSTOM_DOMAIN=example.com \
+		DYNAMODB_TABLE=table_name \
+		LOCAL_DYNAMODB_URL=http://localhost:8000 \
+		REGION=eu-west-1 \
+		cargo run
+
+.PHONY: test
+test:
+	cargo run --example test http://localhost:8080
+	cargo fmt --all -- --check
+	cargo clippy --all -- \
+		-D "clippy::all" \
+		-D clippy::pedantic \
+		-D clippy::cargo \
+		-D clippy::nursery \
+		-W clippy::no_effect_underscore_binding \
+		-W clippy::multiple_crate_versions \
+		-W clippy::future_not_send
+
+.PHONY: create_user
+create_user:
+	LOCAL_DYNAMODB_URL=http://localhost:8000 cargo run --example create_user
+
+.PHONY: scan_table
+scan_table:
+	@if ! grep -F '[profile localhost]' <~/.aws/config; then \
+		echo "[profile localhost]\nregion = us-east-1" >>~/.aws/config; \
+	fi
+	@if ! grep -F '[localhost]' <~/.aws/credentials; then \
+		echo "[localhost]\naws_access_key_id = ANY_ACCESS_KEY_WILL_DO\naws_secret_access_key = ANY_SECRET_KEY_WILL_DO" >>~/.aws/credentials; \
+	fi
+	aws dynamodb scan --table-name table_name --endpoint-url http://localhost:8000 --profile localhost

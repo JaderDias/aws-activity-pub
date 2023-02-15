@@ -3,6 +3,7 @@ use rand::prelude::*;
 
 mod activitypub;
 mod dynamodb;
+mod model;
 mod routes;
 mod snowflake;
 

@@ -35,11 +35,11 @@ brew install filosottile/musl-cross/musl-cross --with-x86_64
 ## Run tests locally
 
 ```bash
-./run.sh
+make run
 ```
 
 on another terminal
 
 ```bash
-./run_test.sh
+make test
 ```
