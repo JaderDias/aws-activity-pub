@@ -1,4 +1,4 @@
-.PHONY: run
+.PHONY: all clean run test create_user scan_table
 run:
 	docker-compose -f docker/test/docker-compose.yml kill
 	docker-compose -f docker/test/docker-compose.yml up --build --detach
@@ -9,7 +9,6 @@ run:
 		REGION=eu-west-1 \
 		cargo run
 
-.PHONY: test
 test:
 	cargo run --example test http://localhost:8080
 	cargo fmt --all -- --check
@@ -22,11 +21,9 @@ test:
 		-W clippy::multiple_crate_versions \
 		-W clippy::future_not_send
 
-.PHONY: create_user
 create_user:
 	LOCAL_DYNAMODB_URL=http://localhost:8000 cargo run --example create_user
 
-.PHONY: scan_table
 scan_table:
 	@if ! grep -F '[profile localhost]' <~/.aws/config; then \
 		echo "[profile localhost]\nregion = us-east-1" >>~/.aws/config; \
