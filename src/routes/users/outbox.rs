@@ -1,5 +1,5 @@
 use crate::activitypub::object::Object;
-use crate::Settings;
+use crate::settings::Settings;
 use aws_sdk_dynamodb::model::AttributeValue;
 use rocket::serde::json::Json;
 

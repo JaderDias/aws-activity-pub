@@ -7,7 +7,7 @@ async fn main() {
     let keypair = Rsa::generate(KEYSIZE).unwrap();
     let preferred_username = "test_username";
     let partition = format!("users/{}", preferred_username);
-    let values = serde_dynamo::to_item(rust_lambda::model::User {
+    let values = serde_dynamo::to_item(rust_lambda::model::user::User {
         preferred_username: Some(preferred_username.to_owned()),
         private_key: Some(keypair.private_key_to_der().unwrap()),
         public_key: Some(keypair.public_key_to_der().unwrap()),

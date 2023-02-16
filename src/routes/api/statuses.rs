@@ -3,7 +3,7 @@ use crate::activitypub::object::Object;
 #[rocket::post("/api/v1/statuses", data = "<status>")]
 pub async fn handler(
     status: rocket::serde::json::Json<Object>,
-    settings: &rocket::State<crate::Settings>,
+    settings: &rocket::State<crate::settings::Settings>,
 ) -> Option<String> {
     let mut object = status.into_inner();
     let object_type = object.r#type.as_str();

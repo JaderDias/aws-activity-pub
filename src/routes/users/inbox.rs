@@ -1,28 +1,54 @@
-use crate::activitypub::object::Object;
-use crate::Settings;
+use crate::activitypub::digest::Digest;
+use crate::activitypub::sign::{self, SignatureValidity::Valid};
+use crate::settings::Settings;
+use core::fmt::Error;
+use rocket::{
+    request::{FromRequest, Outcome, Request},
+    response::status::BadRequest,
+};
 
-#[rocket::post("/users/<_username>/inbox", data = "<wrapper>")]
+pub struct CustomHeaders<'a>(pub rocket::http::HeaderMap<'a>);
+
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for CustomHeaders<'r> {
+    type Error = Error;
+
+    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+        let headers = request.headers().clone();
+        Outcome::Success(Self(headers))
+    }
+}
+
+#[rocket::post("/users/<username>/inbox", data = "<data>")]
 pub async fn handler(
-    _username: &str,
-    wrapper: rocket::serde::json::Json<Object>,
+    username: &str,
+    headers: CustomHeaders<'_>,
+    data: rocket::serde::json::Json<serde_json::Value>,
     settings: &rocket::State<Settings>,
-) -> Option<String> {
-    let object = wrapper.into_inner();
-    let object_type = object.r#type.as_str();
-    if object_type != "Follow" {
-        return None;
+) -> Result<String, BadRequest<&'static str>> {
+    let activity = data.into_inner();
+    let actor_id = activity["actor"]
+        .as_str()
+        .or_else(|| activity["actor"]["id"].as_str())
+        .ok_or(BadRequest(Some("Missing actor id for activity")))?;
+    if let Some(actor) = crate::model::user::get(actor_id, settings).await {
+        let digest_header = headers.0.get_one("digest").unwrap();
+        if Valid == sign::verify_http_headers(&actor, &headers.0, &Digest(digest_header.to_owned()))
+        {
+            let partition = format!("users/{username}/followers");
+            let values = serde_dynamo::to_item(&activity).unwrap();
+            crate::dynamodb::put_item(
+                &settings.db_client,
+                &settings.table_name,
+                partition.as_str(),
+                actor_id,
+                values,
+            )
+            .await
+            .unwrap();
+            return Ok(String::new());
+        }
     }
 
-    let partition = format!("users/{}/followers", object.actor.as_ref().unwrap());
-    let values = serde_dynamo::to_item(&object).unwrap();
-    crate::dynamodb::put_item(
-        &settings.db_client,
-        &settings.table_name,
-        partition.as_str(),
-        object.actor.as_ref().unwrap(),
-        values,
-    )
-    .await
-    .unwrap();
-    Some(String::new())
+    Err(BadRequest(Some("Missing actor")))
 }

@@ -17,7 +17,7 @@ pub fn routes() -> Vec<rocket::Route> {
 #[rocket::get("/<path>")]
 fn handler(
     path: &str,
-    settings: &rocket::State<crate::Settings>,
+    settings: &rocket::State<crate::settings::Settings>,
 ) -> Option<Json<serde_json::Value>> {
     if path.len() < 2 || !path.starts_with('@') {
         return None;

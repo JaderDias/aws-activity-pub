@@ -3,7 +3,7 @@ use rocket::serde::json::Json;
 #[rocket::get("/users/<username>/followers")]
 pub fn handler(
     username: &str,
-    settings: &rocket::State<crate::Settings>,
+    settings: &rocket::State<crate::settings::Settings>,
 ) -> Json<serde_json::Value> {
     let domain = settings.domain_name.as_str();
     let user_uri = format!("https://{domain}/users/{username}");

@@ -5,7 +5,7 @@ use rocket::serde::json::Json;
 pub async fn handler(
     username: &str,
     status_id: &str,
-    settings: &rocket::State<crate::Settings>,
+    settings: &rocket::State<crate::settings::Settings>,
 ) -> Option<Json<Object>> {
     let partition = format!("users/{username}/statuses");
     let get_item_output = crate::dynamodb::get_item(
