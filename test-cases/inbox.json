@@ -1,6 +1,6 @@
 [
   {
-    "name": "federation sends an unsigned follow request",
+    "name": "federation sends an unsigned follow request for an unknown actor",
     "request": {
       "version": "2.0",
       "routeKey": "$default",
@@ -95,7 +95,7 @@
       "tag": []
     },
     "expected_response": {
-      "body": "",
+      "body": "Missing actor",
       "cookies": [],
       "headers": {
         "content-type": "text/plain; charset=utf-8"

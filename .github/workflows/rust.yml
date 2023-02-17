@@ -25,6 +25,8 @@ jobs:
         run: docker-compose -f docker/test/docker-compose.yml up --build -d
       - run: cargo build --all-targets
       - run: cargo test
+        env:
+          LOCAL_DYNAMODB_URL: http://localhost:8000
       - name: Run
         env:
           CUSTOM_DOMAIN: example.com

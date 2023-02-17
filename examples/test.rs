@@ -1,6 +1,8 @@
 use aws_lambda_events::apigw::ApiGatewayV2httpRequest;
 use aws_lambda_events::apigw::ApiGatewayV2httpResponse;
 use aws_lambda_events::encodings::Body;
+use openssl::pkey::Private;
+use openssl::rsa::Rsa;
 use regex::Regex;
 use serde::Deserialize;
 use serde_json::{json, Value};
@@ -25,10 +27,15 @@ struct TestCase {
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = env::args().collect();
+    if args.len() != 2 {
+        eprintln!("Usage: {} http://localhost:8000", args[0]);
+        return;
+    }
+
     let test_target_url = &args[1];
+    let key: openssl::rsa::Rsa<Private>;
     if test_target_url.contains("localhost") {
-        let db_client = rust_lambda::dynamodb::get_local_client(DB_URL.to_owned()).await;
-        rust_lambda::dynamodb::create_table_if_not_exists(&db_client).await;
+        key = rust_lambda::dynamodb::create_user("test_username").await;
     }
 
     let paths = std::fs::read_dir("./test-cases").unwrap();

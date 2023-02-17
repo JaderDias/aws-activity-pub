@@ -5,10 +5,13 @@ use aws_sdk_dynamodb::model::{
 };
 use aws_sdk_dynamodb::types::SdkError;
 use aws_sdk_dynamodb::Client;
+use openssl::pkey::Private;
+use openssl::rsa::Rsa;
 
+const DEFAULT_TABLE_NAME: &str = "table_name";
+const KEYSIZE: u32 = 4096;
 pub const PARTITION_KEY_NAME: &str = "partition_key";
 pub const SORT_KEY_NAME: &str = "sort_key";
-pub const DEFAULT_TABLE_NAME: &str = "table_name";
 
 pub type GetItemResult = Result<aws_sdk_dynamodb::output::GetItemOutput, SdkError<GetItemError>>;
 pub type PutItemResult = Result<aws_sdk_dynamodb::output::PutItemOutput, SdkError<PutItemError>>;
@@ -127,4 +130,34 @@ pub async fn create_table_if_not_exists(client: &aws_sdk_dynamodb::Client) {
         .send()
         .await
         .unwrap();
+}
+
+/// # Panics
+///
+/// Will panic if it can´t generate the private key.
+pub async fn create_user(preferred_username: &str) -> Rsa<Private> {
+    let keypair = Rsa::generate(KEYSIZE).unwrap();
+    let partition = format!("users/{preferred_username}");
+    let values = serde_dynamo::to_item(crate::model::user::User {
+        preferred_username: Some(preferred_username.to_owned()),
+        private_key: Some(keypair.private_key_to_der().unwrap()),
+        public_key: Some(keypair.public_key_to_der().unwrap()),
+    })
+    .unwrap();
+
+    let db_client = get_client().await;
+    if std::env::var("LOCAL_DYNAMODB_URL").is_ok() {
+        create_table_if_not_exists(&db_client).await;
+    }
+
+    crate::dynamodb::put_item(
+        &db_client,
+        DEFAULT_TABLE_NAME,
+        partition.as_str(),
+        "user",
+        values,
+    )
+    .await
+    .unwrap();
+    keypair
 }
