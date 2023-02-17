@@ -29,7 +29,6 @@ pub async fn handler(
     let activity = data.into_inner();
     let actor_id = activity["actor"]
         .as_str()
-        .or_else(|| activity["actor"]["id"].as_str())
         .ok_or(BadRequest(Some("Missing actor id for activity")))?;
     if let Some(actor) = crate::model::user::get(actor_id, settings).await {
         let digest_header = headers.0.get_one("digest").unwrap();
@@ -48,6 +47,8 @@ pub async fn handler(
             .unwrap();
             return Ok(String::new());
         }
+
+        return Err(BadRequest(Some("Invalid digest")));
     }
 
     Err(BadRequest(Some("Missing actor")))
