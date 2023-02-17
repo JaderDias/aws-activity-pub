@@ -22,6 +22,9 @@ pub trait Signer {
     fn verify(&self, data: &str, signature: &[u8]) -> Result<bool, String>;
 }
 
+/// # Panics
+///
+/// Will panic if it can´t parse the date in the header.
 pub fn verify_http_headers<S: Signer + ::std::fmt::Debug>(
     sender: &S,
     all_headers: &HeaderMap<'_>,

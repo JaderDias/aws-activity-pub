@@ -31,36 +31,39 @@ impl crate::activitypub::sign::Signer for User {
     fn sign(&self, to_sign: &str) -> Result<Vec<u8>, String> {
         let key = PKey::from_rsa(
             Rsa::private_key_from_pem(self.private_key.as_ref().unwrap())
-                .map_err(|e| format!("Failed to private_key_from_pem {:?}", e))?,
+                .map_err(|e| format!("Failed to private_key_from_pem {e:?}"))?,
         )
-        .map_err(|e| format!("Failed to from_rsa {:?}", e))?;
+        .map_err(|e| format!("Failed to from_rsa {e:?}"))?;
         let mut signer = Signer::new(MessageDigest::sha256(), &key)
-            .map_err(|e| format!("Failed to create signer {:?}", e))?;
+            .map_err(|e| format!("Failed to create signer {e:?}"))?;
         signer
             .update(to_sign.as_bytes())
-            .map_err(|e| format!("Failed to update signer {:?}", e))?;
+            .map_err(|e| format!("Failed to update signer {e:?}"))?;
         signer
             .sign_to_vec()
-            .map_err(|e| format!("Failed to sign_to_vec {:?}", e))
+            .map_err(|e| format!("Failed to sign_to_vec {e:?}"))
     }
     /// Verify if the signature is valid
     fn verify(&self, data: &str, signature: &[u8]) -> Result<bool, String> {
         let key = PKey::from_rsa(
             Rsa::public_key_from_pem(self.public_key.as_ref().unwrap())
-                .map_err(|e| format!("Failed to public_key_from_pem {:?}", e))?,
+                .map_err(|e| format!("Failed to public_key_from_pem {e:?}"))?,
         )
-        .map_err(|e| format!("Failed to from_rsa {:?}", e))?;
+        .map_err(|e| format!("Failed to from_rsa {e:?}"))?;
         let mut verifier = Verifier::new(MessageDigest::sha256(), &key)
-            .map_err(|e| format!("Failed to create verifier {:?}", e))?;
+            .map_err(|e| format!("Failed to create verifier {e:?}"))?;
         verifier
             .update(data.as_bytes())
-            .map_err(|e| format!("Failed to update verifier {:?}", e))?;
+            .map_err(|e| format!("Failed to update verifier {e:?}"))?;
         verifier
             .verify(signature)
-            .map_err(|e| format!("Failed to verify {:?}", e))
+            .map_err(|e| format!("Failed to verify {e:?}"))
     }
 }
 
+/// # Panics
+///
+/// Will panic if it can´t get the user.
 pub async fn get(username: &str, settings: &rocket::State<Settings>) -> Option<User> {
     let partition = format!("users/{username}");
     let get_item_output = crate::dynamodb::get_item(

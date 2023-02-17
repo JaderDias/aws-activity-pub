@@ -6,6 +6,7 @@ use reqwest::header::HeaderValue;
 pub struct Digest(pub String);
 
 impl Digest {
+    #[must_use]
     pub fn digest(body: &str) -> HeaderValue {
         let mut hasher =
             Hasher::new(MessageDigest::sha256()).expect("Digest::digest: initialization error");
@@ -13,11 +14,12 @@ impl Digest {
             .update(body.as_bytes())
             .expect("Digest::digest: content insertion error");
         let res = general_purpose::STANDARD
-            .encode(&hasher.finish().expect("Digest::digest: finalizing error"));
-        HeaderValue::from_str(&format!("SHA-256={}", res))
+            .encode(hasher.finish().expect("Digest::digest: finalizing error"));
+        HeaderValue::from_str(&format!("SHA-256={res}"))
             .expect("Digest::digest: header creation error")
     }
 
+    #[must_use]
     pub fn verify(&self, body: &str) -> bool {
         if self.algorithm() == "SHA-256" {
             let mut hasher =
@@ -35,10 +37,12 @@ impl Digest {
         }
     }
 
-    pub fn verify_header(&self, other: &Digest) -> bool {
+    #[must_use]
+    pub fn verify_header(&self, other: &Self) -> bool {
         self.value() == other.value()
     }
 
+    #[must_use]
     pub fn algorithm(&self) -> &str {
         let pos = self
             .0
@@ -47,6 +51,7 @@ impl Digest {
         &self.0[..pos]
     }
 
+    #[must_use]
     pub fn value(&self) -> Vec<u8> {
         let pos = self
             .0
@@ -58,19 +63,22 @@ impl Digest {
             .expect("Digest::value: invalid encoding error")
     }
 
+    #[must_use]
     pub fn from_header(dig: &str) -> Result<Self, String> {
-        if let Some(pos) = dig.find('=') {
-            let pos = pos + 1;
-            if general_purpose::STANDARD.decode(&dig[pos..]).is_ok() {
-                Ok(Digest(dig.to_owned()))
-            } else {
-                Err("Digest::from_header: invalid algorithm".to_owned())
-            }
-        } else {
-            Err("Digest::from_header: invalid header".to_owned())
-        }
+        dig.find('=').map_or_else(
+            || Err("Digest::from_header: invalid header".to_owned()),
+            |pos| {
+                let pos = pos + 1;
+                if general_purpose::STANDARD.decode(&dig[pos..]).is_ok() {
+                    Ok(Self(dig.to_owned()))
+                } else {
+                    Err("Digest::from_header: invalid algorithm".to_owned())
+                }
+            },
+        )
     }
 
+    #[must_use]
     pub fn from_body(body: &str) -> Self {
         let mut hasher =
             Hasher::new(MessageDigest::sha256()).expect("Digest::digest: initialization error");
@@ -78,7 +86,7 @@ impl Digest {
             .update(body.as_bytes())
             .expect("Digest::digest: content insertion error");
         let res = general_purpose::STANDARD
-            .encode(&hasher.finish().expect("Digest::digest: finalizing error"));
+            .encode(hasher.finish().expect("Digest::digest: finalizing error"));
         Digest(format!("SHA-256={}", res))
     }
 }
