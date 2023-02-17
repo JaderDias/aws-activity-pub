@@ -1,5 +1,6 @@
 [
   {
+    "name": "federation requests the list of the followers of one of our users",
     "request": {
       "version": "2.0",
       "routeKey": "$default",

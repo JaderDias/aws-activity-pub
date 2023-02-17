@@ -1,5 +1,6 @@
 [
   {
+    "name": "federation sends an unsigned follow request",
     "request": {
       "version": "2.0",
       "routeKey": "$default",
@@ -101,7 +102,7 @@
       },
       "isBase64Encoded": false,
       "multiValueHeaders": {},
-      "statusCode": 200
+      "statusCode": 400
     }
   }
 ]

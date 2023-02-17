@@ -1,5 +1,6 @@
 [
   {
+    "name": "federation wants to know information about our server",
     "request": {
       "version": "2.0",
       "routeKey": "$default",

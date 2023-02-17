@@ -13,6 +13,7 @@ const DB_URL: &str = "http://localhost:8000";
 
 #[derive(Deserialize)]
 struct TestCase {
+    name: String,
     request: ApiGatewayV2httpRequest,
     request_body_json: Option<Value>,
     expected_response: ApiGatewayV2httpResponse,
@@ -53,7 +54,10 @@ async fn main() {
             let actual_response: reqwest::Response;
             let mut url = format!("{test_target_url}{}", &request.raw_path.as_ref().unwrap());
             if &request.request_context.http.method == "POST" {
-                println!("{} {}", &request.request_context.http.method, &url);
+                println!(
+                    "{} {} {}",
+                    &request.request_context.http.method, &url, &test.name
+                );
                 let mut request_body = json!(&test.request_body_json).to_string();
                 if let Some(placeholder) = &test.placeholder {
                     request_body = request_body
@@ -75,7 +79,10 @@ async fn main() {
                 if query_string.is_some() {
                     url = format!("{}?{}", url, query_string.as_ref().unwrap());
                 }
-                println!("{} {}", &request.request_context.http.method, &url);
+                println!(
+                    "{} {} {}",
+                    &request.request_context.http.method, &url, &test.name
+                );
                 actual_response = http_client.get(url).send().await.unwrap();
             }
             assert_eq!(

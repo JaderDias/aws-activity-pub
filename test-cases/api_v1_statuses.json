@@ -1,5 +1,6 @@
 [
   {
+    "name": "local user create own status",
     "request": {
       "version": "2.0",
       "routeKey": "$default",
@@ -99,6 +100,7 @@
     "placeholder": "1234567890123456789"
   },
   {
+    "name": "verify if own status was created",
     "request": {
       "version": "2.0",
       "routeKey": "$default",
