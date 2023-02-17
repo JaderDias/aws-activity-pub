@@ -1,13 +1,12 @@
 // copied from https://github.com/Plume-org/Plume/blob/main/plume-common/src/activity_pub/request.rs
 use base64::{engine::general_purpose, Engine as _};
 use openssl::hash::{Hasher, MessageDigest};
-use reqwest::header::HeaderValue;
 
 pub struct Digest(pub String);
 
 impl Digest {
     #[must_use]
-    pub fn digest(body: &str) -> HeaderValue {
+    pub fn from_body(body: &str) -> String {
         let mut hasher =
             Hasher::new(MessageDigest::sha256()).expect("Digest::digest: initialization error");
         hasher
@@ -15,8 +14,7 @@ impl Digest {
             .expect("Digest::digest: content insertion error");
         let res = general_purpose::STANDARD
             .encode(hasher.finish().expect("Digest::digest: finalizing error"));
-        HeaderValue::from_str(&format!("SHA-256={res}"))
-            .expect("Digest::digest: header creation error")
+        format!("SHA-256={res}")
     }
 
     #[must_use]
@@ -26,7 +24,7 @@ impl Digest {
                 Hasher::new(MessageDigest::sha256()).expect("Digest::digest: initialization error");
             hasher
                 .update(body.as_bytes())
-                .expect("Digest::digest: contfent insertion error");
+                .expect("Digest::digest: content insertion error");
             self.value()
                 == hasher
                     .finish()
@@ -63,7 +61,6 @@ impl Digest {
             .expect("Digest::value: invalid encoding error")
     }
 
-    #[must_use]
     pub fn from_header(dig: &str) -> Result<Self, String> {
         dig.find('=').map_or_else(
             || Err("Digest::from_header: invalid header".to_owned()),
@@ -76,17 +73,5 @@ impl Digest {
                 }
             },
         )
-    }
-
-    #[must_use]
-    pub fn from_body(body: &str) -> Self {
-        let mut hasher =
-            Hasher::new(MessageDigest::sha256()).expect("Digest::digest: initialization error");
-        hasher
-            .update(body.as_bytes())
-            .expect("Digest::digest: content insertion error");
-        let res = general_purpose::STANDARD
-            .encode(hasher.finish().expect("Digest::digest: finalizing error"));
-        Digest(format!("SHA-256={}", res))
     }
 }

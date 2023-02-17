@@ -33,7 +33,7 @@ async fn main() {
     }
 
     let test_target_url = &args[1];
-    let key: openssl::rsa::Rsa<Private>;
+    let key: Rsa<Private>;
     if test_target_url.contains("localhost") {
         key = rust_lambda::dynamodb::create_user("test_username").await;
     }
@@ -71,6 +71,10 @@ async fn main() {
                         .to_string()
                         .replace(placeholder, last_regex_capture.as_str());
                 }
+
+                let digest =
+                    rust_lambda::activitypub::digest::Digest::from_body(&request_body.to_string());
+                println!("Digest {}", digest);
                 actual_response = http_client
                     .post(url)
                     .body(request_body)
