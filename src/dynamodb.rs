@@ -135,15 +135,15 @@ pub async fn create_table_if_not_exists(client: &aws_sdk_dynamodb::Client) {
 /// # Panics
 ///
 /// Will panic if it can´t generate the private key.
-pub async fn create_user(preferred_username: &str) -> Rsa<Private> {
+pub async fn create_user(preferred_username: &str) -> crate::model::user::User {
     let keypair = Rsa::generate(KEYSIZE).unwrap();
     let partition = format!("users/{preferred_username}");
-    let values = serde_dynamo::to_item(crate::model::user::User {
+    let user = crate::model::user::User {
         preferred_username: Some(preferred_username.to_owned()),
         private_key: Some(keypair.private_key_to_der().unwrap()),
         public_key: Some(keypair.public_key_to_der().unwrap()),
-    })
-    .unwrap();
+    };
+    let values = serde_dynamo::to_item(&user).unwrap();
 
     let db_client = get_client().await;
     if std::env::var("LOCAL_DYNAMODB_URL").is_ok() {
@@ -159,5 +159,5 @@ pub async fn create_user(preferred_username: &str) -> Rsa<Private> {
     )
     .await
     .unwrap();
-    keypair
+    user
 }

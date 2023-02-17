@@ -22,7 +22,7 @@ pub struct User {
     pub public_key: Option<Vec<u8>>,
 }
 
-impl crate::activitypub::sign::Signer for User {
+impl crate::activitypub::signer::Signer for User {
     fn get_key_id(&self) -> String {
         format!("{}#main-key", self.preferred_username.as_ref().unwrap())
     }
@@ -30,8 +30,8 @@ impl crate::activitypub::sign::Signer for User {
     /// Sign some data with the signer keypair
     fn sign(&self, to_sign: &str) -> Result<Vec<u8>, String> {
         let key = PKey::from_rsa(
-            Rsa::private_key_from_pem(self.private_key.as_ref().unwrap())
-                .map_err(|e| format!("Failed to private_key_from_pem {e:?}"))?,
+            Rsa::private_key_from_der(self.private_key.as_ref().unwrap())
+                .map_err(|e| format!("Failed to private_key_from_der {e:?}"))?,
         )
         .map_err(|e| format!("Failed to from_rsa {e:?}"))?;
         let mut signer = Signer::new(MessageDigest::sha256(), &key)
@@ -46,8 +46,8 @@ impl crate::activitypub::sign::Signer for User {
     /// Verify if the signature is valid
     fn verify(&self, data: &str, signature: &[u8]) -> Result<bool, String> {
         let key = PKey::from_rsa(
-            Rsa::public_key_from_pem(self.public_key.as_ref().unwrap())
-                .map_err(|e| format!("Failed to public_key_from_pem {e:?}"))?,
+            Rsa::public_key_from_der(self.public_key.as_ref().unwrap())
+                .map_err(|e| format!("Failed to public_key_from_der {e:?}"))?,
         )
         .map_err(|e| format!("Failed to from_rsa {e:?}"))?;
         let mut verifier = Verifier::new(MessageDigest::sha256(), &key)

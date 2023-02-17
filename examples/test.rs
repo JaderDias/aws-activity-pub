@@ -1,9 +1,8 @@
 use aws_lambda_events::apigw::ApiGatewayV2httpRequest;
 use aws_lambda_events::apigw::ApiGatewayV2httpResponse;
 use aws_lambda_events::encodings::Body;
-use openssl::pkey::Private;
-use openssl::rsa::Rsa;
 use regex::Regex;
+use rust_lambda::activitypub::signable::Signable;
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::env;
@@ -33,10 +32,10 @@ async fn main() {
     }
 
     let test_target_url = &args[1];
-    let key: Rsa<Private>;
-    if test_target_url.contains("localhost") {
-        key = rust_lambda::dynamodb::create_user("test_username").await;
-    }
+    let signer: rust_lambda::model::user::User;
+    //  if test_target_url.contains("localhost") {
+    signer = rust_lambda::dynamodb::create_user("test_username").await;
+    //  }
 
     let paths = std::fs::read_dir("./test-cases").unwrap();
 
@@ -50,11 +49,8 @@ async fn main() {
         let test_cases = TestCases::deserialize(&mut file_deserializer).unwrap();
         let mut last_regex_capture = String::new();
         for mut test in test_cases {
-            match &test.request_body_json {
-                Some(body) => {
-                    test.request.body = Some(serde_json::to_string(body).unwrap());
-                }
-                None => {}
+            if let Some(body) = &test.request_body_json {
+                test.request.body = Some(serde_json::to_string(body).unwrap());
             }
 
             let request = &test.request;
@@ -74,7 +70,11 @@ async fn main() {
 
                 let digest =
                     rust_lambda::activitypub::digest::Digest::from_body(&request_body.to_string());
-                println!("Digest {}", digest);
+                println!("Digest {digest}");
+                let request_body_value: &mut serde_json::Value =
+                    &mut serde_json::from_str(&request_body).unwrap();
+                let signature = request_body_value.sign(&signer).unwrap();
+                println!("Signature {signature}");
                 actual_response = http_client
                     .post(url)
                     .body(request_body)

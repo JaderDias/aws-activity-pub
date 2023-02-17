@@ -1,4 +1,4 @@
-.PHONY: all clean run test create_user scan_table integration_test clippy watch
+.PHONY: all clean run test check create_user scan_table integration_test clippy watch
 run:
 	docker-compose -f docker/test/docker-compose.yml kill
 	docker-compose -f docker/test/docker-compose.yml up --build --detach
@@ -9,7 +9,9 @@ run:
 		REGION=eu-west-1 \
 		cargo run
 
-test: create_user integration_test clippy
+test: integration_test
+
+check: integration_test clippy
 	cargo fmt --all -- --check
 
 create_user:

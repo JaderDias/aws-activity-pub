@@ -9,7 +9,7 @@
       "cookies": [],
       "headers": {
         "Content-Type": ["application/activity+json"],
-        "Digest": ["SHA-256=8we9H5V74oUdQr8R5vay/dyQEi0I2up5wwI7+9e8T70="],
+        "Digest": ["SHA-256=4xTf0IjwAnGNeeoIK6ooVxE+XARKIyHVagmSi8LFF1Q="],
         "Signature": [
           "keyId=\"https://mastodon.social/users/jgarr#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date digest content-type\",signature=\"hx1jRjCGyBfnI/Cak8ujAlfau5G1Ph+9niCFyRdm5J7b9wQGxbk+SbUhG0kV2L7W0h54JBc6htQhR8V+fFqxX+UiLXe1l7jRoBZOYSKq7UKqtogJwLLvS89DeDgWLWDPqbZ6W1FzU9MLUqJLTqFNnhgtOH+m+YhKEfjE35+65d5vmPUNjR8TRDAjXjMugMi3NmeaeA789NV3gs7GaGyfI734kGwvPDHcLp9MyDHqBivdDqmPAzXRP4gyrjqXHQRpxCdX7iinA/aqgnsNf2CoY/uH7M+z+zPWohlTvVDU2L+xeT2N7pXFc6WxREPV4ojZ+VxMzmIuzHkxW8TVpVNwMw==\""
         ],

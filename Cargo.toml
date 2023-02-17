@@ -38,6 +38,7 @@ openssl = "0.10.45"
 serde_bytes = "0.11.9"
 chrono = "0.4.23"
 base64 = "0.21.0"
+hex = "0.4.3"
 # TODO: use activitystreams = "0.6.2"
 
 [dev-dependencies]

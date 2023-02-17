@@ -13,19 +13,10 @@ pub enum SignatureValidity {
     Outdated,
 }
 
-pub trait Signer {
-    fn get_key_id(&self) -> String;
-
-    /// Sign some data with the signer keypair
-    fn sign(&self, to_sign: &str) -> Result<Vec<u8>, String>;
-    /// Verify if the signature is valid
-    fn verify(&self, data: &str, signature: &[u8]) -> Result<bool, String>;
-}
-
 /// # Panics
 ///
 /// Will panic if it can´t parse the date in the header.
-pub fn verify_http_headers<S: Signer + ::std::fmt::Debug>(
+pub fn verify_http_headers<S: super::signer::Signer + ::std::fmt::Debug>(
     sender: &S,
     all_headers: &HeaderMap<'_>,
     data: &Digest,
