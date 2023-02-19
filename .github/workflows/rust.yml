@@ -9,30 +9,10 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  check-code-format:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - run: cargo fmt --all -- --check
-
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
-      - name: Run database
-        run: docker-compose -f docker/test/docker-compose.yml up --build -d
-      - run: cargo build --all-targets
-      - run: cargo test
-        env:
-          LOCAL_DYNAMODB_URL: http://localhost:8000
-      - name: Run
-        env:
-          CUSTOM_DOMAIN: example.com
-          DYNAMODB_TABLE: table_name
-          LOCAL_DYNAMODB_URL: http://localhost:8000
-          REGION: eu-west-1
-        run: cargo run &
-      - name: Run tests
-        run: cargo run --example test http://localhost:8080
+      - run: make test
