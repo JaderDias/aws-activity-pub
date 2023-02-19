@@ -1,8 +1,7 @@
 use super::signer::Signer;
 use base64::{engine::general_purpose, Engine as _};
 use chrono::{DateTime, Duration, Utc};
-use openssl::{pkey::PKey, rsa::Rsa, sha::sha256};
-use rocket::http::HeaderMap;
+use openssl::sha::sha256;
 
 pub trait Signable {
     fn sign<T>(&mut self, creator: &T) -> Result<&mut Self, String>

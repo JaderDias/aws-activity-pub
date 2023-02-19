@@ -5,7 +5,6 @@ use aws_sdk_dynamodb::model::{
 };
 use aws_sdk_dynamodb::types::SdkError;
 use aws_sdk_dynamodb::Client;
-use openssl::pkey::Private;
 use openssl::rsa::Rsa;
 
 const DEFAULT_TABLE_NAME: &str = "table_name";
