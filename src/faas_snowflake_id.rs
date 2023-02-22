@@ -23,6 +23,8 @@ const NODE_MASK: u64 = NODE_RANGE - 1;
 const NODE_SHIFT: u64 = SEQUENCE_BITS; // 12 bits
 
 const EPOCH_MILLISECONDS_SHIFT: u64 = SEQUENCE_BITS + NODE_BITS; // 22 bits, the remaining 42 bits are reserved for the timestamp, lasting until year 2100
+const EPOCH_MILLISECONDS_BITS: u64 = 64 - EPOCH_MILLISECONDS_SHIFT; // 42 bits
+const EPOCH_MILLISECONDS_MASK: u64 = (1 << EPOCH_MILLISECONDS_BITS) - 1;
 
 pub fn get_node_id() -> u64 {
     let mut rng = thread_rng();
@@ -37,7 +39,7 @@ fn get_id_with_timestamp(node_id: u64, time: SystemTime) -> u64 {
     let since_unix = time.duration_since(UNIX_EPOCH).unwrap();
     let timestamp: u64 = since_unix.as_millis().try_into().unwrap();
     let sequence_number = fetch_add_sequence(timestamp);
-    (timestamp << EPOCH_MILLISECONDS_SHIFT)
+    ((timestamp & EPOCH_MILLISECONDS_MASK) << EPOCH_MILLISECONDS_SHIFT)
         | ((node_id & NODE_MASK) << NODE_SHIFT)
         | (sequence_number & SEQUENCE_MASK)
 }
@@ -63,15 +65,10 @@ mod tests {
     #[test]
     fn test_get_id_with_timestamp() {
         // Arrange
-        const INITIAL_TIME_OFFSET_MILLISECONDS: u64 = 0b10101010101010101010101010101010101;
-        const INITIAL_TIME_OFFSET_SECONDS: u64 = INITIAL_TIME_OFFSET_MILLISECONDS / 1000;
-        let initial_time_offset_nanos: u32 =
-            ((INITIAL_TIME_OFFSET_MILLISECONDS - (INITIAL_TIME_OFFSET_SECONDS * 1000)) * 1_000_000)
-                .try_into()
-                .unwrap();
         const NODE_ID: u64 = 0b1100110000;
-        let initial_time_offset =
-            Duration::new(INITIAL_TIME_OFFSET_SECONDS, initial_time_offset_nanos);
+        const INITIAL_TIME_OFFSET_MILLISECONDS: u64 = 0b10101010101010101010101010101010101;
+
+        let initial_time_offset = Duration::from_millis(INITIAL_TIME_OFFSET_MILLISECONDS);
         let initial_system_time = SystemTime::UNIX_EPOCH + initial_time_offset;
 
         // Act
@@ -81,9 +78,11 @@ mod tests {
         assert_eq!(
             first,
             // 42 bits of timestamp
-            //                                          10 bits of node_id
-            //                                                    12 bits of sequence number
-            //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTNNNNNNNNNNSSSSSSSSSSSS
+            // 32 bits seconds                 10 bits milliseconds
+            //SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSMMMMMMMMMM
+            //                                          10 bits node id
+            //                                                    12 bits sequence number
+            //                                          NNNNNNNNNNSSSSSSSSSSSS
             0b0000000101010101010101010101010101010101011100110000000000000000,
         );
 
@@ -94,15 +93,18 @@ mod tests {
         assert_eq!(
             second,
             // 42 bits of timestamp
-            //                                          10 bits of node_id
-            //                                                    12 bits of sequence number
-            //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTNNNNNNNNNNSSSSSSSSSSSS
+            // 32 bits seconds                 10 bits milliseconds
+            //SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSMMMMMMMMMM
+            //                                          10 bits node id
+            //                                                    12 bits sequence number
+            //                                          NNNNNNNNNNSSSSSSSSSSSS
             0b0000000101010101010101010101010101010101011100110000000000000001,
         );
 
         // Arrange
+        const ONE_SECOND_IN_MILLISECONDS: u64 = 1000;
         let new_time_offset =
-            Duration::new(INITIAL_TIME_OFFSET_SECONDS + 1, initial_time_offset_nanos);
+            Duration::from_millis(INITIAL_TIME_OFFSET_MILLISECONDS + ONE_SECOND_IN_MILLISECONDS);
         let new_system_time = SystemTime::UNIX_EPOCH + new_time_offset;
 
         // Act
@@ -112,10 +114,33 @@ mod tests {
         assert_eq!(
             second,
             // 42 bits of timestamp
-            //                                          10 bits of node_id
-            //                                                    12 bits of sequence number
-            //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTNNNNNNNNNNSSSSSSSSSSSS
+            // 32 bits seconds                 10 bits milliseconds
+            //SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSMMMMMMMMMM
+            //                                          10 bits node id
+            //                                                    12 bits sequence number
+            //                                          NNNNNNNNNNSSSSSSSSSSSS
             0b0000000101010101010101010101011001001111011100110000000000000000,
+        );
+
+        // Arrange
+
+        const OVERFLOW_TIME_OFFSET_MILLISECONDS: u64 = (1 << EPOCH_MILLISECONDS_BITS) + 1;
+        let overflow_time_offset = Duration::from_millis(OVERFLOW_TIME_OFFSET_MILLISECONDS);
+        let overflow_system_time = SystemTime::UNIX_EPOCH + overflow_time_offset;
+
+        // Act
+        let actual_overflow = get_id_with_timestamp(NODE_ID, overflow_system_time);
+
+        // Assert
+        assert_eq!(
+            actual_overflow,
+            // 42 bits of timestamp
+            // 32 bits seconds                 10 bits milliseconds
+            //SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSMMMMMMMMMM
+            //                                          10 bits node id
+            //                                                    12 bits sequence number
+            //                                          NNNNNNNNNNSSSSSSSSSSSS
+            0b0000000000000000000000000000000000000000011100110000000000000000,
         );
     }
 }

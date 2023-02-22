@@ -6,6 +6,7 @@ mod dynamodb;
 mod faas_snowflake_id;
 mod model;
 mod routes;
+pub mod rsa;
 pub mod settings;
 
 #[rocket::main]

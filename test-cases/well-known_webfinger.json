@@ -1,6 +1,6 @@
 [
   {
-    "name": "federation wants to know information about one of our users",
+    "name": "federation requests information about one of our users",
     "request": {
       "version": "2.0",
       "routeKey": "$default",

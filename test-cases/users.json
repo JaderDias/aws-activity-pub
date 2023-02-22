@@ -1,0 +1,163 @@
+[
+  {
+    "name": "federation requests information about one of our users including public key",
+    "request": {
+      "version": "2.0",
+      "routeKey": "$default",
+      "rawPath": "/users/test_username",
+      "rawQueryString": "",
+      "cookies": [],
+      "headers": {
+        "Accept": [
+          "application/activity+json, application/ld+json"
+        ],
+        "Accept-Encoding": [
+          "gzip"
+        ],
+        "Signature": [
+          "keyId=\"https://example.com/actor#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date accept\",signature=\"wUAArkeEJh4yXkstcC8IgrnSlsRcledOUjo63nqRZrXI0RtoKo369/+j5K7bEFDoJ8psuCnnY9cW+KDgog7Gg2mQjAb1cZa2ffeqFY3PPXqpO+5entfRkAEyYBsrd3CiVn5wz0LEwbOs3XHe1w2wVgoIbSunCE/DN0Ra5tQLriITzBA5YzI26QuQSJzb5sMmMjiTiVocF/i0djqXfLmnjvhyaxsS0i0O8LfPHVPzSSGFHaqzawIL28MZu8J42ha//baJmPozQQquFHKs7lcDcSSGtrvMGjfJYoFy4cMSsSqLH / 8 VRzNR0nXs47ydDwQ9XRpT55LPWL7uRQoeYBAkwA == \""
+        ]
+      },
+      "queryStringParameters": {},
+      "requestContext": {
+        "accountId": "123456789012",
+        "apiId": "api-id",
+        "authentication": {
+          "clientCert": {
+            "clientCertPem": "CERT_CONTENT",
+            "subjectDN": "www.example.com",
+            "issuerDN": "Example issuer",
+            "serialNumber": "a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1",
+            "validity": {
+              "notBefore": "May 28 12:30:02 2019 GMT",
+              "notAfter": "Aug  5 09:36:04 2021 GMT"
+            }
+          }
+        },
+        "authorizer": {
+          "jwt": {
+            "claims": {
+              "claim1": "value1",
+              "claim2": "value2"
+            },
+            "scopes": [
+              "scope1",
+              "scope2"
+            ]
+          }
+        },
+        "domainName": "id.execute-api.us-east-1.amazonaws.com",
+        "domainPrefix": "id",
+        "http": {
+          "method": "GET",
+          "path": "/users/test_username",
+          "protocol": "HTTP/1.1",
+          "sourceIp": "192.0.2.1",
+          "userAgent": "agent"
+        },
+        "requestId": "id",
+        "routeKey": "$default",
+        "stage": "$default",
+        "time": "12/Mar/2020:19:03:58 +0000",
+        "timeEpoch": 1583348638390
+      },
+      "pathParameters": {},
+      "isBase64Encoded": false,
+      "stageVariables": {
+        "stageVariable1": "value1",
+        "stageVariable2": "value2"
+      }
+    },
+    "expected_response": {
+      "cookies": [],
+      "headers": {
+        "content-type": "application/json"
+      },
+      "isBase64Encoded": false,
+      "multiValueHeaders": {
+        "content-type": "application/json"
+      },
+      "statusCode": 200
+    },
+    "expected_body_json": {
+      "@context": [
+        "https://www.w3.org/ns/activitystreams",
+        "https://w3id.org/security/v1",
+        {
+          "manuallyApprovesFollowers": "as:manuallyApprovesFollowers",
+          "toot": "http://joinmastodon.org/ns#",
+          "featured": {
+            "@id": "toot:featured",
+            "@type": "@id"
+          },
+          "featuredTags": {
+            "@id": "toot:featuredTags",
+            "@type": "@id"
+          },
+          "alsoKnownAs": {
+            "@id": "as:alsoKnownAs",
+            "@type": "@id"
+          },
+          "movedTo": {
+            "@id": "as:movedTo",
+            "@type": "@id"
+          },
+          "schema": "http://schema.org#",
+          "PropertyValue": "schema:PropertyValue",
+          "value": "schema:value",
+          "discoverable": "toot:discoverable",
+          "Device": "toot:Device",
+          "Ed25519Signature": "toot:Ed25519Signature",
+          "Ed25519Key": "toot:Ed25519Key",
+          "Curve25519Key": "toot:Curve25519Key",
+          "EncryptedMessage": "toot:EncryptedMessage",
+          "publicKeyBase64": "toot:publicKeyBase64",
+          "deviceId": "toot:deviceId",
+          "claim": {
+            "@type": "@id",
+            "@id": "toot:claim"
+          },
+          "fingerprintKey": {
+            "@type": "@id",
+            "@id": "toot:fingerprintKey"
+          },
+          "identityKey": {
+            "@type": "@id",
+            "@id": "toot:identityKey"
+          },
+          "devices": {
+            "@type": "@id",
+            "@id": "toot:devices"
+          },
+          "messageFranking": "toot:messageFranking",
+          "messageType": "toot:messageType",
+          "cipherText": "toot:cipherText",
+          "suspended": "toot:suspended"
+        }
+      ],
+      "devices": "https://example.com/users/test_username/collections/devices",
+      "discoverable": false,
+      "followers": "https://example.com/users/test_username/followers",
+      "following": "https://example.com/users/test_username/following",
+      "id": "https://example.com/users/test_username",
+      "inbox": "https://example.com/users/test_username/inbox",
+      "manuallyApprovesFollowers": false,
+      "name": "test_username",
+      "outbox": "https://example.com/users/test_username/outbox",
+      "preferredUsername": "test_username",
+      "published": "2023-01-19T00:00:00Z",
+      "summary": "",
+      "type": "Person",
+      "url": "https://example.com/@test_username",
+      "publicKey": {
+        "id": "https://example.com/users/test_username#main-key",
+        "owner": "https://example.com/users/test_username",
+        "publicKeyPem": "publicKeyPemPlaceholder"
+      },
+      "tag": [
+      ],
+      "attachment": [
+      ]
+    }
+  }
+]

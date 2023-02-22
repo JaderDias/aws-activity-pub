@@ -22,25 +22,26 @@ license-file = "LICENSE"
 [dependencies]
 aws-config = "0.54.1"
 aws-sdk-dynamodb = "0.24.0"
+base64 = "0.21.0"
+chrono = "0.4.23"
+hex = "0.4.3"
 lambda-web = { version = "0.2.1", features = ["rocket05"] }
+openssl = "0.10.45"
+rand = "0.8.5"
+reqwest = { version = "0.11.14", default-features = false, features = [
+    "rustls-tls",
+] }
 rocket = { version = "0.5.0-rc.2", features = ["json"] }
 serde = { version = "1.0.152", features = ["derive"] }
 serde_dynamo = { version = "4.0.12", features = ["aws-sdk-dynamodb+0_24"] }
 serde_json = { version = "1.0.93", features = ["raw_value"] }
 tracing = { version = "0.1", features = ["log"] }
 tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt"] }
-rand = "0.8.5"
-reqwest = { version = "0.11.14", default-features = false, features = [
-    "rustls-tls",
-] }
-openssl = "0.10.45"
 serde_bytes = "0.11.9"
-chrono = "0.4.23"
-base64 = "0.21.0"
-hex = "0.4.3"
 
 [dev-dependencies]
 aws_lambda_events = "0.7.3"
+http = "0.2.9"
 regex = "1.7.1"
 tokio = { version = "1", features = ["macros"] }
 

@@ -62,7 +62,7 @@
         {
           "ostatus": "http://ostatus.org#",
           "atomUri": "ostatus:atomUri",
-          "in_reply_to_atom_uri": "ostatus:in_reply_to_atom_uri",
+          "inReplyToAtomUri": "ostatus:inReplyToAtomUri",
           "conversation": "ostatus:conversation",
           "sensitive": "as:sensitive",
           "Hashtag": "as:Hashtag",
@@ -80,8 +80,8 @@
       "published": "2019-04-28T20:58:40Z",
       "to": ["https://www.w3.org/ns/activitystreams#Public"],
       "sensitive": false,
-      "in_reply_to_atom_uri": null,
-      "conversation": "tag:mastodon.social,2019-04-28:objectId=1754000:objectType=Conversation",
+      "inReplyToAtomUri": null,
+      "conversation": "tag:example.com,2019-04-28:objectId=1754000:objectType=Conversation",
       "content": "test_content",
       "attachment": [],
       "tag": []
@@ -173,7 +173,7 @@
         {
           "ostatus": "http://ostatus.org#",
           "atomUri": "ostatus:atomUri",
-          "in_reply_to_atom_uri": "ostatus:in_reply_to_atom_uri",
+          "inReplyToAtomUri": "ostatus:inReplyToAtomUri",
           "conversation": "ostatus:conversation",
           "sensitive": "as:sensitive",
           "Hashtag": "as:Hashtag",
@@ -191,7 +191,7 @@
       "published": "2019-04-28T20:58:40Z",
       "to": ["https://www.w3.org/ns/activitystreams#Public"],
       "sensitive": false,
-      "conversation": "tag:mastodon.social,2019-04-28:objectId=1754000:objectType=Conversation",
+      "conversation": "tag:example.com,2019-04-28:objectId=1754000:objectType=Conversation",
       "content": "test_content",
       "tag": []
     },

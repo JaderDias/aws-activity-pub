@@ -13,90 +13,116 @@ pub enum SignatureValidity {
     Outdated,
 }
 
-/// # Panics
-///
-/// Will panic if it can´t parse the date in the header.
-pub fn verify_http_headers<S: super::signer::Signer + ::std::fmt::Debug>(
-    sender: &S,
-    all_headers: &HeaderMap<'_>,
-    data: &Digest,
-) -> SignatureValidity {
-    let sig_header = all_headers.get_one("Signature");
-    if sig_header.is_none() {
-        return SignatureValidity::Absent;
-    }
-    let sig_header = sig_header.expect("sign::verify_http_headers: unreachable");
+pub struct SignatureHeader {
+    pub algorithm: Option<String>,
+    pub headers: Option<String>,
+    pub signature: Option<String>,
+}
 
-    let mut _key_id = None;
-    let mut _algorithm = None;
-    let mut headers = None;
-    let mut signature = None;
-    for part in sig_header.split(',') {
+pub fn parse_header(signature_header: &str) -> SignatureHeader {
+    let mut result: SignatureHeader = SignatureHeader {
+        algorithm: None,
+        headers: None,
+        signature: None,
+    };
+    for part in signature_header.split(',') {
         match part {
-            part if part.starts_with("keyId=") => _key_id = Some(&part[7..part.len() - 1]),
-            part if part.starts_with("algorithm=") => _algorithm = Some(&part[11..part.len() - 1]),
-            part if part.starts_with("headers=") => headers = Some(&part[9..part.len() - 1]),
-            part if part.starts_with("signature=") => signature = Some(&part[11..part.len() - 1]),
+            part if part.starts_with("algorithm=") => {
+                result.algorithm = Some((&part[11..part.len() - 1]).to_owned())
+            }
+            part if part.starts_with("headers=") => {
+                result.headers = Some((&part[9..part.len() - 1]).to_owned())
+            }
+            part if part.starts_with("signature=") => {
+                result.signature = Some((&part[11..part.len() - 1]).to_owned())
+            }
             _ => {}
         }
     }
 
-    if signature.is_none() || headers.is_none() {
-        //missing part of the header
-        return SignatureValidity::Invalid;
-    }
-    let headers = headers
-        .expect("sign::verify_http_headers: unreachable")
+    result
+}
+
+fn select_headers(all_headers: &HeaderMap<'_>, query: &str) -> String {
+    query
         .split_whitespace()
-        .collect::<Vec<_>>();
-    let signature = signature.expect("sign::verify_http_headers: unreachable");
-    let h = headers
-        .iter()
         .map(|header| (header, all_headers.get_one(header)))
         .map(|(header, value)| format!("{}: {}", header.to_lowercase(), value.unwrap_or("")))
         .collect::<Vec<_>>()
-        .join("\n");
+        .join("\n")
+}
 
-    if !sender
-        .verify(
-            &h,
-            general_purpose::STANDARD
-                .decode(signature)
-                .unwrap_or_default()
-                .as_ref(),
-        )
-        .unwrap_or(false)
-    {
+/// # Panics
+///
+/// Will panic if it can´t parse the date in the header.
+pub fn verify_http_headers<S: super::verifier::Verifier + ::std::fmt::Debug>(
+    sender: &S,
+    all_headers: &HeaderMap<'_>,
+    data: &Digest,
+) -> SignatureValidity {
+    println!("verify_http_headers");
+    let signature_header = all_headers.get_one("Signature");
+    if signature_header.is_none() {
+        println!("missing signature header");
+        return SignatureValidity::Absent;
+    }
+    let signature_header = signature_header.expect("sign::verify_http_headers: unreachable");
+    let signature_header = parse_header(signature_header);
+    if signature_header.signature.is_none() || signature_header.headers.is_none() {
+        println!("missing part of headers");
+        //missing part of the header
+        return SignatureValidity::Invalid;
+    }
+    let signature = signature_header
+        .signature
+        .expect("sign::verify_http_headers: unreachable");
+    println!("signature: {:?}", signature);
+    let signature = general_purpose::STANDARD
+        .decode(signature)
+        .expect("sign::verify_http_headers: can't decode signature");
+    let headers = signature_header.headers.unwrap();
+    let select_headers = select_headers(all_headers, headers.as_str());
+    println!("verify_http_headers: {}", select_headers);
+
+    if !sender.verify(&select_headers, &signature).unwrap_or(false) {
+        println!("invalid signature");
         return SignatureValidity::Invalid;
     }
     if !headers.contains(&"digest") {
+        println!("valid no digest");
         // signature is valid, but body content is not verified
         return SignatureValidity::ValidNoDigest;
     }
     let digest = all_headers.get_one("digest").unwrap_or("");
     let digest = Digest::from_header(digest);
     if !digest.map(|d| d.verify_header(data)).unwrap_or(false) {
+        println!("valid but digest doesn't match");
         // signature was valid, but body content does not match its digest
         return SignatureValidity::Invalid;
     }
     if !headers.contains(&"date") {
+        println!("valid no date");
         return SignatureValidity::Valid; //maybe we shouldn't trust a request without date?
     }
 
     let date = all_headers.get_one("date");
     if date.is_none() {
+        println!("missing date header");
         return SignatureValidity::Outdated;
     }
     let date = NaiveDateTime::parse_from_str(date.unwrap(), "%a, %d %h %Y %T GMT");
     if date.is_err() {
+        println!("invalid date header");
         return SignatureValidity::Outdated;
     }
     let diff = Utc::now().naive_utc() - date.unwrap();
     let future = Duration::hours(12);
     let past = Duration::hours(-12);
     if diff < future && diff > past {
+        println!("valid");
         SignatureValidity::Valid
     } else {
+        println!("valid but date is in the past");
         SignatureValidity::Outdated
     }
 }

@@ -23,34 +23,39 @@ impl<'r> FromRequest<'r> for CustomHeaders<'r> {
 pub async fn handler(
     username: &str,
     headers: CustomHeaders<'_>,
-    data: rocket::serde::json::Json<serde_json::Value>,
+    data: String,
     settings: &rocket::State<Settings>,
-) -> Result<String, BadRequest<&'static str>> {
-    let activity = data.into_inner();
+) -> Result<String, BadRequest<String>> {
+    let activity: serde_json::Value = serde_json::from_str(&data).unwrap();
+    println!("activity {:?}", activity);
     let actor_id = activity["actor"]
         .as_str()
-        .ok_or(BadRequest(Some("Missing actor id for activity")))?;
-    if let Some(actor) = crate::model::user::get(actor_id, settings).await {
-        let digest_header = headers.0.get_one("digest").unwrap();
-        if Valid
-            == signature::verify_http_headers(&actor, &headers.0, &Digest(digest_header.to_owned()))
-        {
-            let partition = format!("users/{username}/followers");
-            let values = serde_dynamo::to_item(&activity).unwrap();
-            crate::dynamodb::put_item(
-                &settings.db_client,
-                &settings.table_name,
-                partition.as_str(),
-                actor_id,
-                values,
-            )
-            .await
-            .unwrap();
-            return Ok(String::new());
-        }
-
-        return Err(BadRequest(Some("Invalid digest")));
+        .ok_or(BadRequest(Some("Missing actor id for activity".to_owned())))?;
+    let public_key = crate::model::actor::get_public_key(actor_id, settings)
+        .await
+        .map_err(|err| BadRequest(Some(err)))?;
+    let digest_header = headers.0.get_one("digest").unwrap();
+    if Valid
+        == signature::verify_http_headers(
+            &public_key,
+            &headers.0,
+            &Digest(digest_header.to_owned()),
+        )
+    {
+        let partition = format!("users/{username}/followers");
+        let values = serde_dynamo::to_item(&activity).unwrap();
+        crate::dynamodb::put_item(
+            &settings.db_client,
+            &settings.table_name,
+            partition.as_str(),
+            actor_id,
+            values,
+        )
+        .await
+        .unwrap();
+        return Ok(String::new());
     }
 
-    Err(BadRequest(Some("Missing actor")))
+    println!("Invalid signature or digest");
+    return Err(BadRequest(Some("Invalid signature or digest".to_owned())));
 }

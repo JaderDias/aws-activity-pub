@@ -19,6 +19,7 @@ impl Digest {
 
     #[must_use]
     pub fn verify(&self, body: &str) -> bool {
+        println!("Verifying digest");
         if self.algorithm() == "SHA-256" {
             let mut hasher =
                 Hasher::new(MessageDigest::sha256()).expect("Digest::digest: initialization error");
@@ -37,6 +38,7 @@ impl Digest {
 
     #[must_use]
     pub fn verify_header(&self, other: &Self) -> bool {
+        println!("Verifying verify_header");
         self.value() == other.value()
     }
 

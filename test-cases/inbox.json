@@ -1,108 +1,60 @@
 [
   {
-    "name": "federation sends an unsigned follow request for an unknown actor",
+    "name": "federation sends a follow request for a known actor",
     "request": {
       "version": "2.0",
       "routeKey": "$default",
       "rawPath": "/users/test_username/inbox",
       "rawQueryString": "",
-      "cookies": [],
       "headers": {
-        "Content-Type": ["application/activity+json"],
-        "Digest": ["SHA-256=4xTf0IjwAnGNeeoIK6ooVxE+XARKIyHVagmSi8LFF1Q="],
-        "Signature": [
-          "keyId=\"https://mastodon.social/users/jgarr#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date digest content-type\",signature=\"hx1jRjCGyBfnI/Cak8ujAlfau5G1Ph+9niCFyRdm5J7b9wQGxbk+SbUhG0kV2L7W0h54JBc6htQhR8V+fFqxX+UiLXe1l7jRoBZOYSKq7UKqtogJwLLvS89DeDgWLWDPqbZ6W1FzU9MLUqJLTqFNnhgtOH+m+YhKEfjE35+65d5vmPUNjR8TRDAjXjMugMi3NmeaeA789NV3gs7GaGyfI734kGwvPDHcLp9MyDHqBivdDqmPAzXRP4gyrjqXHQRpxCdX7iinA/aqgnsNf2CoY/uH7M+z+zPWohlTvVDU2L+xeT2N7pXFc6WxREPV4ojZ+VxMzmIuzHkxW8TVpVNwMw==\""
-        ],
-        "Accept-Encoding": ["gzip"]
+        "x-amzn-tls-version": "TLSv1.2",
+        "x-forwarded-proto": "https",
+        "signature": "keyId=\"https://example.com/users/test_username#main-key\",algorithm=\"rsa-sha256\",headers=\"host date digest content-type\",signature=\"SIGNATURE_PLACEHOLDER\"",
+        "x-forwarded-port": "443",
+        "x-forwarded-for": "162.19.31.97",
+        "via": "1.1 449a51e3fb5bfe1fe97ced981c9a5b4e.cloudfront.net (CloudFront)",
+        "x-amzn-tls-cipher-suite": "ECDHE-RSA-AES128-GCM-SHA256",
+        "x-amzn-trace-id": "Root=1-63f3e787-5625d0b94c7acdc91dc25d74",
+        "digest": "SHA-256=MXMcGEtsEj/Bqg5ZVZkHoZFyJe7k7avi1Hnc5rVXMzU=",
+        "host": "example.com",
+        "content-type": "application/activity+json",
+        "accept-encoding": "gzip",
+        "x-amz-cf-id": "8o65jbh76x7rSXVSN0vL0tXyoShuczOQSf8WYL3ueK_ALpBwAn_lUw==",
+        "user-agent": "Amazon CloudFront"
       },
       "requestContext": {
-        "accountId": "123456789012",
-        "apiId": "api-id",
-        "authentication": {
-          "clientCert": {
-            "clientCertPem": "CERT_CONTENT",
-            "subjectDN": "www.example.com",
-            "issuerDN": "Example issuer",
-            "serialNumber": "a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1",
-            "validity": {
-              "notBefore": "May 28 12:30:02 2019 GMT",
-              "notAfter": "Aug  5 09:36:04 2021 GMT"
-            }
-          }
-        },
-        "authorizer": {
-          "jwt": {
-            "claims": {
-              "claim1": "value1",
-              "claim2": "value2"
-            },
-            "scopes": ["scope1", "scope2"]
-          }
-        },
-        "domainName": "id.execute-api.us-east-1.amazonaws.com",
-        "domainPrefix": "id",
+        "accountId": "anonymous",
         "http": {
           "method": "POST",
           "path": "/users/test_username/inbox",
           "protocol": "HTTP/1.1",
-          "sourceIp": "192.0.2.1",
-          "userAgent": "agent"
+          "sourceIp": "15.158.44.245",
+          "userAgent": "Amazon CloudFront"
         },
-        "requestId": "id",
+        "requestId": "249deea0-ccc6-4771-a7b5-cc8dd454a7f6",
         "routeKey": "$default",
         "stage": "$default",
-        "time": "12/Mar/2020:19:03:58 +0000",
-        "timeEpoch": 1583348638390
+        "time": "20/Feb/2023:21:35:03 +0000",
+        "timeEpoch": 1676928903060
       },
-      "pathParameters": {
-        "parameter1": "value1"
-      },
-      "isBase64Encoded": false,
-      "stageVariables": {
-        "stageVariable1": "value1",
-        "stageVariable2": "value2"
-      }
+      "isBase64Encoded": false
     },
     "request_body_json": {
-      "@context": [
-        "https://www.w3.org/ns/activitystreams",
-        {
-          "ostatus": "http://ostatus.org#",
-          "atomUri": "ostatus:atomUri",
-          "in_reply_to_atom_uri": "ostatus:in_reply_to_atom_uri",
-          "conversation": "ostatus:conversation",
-          "sensitive": "as:sensitive",
-          "Hashtag": "as:Hashtag",
-          "toot": "http://joinmastodon.org/ns#",
-          "Emoji": "toot:Emoji",
-          "focalPoint": {
-            "@container": "@list",
-            "@id": "toot:focalPoint"
-          }
-        }
-      ],
-      "actor": "https://mastodon.social/users/example_follower",
+      "@context": "https://www.w3.org/ns/activitystreams",
+      "id": "https://example.com/a568596b-e6a0-4a5f-a5b1-9167756d4b68",
       "type": "Follow",
-      "summary": null,
-      "inReplyTo": null,
-      "published": "2019-04-28T20:58:40Z",
-      "to": ["https://www.w3.org/ns/activitystreams#Public"],
-      "sensitive": false,
-      "in_reply_to_atom_uri": null,
-      "conversation": "tag:mastodon.social,2019-04-28:objectId=1754000:objectType=Conversation",
-      "content": "test_content",
-      "attachment": [],
-      "tag": []
+      "actor": "https://example.com/users/test_username",
+      "object": "https://example.com/users/test_username"
     },
     "expected_response": {
-      "body": "Missing actor",
+      "body": "",
       "cookies": [],
       "headers": {
         "content-type": "text/plain; charset=utf-8"
       },
       "isBase64Encoded": false,
       "multiValueHeaders": {},
-      "statusCode": 400
+      "statusCode": 200
     }
   }
 ]

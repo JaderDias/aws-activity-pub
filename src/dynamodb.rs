@@ -5,10 +5,8 @@ use aws_sdk_dynamodb::model::{
 };
 use aws_sdk_dynamodb::types::SdkError;
 use aws_sdk_dynamodb::Client;
-use openssl::rsa::Rsa;
 
-const DEFAULT_TABLE_NAME: &str = "table_name";
-const KEYSIZE: u32 = 4096;
+pub const DEFAULT_TABLE_NAME: &str = "table_name";
 pub const PARTITION_KEY_NAME: &str = "partition_key";
 pub const SORT_KEY_NAME: &str = "sort_key";
 
@@ -23,12 +21,14 @@ pub async fn get_item(
     dynamodb_table_name: &str,
     partition: &str,
     sort_value: &str,
+    projection_expression: &str,
 ) -> GetItemResult {
     client
         .get_item()
         .table_name(dynamodb_table_name)
         .key(PARTITION_KEY_NAME, AttributeValue::S(partition.to_owned()))
         .key(SORT_KEY_NAME, AttributeValue::S(sort_value.to_owned()))
+        .projection_expression(projection_expression)
         .send()
         .await
 }
@@ -129,34 +129,4 @@ pub async fn create_table_if_not_exists(client: &aws_sdk_dynamodb::Client) {
         .send()
         .await
         .unwrap();
-}
-
-/// # Panics
-///
-/// Will panic if it can´t generate the private key.
-pub async fn create_user(preferred_username: &str) -> crate::model::user::User {
-    let keypair = Rsa::generate(KEYSIZE).unwrap();
-    let partition = format!("users/{preferred_username}");
-    let user = crate::model::user::User {
-        preferred_username: Some(preferred_username.to_owned()),
-        private_key: Some(keypair.private_key_to_der().unwrap()),
-        public_key: Some(keypair.public_key_to_der().unwrap()),
-    };
-    let values = serde_dynamo::to_item(&user).unwrap();
-
-    let db_client = get_client().await;
-    if std::env::var("LOCAL_DYNAMODB_URL").is_ok() {
-        create_table_if_not_exists(&db_client).await;
-    }
-
-    crate::dynamodb::put_item(
-        &db_client,
-        DEFAULT_TABLE_NAME,
-        partition.as_str(),
-        "user",
-        values,
-    )
-    .await
-    .unwrap();
-    user
 }

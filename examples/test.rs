@@ -1,16 +1,23 @@
 use aws_lambda_events::apigw::ApiGatewayV2httpRequest;
 use aws_lambda_events::apigw::ApiGatewayV2httpResponse;
 use aws_lambda_events::encodings::Body;
+use base64::{engine::general_purpose, Engine as _};
+use std::time::SystemTime;
+
+use chrono::{offset::Utc, DateTime};
+use http::header::{HeaderMap, HeaderValue};
 use regex::Regex;
-use rust_lambda::activitypub::signable::Signable;
+use rust_lambda::activitypub::object::Object;
+use rust_lambda::activitypub::signature;
+use rust_lambda::activitypub::signer::Signer;
+use rust_lambda::dynamodb;
+use rust_lambda::model::user::User;
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::env;
 use std::fs::File;
 
 type TestCases = Vec<TestCase>;
-
-const DB_URL: &str = "http://localhost:8000";
 
 #[derive(Deserialize)]
 struct TestCase {
@@ -27,15 +34,28 @@ struct TestCase {
 async fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
-        eprintln!("Usage: {} http://localhost:8000", args[0]);
+        eprintln!(
+            "Usage: LOCAL_DYNAMODB_URL=http://localhost:8000 {} http://localhost:8080",
+            args[0]
+        );
         return;
     }
 
     let test_target_url = &args[1];
-    let signer: rust_lambda::model::user::User;
-    //  if test_target_url.contains("localhost") {
-    signer = rust_lambda::dynamodb::create_user("test_username").await;
-    //  }
+    let signer: Option<User> = if test_target_url.contains("localhost") {
+        let db_client = dynamodb::get_client().await;
+        dynamodb::create_table_if_not_exists(&db_client).await;
+        Some(
+            rust_lambda::model::user::create(
+                db_client,
+                dynamodb::DEFAULT_TABLE_NAME,
+                "test_username",
+            )
+            .await,
+        )
+    } else {
+        None
+    };
 
     let paths = std::fs::read_dir("./test-cases").unwrap();
 
@@ -53,7 +73,7 @@ async fn main() {
                 test.request.body = Some(serde_json::to_string(body).unwrap());
             }
 
-            let request = &test.request;
+            let request = &mut test.request;
             let actual_response: reqwest::Response;
             let mut url = format!("{test_target_url}{}", &request.raw_path.as_ref().unwrap());
             if &request.request_context.http.method == "POST" {
@@ -71,14 +91,17 @@ async fn main() {
                 let digest =
                     rust_lambda::activitypub::digest::Digest::from_body(&request_body.to_string());
                 println!("Digest {digest}");
-                let request_body_value: &mut serde_json::Value =
-                    &mut serde_json::from_str(&request_body).unwrap();
-                let signature = request_body_value.sign(&signer).unwrap();
-                println!("Signature {signature}");
+                let headers = &mut request.headers;
+                if let Some(user) = &signer {
+                    if let Some(signature_header) = headers.get("signature") {
+                        insert_date(headers);
+                        insert_signature(user, headers);
+                    }
+                }
                 actual_response = http_client
                     .post(url)
                     .body(request_body)
-                    .headers(request.headers.to_owned())
+                    .headers(headers.to_owned())
                     .send()
                     .await
                     .unwrap();
@@ -106,9 +129,66 @@ async fn main() {
             );
 
             let actual_body_text = actual_response.text().await.unwrap();
+            if let Some(signer) = &signer {
+                if let Some(expected_body) = &mut test.expected_body_json {
+                    let expected_object: Result<Object, serde_json::Error> =
+                        serde_json::from_value(expected_body.clone());
+                    if let Ok(mut expected_object) = expected_object {
+                        if let Some(public_key) = expected_object.public_key.as_mut() {
+                            let public_key_der = signer.public_key.as_ref().unwrap();
+                            public_key.public_key_pem =
+                                rust_lambda::rsa::der_to_pem(public_key_der);
+                            expected_object.published = Some(signer.get_published_time());
+                            test.expected_body_json =
+                                Some(serde_json::to_value(expected_object).unwrap());
+                        }
+                    }
+                }
+            }
             last_regex_capture = assert_body_matches_with_replacement(&test, &actual_body_text);
         }
     }
+}
+
+fn insert_date(all_headers: &mut HeaderMap) {
+    let date: DateTime<Utc> = SystemTime::now().into();
+    let date = format!("{}", date.format("%a, %d %b %Y %T GMT"));
+    let date = HeaderValue::from_str(&date).unwrap();
+    all_headers.insert("date", date);
+}
+
+fn insert_signature(user: &User, all_headers: &mut HeaderMap) {
+    let signature_header = all_headers.get("signature").unwrap();
+    let parsed_signature_header = signature::parse_header(signature_header.to_str().unwrap());
+    let select_headers = select_headers(
+        all_headers,
+        parsed_signature_header.headers.unwrap().as_str(),
+    );
+    let signature = user.sign(&select_headers).unwrap();
+    let signature = general_purpose::STANDARD.encode(signature);
+
+    println!("Signature {signature}");
+    let signature_header = signature_header.to_str().unwrap().to_owned();
+    let signature_header =
+        signature_header.replace("SIGNATURE_PLACEHOLDER", format!("{}", signature).as_str());
+    let signature_header = HeaderValue::from_str(signature_header.as_str()).unwrap();
+    all_headers.insert("signature", signature_header);
+    println!("Headers {:?}", all_headers);
+}
+
+fn select_headers(all_headers: &HeaderMap, query: &str) -> String {
+    query
+        .split_whitespace()
+        .map(|header| (header, all_headers.get(header)))
+        .map(|(header, value)| {
+            format!(
+                "{}: {}",
+                header.to_lowercase(),
+                value.unwrap().to_str().unwrap_or("")
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 fn assert_body_matches_with_replacement(test: &TestCase, actual_body_text: &String) -> String {

@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
+use std::cmp::PartialEq;
+use std::fmt::Debug;
 
 // TODO: use activitystreams = "0.6.2"
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct Object {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor: Option<String>,
@@ -22,6 +24,8 @@ pub struct Object {
     pub context: serde_json::Value,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub conversation: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub devices: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub discoverable: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -46,8 +50,13 @@ pub struct Object {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub object: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub outbox: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "preferredUsername")]
     pub preferred_username: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "publicKey")]
+    pub public_key: Option<PublicKey>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published: Option<String>,
     pub r#type: String,
@@ -61,13 +70,23 @@ pub struct Object {
     pub to: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
+    #[serde(flatten)]
+    pub extra: serde_json::Value,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct Attachment {
     pub r#type: String,
     #[serde(rename = "mediaType")]
     pub media_type: String,
     pub url: String,
     pub name: String,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+pub struct PublicKey {
+    pub id: String,
+    pub owner: String,
+    #[serde(rename = "publicKeyPem")]
+    pub public_key_pem: String,
 }
