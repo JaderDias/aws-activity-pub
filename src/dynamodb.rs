@@ -6,7 +6,7 @@ use aws_sdk_dynamodb::model::{
 use aws_sdk_dynamodb::types::SdkError;
 use aws_sdk_dynamodb::Client;
 
-pub const DEFAULT_TABLE_NAME: &str = "table_name";
+pub const DEFAULT_TABLE_NAME: &str = "ServerlessActivityPub";
 pub const PARTITION_KEY_NAME: &str = "partition_key";
 pub const SORT_KEY_NAME: &str = "sort_key";
 

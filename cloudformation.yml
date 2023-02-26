@@ -15,7 +15,7 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: "MyTable"
+      TableName: "ServerlessActivityPub"
       AttributeDefinitions:
         - AttributeName: partition_key
           AttributeType: S

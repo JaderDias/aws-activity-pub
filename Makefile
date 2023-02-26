@@ -77,7 +77,7 @@ refresh_database:
 
 run_service_in_background: kill_service_running_in_background
 	CUSTOM_DOMAIN=example.com \
-		DYNAMODB_TABLE=table_name \
+		DYNAMODB_TABLE=ServerlessActivityPub \
 		LOCAL_DYNAMODB_URL=http://localhost:8000 \
 		REGION=eu-west-1 \
 		./target/debug/rust_lambda &
