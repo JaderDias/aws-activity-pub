@@ -9,6 +9,7 @@ mkdir -p dist/amazonlinux2 ||
 	exit 1
 if uname -a | grep x86_64; then
 	docker-compose -f docker/build/docker-compose.yml up \
+		--build \
 		--exit-code-from amazonlinux2 ||
 		exit 1
 	cp target/release/rust_lambda dist/amazonlinux2/bootstrap

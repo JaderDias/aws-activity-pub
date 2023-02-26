@@ -41,7 +41,10 @@ impl crate::activitypub::verifier::Verifier for PKey<Public> {
         let mut verifier = Verifier::new(MessageDigest::sha256(), &self)
             .map_err(|e| format!("Failed to create verifier {e:?}"))?;
         verifier
-            .verify_oneshot(signature, data.as_bytes())
+            .update(data.as_bytes())
+            .map_err(|e| format!("Failed to update verifier {e:?}"))?;
+        verifier
+            .verify(signature)
             .map_err(|e| format!("Failed to verify {e:?}"))
     }
 }
