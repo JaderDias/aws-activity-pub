@@ -1,6 +1,7 @@
 // copied from https://github.com/Plume-org/Plume/blob/main/plume-common/src/activity_pub/request.rs
 use base64::{engine::general_purpose, Engine as _};
 use openssl::hash::{Hasher, MessageDigest};
+use tracing::{event, Level};
 
 pub struct Digest(pub String);
 
@@ -19,7 +20,7 @@ impl Digest {
 
     #[must_use]
     pub fn verify(&self, body: &str) -> bool {
-        println!("Verifying digest");
+        event!(Level::DEBUG, "verify digest");
         if self.algorithm() == "SHA-256" {
             let mut hasher =
                 Hasher::new(MessageDigest::sha256()).expect("Digest::digest: initialization error");
@@ -38,7 +39,7 @@ impl Digest {
 
     #[must_use]
     pub fn verify_header(&self, other: &Self) -> bool {
-        println!("Verifying verify_header");
+        event!(Level::DEBUG, "verify_header digest");
         self.value() == other.value()
     }
 

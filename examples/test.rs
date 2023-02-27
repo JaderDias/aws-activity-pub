@@ -3,6 +3,7 @@ use aws_lambda_events::apigw::ApiGatewayV2httpResponse;
 use aws_lambda_events::encodings::Body;
 use base64::{engine::general_purpose, Engine as _};
 use std::time::SystemTime;
+use tracing::{event, Level};
 
 use chrono::{offset::Utc, DateTime};
 use http::header::{HeaderMap, HeaderValue};
@@ -32,6 +33,7 @@ struct TestCase {
 
 #[tokio::main]
 async fn main() {
+    rust_lambda::tracing::init();
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
         eprintln!(
@@ -88,12 +90,13 @@ async fn main() {
                         .replace(placeholder, last_regex_capture.as_str());
                 }
 
-                let digest =
-                    rust_lambda::activitypub::digest::Digest::from_body(&request_body.to_string());
-                println!("Digest {digest}");
                 let headers = &mut request.headers;
                 if let Some(user) = &signer {
-                    if let Some(signature_header) = headers.get("signature") {
+                    if let Some(_signature_header) = headers.get("signature") {
+                        let digest = rust_lambda::activitypub::digest::Digest::from_body(
+                            &request_body.to_string(),
+                        );
+                        event!(Level::DEBUG, digest = digest);
                         insert_date(headers);
                         insert_signature(user, headers);
                     }
@@ -167,13 +170,13 @@ fn insert_signature(user: &User, all_headers: &mut HeaderMap) {
     let signature = user.sign(&select_headers).unwrap();
     let signature = general_purpose::STANDARD.encode(signature);
 
-    println!("Signature {signature}");
+    event!(Level::DEBUG, signature = signature);
     let signature_header = signature_header.to_str().unwrap().to_owned();
     let signature_header =
         signature_header.replace("SIGNATURE_PLACEHOLDER", format!("{}", signature).as_str());
     let signature_header = HeaderValue::from_str(signature_header.as_str()).unwrap();
     all_headers.insert("signature", signature_header);
-    println!("Headers {:?}", all_headers);
+    event!(Level::DEBUG, all_headers = format!("{:?}", all_headers));
 }
 
 fn select_headers(all_headers: &HeaderMap, query: &str) -> String {

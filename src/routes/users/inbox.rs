@@ -27,7 +27,6 @@ pub async fn handler(
     settings: &rocket::State<Settings>,
 ) -> Result<String, BadRequest<String>> {
     let activity: serde_json::Value = serde_json::from_str(&data).unwrap();
-    println!("activity {:?}", activity);
     let actor_id = activity["actor"]
         .as_str()
         .ok_or(BadRequest(Some("Missing actor id for activity".to_owned())))?;

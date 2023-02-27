@@ -8,16 +8,11 @@ mod model;
 mod routes;
 pub mod rsa;
 pub mod settings;
+mod tracing;
 
 #[rocket::main]
 async fn main() -> Result<(), LambdaError> {
-    tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::INFO)
-        // disable printing the name of the module in every log line.
-        .with_target(false)
-        // disabling time is handy because CloudWatch will add the ingestion time.
-        .without_time()
-        .init();
+    tracing::init();
 
     let rocket = rocket::build()
         .mount("/", routes::routes())
