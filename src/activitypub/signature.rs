@@ -20,6 +20,7 @@ pub struct SignatureHeader {
     pub signature: Option<String>,
 }
 
+#[must_use]
 pub fn parse_header(signature_header: &str) -> SignatureHeader {
     let mut result: SignatureHeader = SignatureHeader {
         algorithm: None,
@@ -29,13 +30,13 @@ pub fn parse_header(signature_header: &str) -> SignatureHeader {
     for part in signature_header.split(',') {
         match part {
             part if part.starts_with("algorithm=") => {
-                result.algorithm = Some((&part[11..part.len() - 1]).to_owned())
+                result.algorithm = Some(part[11..part.len() - 1].to_owned());
             }
             part if part.starts_with("headers=") => {
-                result.headers = Some((&part[9..part.len() - 1]).to_owned())
+                result.headers = Some(part[9..part.len() - 1].to_owned());
             }
             part if part.starts_with("signature=") => {
-                result.signature = Some((&part[11..part.len() - 1]).to_owned())
+                result.signature = Some(part[11..part.len() - 1].to_owned());
             }
             _ => {}
         }
@@ -89,7 +90,7 @@ pub fn verify_http_headers<S: super::verifier::Verifier + ::std::fmt::Debug>(
         event!(Level::DEBUG, "invalid signature");
         return SignatureValidity::Invalid;
     }
-    if !headers.contains(&"digest") {
+    if !headers.contains("digest") {
         event!(Level::DEBUG, "valid no digest");
         // signature is valid, but body content is not verified
         return SignatureValidity::ValidNoDigest;
@@ -101,7 +102,7 @@ pub fn verify_http_headers<S: super::verifier::Verifier + ::std::fmt::Debug>(
         // signature was valid, but body content does not match its digest
         return SignatureValidity::Invalid;
     }
-    if !headers.contains(&"date") {
+    if !headers.contains("date") {
         event!(Level::DEBUG, "valid no date");
         return SignatureValidity::Valid; //maybe we shouldn't trust a request without date?
     }

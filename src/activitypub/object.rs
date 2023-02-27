@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
-use std::cmp::PartialEq;
+use std::cmp::{Eq, PartialEq};
 use std::fmt::Debug;
 
 // TODO: use activitystreams = "0.6.2"
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug)]
 pub struct Object {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor: Option<String>,
@@ -74,7 +74,7 @@ pub struct Object {
     pub extra: serde_json::Value,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug)]
 pub struct Attachment {
     pub r#type: String,
     #[serde(rename = "mediaType")]
@@ -83,7 +83,7 @@ pub struct Attachment {
     pub name: String,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug)]
 pub struct PublicKey {
     pub id: String,
     pub owner: String,

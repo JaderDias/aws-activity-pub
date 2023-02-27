@@ -64,6 +64,9 @@ impl Digest {
             .expect("Digest::value: invalid encoding error")
     }
 
+    /// # Errors
+    ///
+    /// Will return `Err` if an invalid header is provided or if it uses an invalid algorithm.
     pub fn from_header(dig: &str) -> Result<Self, String> {
         dig.find('=').map_or_else(
             || Err("Digest::from_header: invalid header".to_owned()),
