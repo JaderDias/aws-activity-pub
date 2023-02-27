@@ -5,6 +5,91 @@
       "version": "2.0",
       "routeKey": "$default",
       "rawPath": "/.well-known/webfinger",
+      "rawQueryString": "resource=acct:test_username@example.com",
+      "cookies": [],
+      "headers": {},
+      "queryStringParameters": {
+        "resource": "acct:test_username@example.com"
+      },
+      "requestContext": {
+        "accountId": "123456789012",
+        "apiId": "api-id",
+        "authentication": {
+          "clientCert": {
+            "clientCertPem": "CERT_CONTENT",
+            "subjectDN": "www.example.com",
+            "issuerDN": "Example issuer",
+            "serialNumber": "a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1",
+            "validity": {
+              "notBefore": "May 28 12:30:02 2019 GMT",
+              "notAfter": "Aug  5 09:36:04 2021 GMT"
+            }
+          }
+        },
+        "authorizer": {
+          "jwt": {
+            "claims": {
+              "claim1": "value1",
+              "claim2": "value2"
+            },
+            "scopes": [
+              "scope1",
+              "scope2"
+            ]
+          }
+        },
+        "domainName": "id.execute-api.us-east-1.amazonaws.com",
+        "domainPrefix": "id",
+        "http": {
+          "method": "GET",
+          "path": "/.well-known/webfinger",
+          "protocol": "HTTP/1.1",
+          "sourceIp": "192.0.2.1",
+          "userAgent": "agent"
+        },
+        "requestId": "id",
+        "routeKey": "$default",
+        "stage": "$default",
+        "time": "12/Mar/2020:19:03:58 +0000",
+        "timeEpoch": 1583348638390
+      },
+      "pathParameters": {
+        "resource": "acct:test_username@example.com"
+      },
+      "isBase64Encoded": false,
+      "stageVariables": {
+        "stageVariable1": "value1",
+        "stageVariable2": "value2"
+      }
+    },
+    "expected_response": {
+       "cookies": [],
+      "headers": {
+        "content-type": "application/json"
+      },
+      "isBase64Encoded": false,
+      "multiValueHeaders": {
+        "content-type": "application/json"
+      },
+      "statusCode": 200
+    },
+    "expected_body_json": {
+      "links": [
+        {
+          "href": "https://example.com/@test_username",
+          "rel": "self",
+          "type": "application/activity+json"
+        }
+      ],
+      "subject": "acct:test_username@example.com"
+    }
+  },
+  {
+    "name": "federation requests information about a non existing user",
+    "request": {
+      "version": "2.0",
+      "routeKey": "$default",
+      "rawPath": "/.well-known/webfinger",
       "rawQueryString": "resource=acct:non_existing_user@example.com",
       "cookies": [],
       "headers": {},
