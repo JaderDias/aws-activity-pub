@@ -57,6 +57,7 @@ html_coverage_report:
 	$(MAKE) grcov TYPE_PARAM=html OUTPUT=coverage
 
 integration_test:
+	RUST_LOG="test=info" \
 	LOCAL_DYNAMODB_URL=http://localhost:8000 \
 		./target/debug/examples/test http://localhost:8080
 
@@ -80,6 +81,7 @@ run_service_in_background: kill_service_running_in_background
 		DYNAMODB_TABLE=ServerlessActivityPub \
 		LOCAL_DYNAMODB_URL=http://localhost:8000 \
 		REGION=eu-west-1 \
+		RUST_LOG="rust_lambda=info" \
 		./target/debug/rust_lambda &
 
 scan_table:

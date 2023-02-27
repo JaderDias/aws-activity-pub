@@ -1,29 +1,13 @@
 use crate::activitypub::digest::Digest;
 use crate::activitypub::signature::{self, SignatureValidity::Valid};
 use crate::settings::Settings;
-use core::fmt::Error;
-use rocket::{
-    request::{FromRequest, Outcome, Request},
-    response::status::BadRequest,
-};
+use rocket::response::status::BadRequest;
 use tracing::{event, Level};
-
-pub struct CustomHeaders<'a>(pub rocket::http::HeaderMap<'a>);
-
-#[rocket::async_trait]
-impl<'r> FromRequest<'r> for CustomHeaders<'r> {
-    type Error = Error;
-
-    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
-        let headers = request.headers().clone();
-        Outcome::Success(Self(headers))
-    }
-}
 
 #[rocket::post("/users/<username>/inbox", data = "<data>")]
 pub async fn handler(
     username: &str,
-    headers: CustomHeaders<'_>,
+    headers: crate::activitypub::headers::Headers<'_>,
     data: String,
     settings: &rocket::State<Settings>,
 ) -> Result<String, BadRequest<String>> {

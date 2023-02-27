@@ -1,5 +1,7 @@
-use aws_lambda_events::apigw::ApiGatewayV2httpRequest;
-use aws_lambda_events::apigw::ApiGatewayV2httpResponse;
+use aws_lambda_events::apigw::{
+    ApiGatewayV2httpRequest, ApiGatewayV2httpRequestContextHttpDescription,
+    ApiGatewayV2httpResponse,
+};
 use aws_lambda_events::encodings::Body;
 use base64::{engine::general_purpose, Engine as _};
 use std::time::SystemTime;
@@ -98,7 +100,7 @@ async fn main() {
                         );
                         event!(Level::DEBUG, digest = digest);
                         insert_date(headers);
-                        insert_signature(user, headers);
+                        insert_signature(user, headers, &request.request_context.http);
                     }
                 }
                 actual_response = http_client
@@ -160,13 +162,19 @@ fn insert_date(all_headers: &mut HeaderMap) {
     all_headers.insert("date", date);
 }
 
-fn insert_signature(user: &User, all_headers: &mut HeaderMap) {
+fn insert_signature(
+    user: &User,
+    all_headers: &mut HeaderMap,
+    http_description: &ApiGatewayV2httpRequestContextHttpDescription,
+) {
     let signature_header = all_headers.get("signature").unwrap();
     let parsed_signature_header = signature::parse_header(signature_header.to_str().unwrap());
     let select_headers = select_headers(
         all_headers,
         parsed_signature_header.headers.unwrap().as_str(),
+        http_description,
     );
+    event!(Level::DEBUG, select_headers = select_headers);
     let signature = user.sign(&select_headers).unwrap();
     let signature = general_purpose::STANDARD.encode(signature);
 
@@ -179,15 +187,25 @@ fn insert_signature(user: &User, all_headers: &mut HeaderMap) {
     event!(Level::DEBUG, all_headers = format!("{:?}", all_headers));
 }
 
-fn select_headers(all_headers: &HeaderMap, query: &str) -> String {
+fn select_headers(
+    all_headers: &HeaderMap,
+    query: &str,
+    http_description: &ApiGatewayV2httpRequestContextHttpDescription,
+) -> String {
     query
         .split_whitespace()
-        .map(|header| (header, all_headers.get(header)))
-        .map(|(header, value)| {
+        .map(|header| {
+            if header == "(request-target)" {
+                return format!(
+                    "(request-target): {} {}",
+                    http_description.method.as_ref().to_lowercase(),
+                    http_description.path.as_ref().unwrap()
+                );
+            }
             format!(
                 "{}: {}",
                 header.to_lowercase(),
-                value.unwrap().to_str().unwrap_or("")
+                all_headers.get(header).unwrap().to_str().unwrap_or("")
             )
         })
         .collect::<Vec<_>>()

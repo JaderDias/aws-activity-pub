@@ -45,15 +45,6 @@ pub fn parse_header(signature_header: &str) -> SignatureHeader {
     result
 }
 
-fn select_headers(all_headers: &HeaderMap<'_>, query: &str) -> String {
-    query
-        .split_whitespace()
-        .map(|header| (header, all_headers.get_one(header)))
-        .map(|(header, value)| format!("{}: {}", header.to_lowercase(), value.unwrap_or("")))
-        .collect::<Vec<_>>()
-        .join("\n")
-}
-
 /// # Panics
 ///
 /// Will panic if it can´t parse the date in the header.
@@ -83,7 +74,7 @@ pub fn verify_http_headers<S: super::verifier::Verifier + ::std::fmt::Debug>(
         .decode(signature)
         .expect("sign::verify_http_headers: can't decode signature");
     let headers = signature_header.headers.unwrap();
-    let select_headers = select_headers(all_headers, headers.as_str());
+    let select_headers = super::headers::select(all_headers, headers.as_str());
     event!(Level::DEBUG, select_headers = select_headers);
 
     if !sender.verify(&select_headers, &signature).unwrap_or(false) {
