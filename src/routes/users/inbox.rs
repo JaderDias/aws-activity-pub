@@ -6,6 +6,7 @@ use rocket::{
     request::{FromRequest, Outcome, Request},
     response::status::BadRequest,
 };
+use tracing::{event, Level};
 
 pub struct CustomHeaders<'a>(pub rocket::http::HeaderMap<'a>);
 
@@ -26,6 +27,10 @@ pub async fn handler(
     data: String,
     settings: &rocket::State<Settings>,
 ) -> Result<String, BadRequest<String>> {
+    for header in headers.0.iter() {
+        event!(Level::DEBUG, "{} = {}", header.name(), header.value());
+    }
+
     let activity: serde_json::Value = serde_json::from_str(&data).unwrap();
     let actor_id = activity["actor"]
         .as_str()
@@ -55,6 +60,6 @@ pub async fn handler(
         return Ok(String::new());
     }
 
-    println!("Invalid signature or digest");
+    event!(Level::DEBUG, "Invalid signature or digest");
     return Err(BadRequest(Some("Invalid signature or digest".to_owned())));
 }
