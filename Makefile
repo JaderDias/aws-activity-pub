@@ -89,7 +89,7 @@ scan_table:
 	@if ! grep -F '[localhost]' <~/.aws/credentials; then \
 		echo "[localhost]\naws_access_key_id = ANY_ACCESS_KEY_WILL_DO\naws_secret_access_key = ANY_SECRET_KEY_WILL_DO" >>~/.aws/credentials; \
 	fi
-	aws dynamodb scan --table-name table_name --endpoint-url http://localhost:8000 --profile localhost
+	aws dynamodb scan --table-name ServerlessActivityPub --endpoint-url http://localhost:8000 --profile localhost
 
 test: \
 	refresh_database \
