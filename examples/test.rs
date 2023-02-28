@@ -33,29 +33,36 @@ struct TestCase {
     placeholder: Option<String>,
 }
 
-fn get_target(args: Vec<String>) -> Option<String> {
-    if args.len() != 2 {
+fn get_target(args: Vec<String>) -> Option<(String, String)> {
+    if args.len() != 3 {
         return None;
     }
 
-    Some(args[1].clone())
+    Some((args[1].clone(), args[2].clone()))
 }
 
 #[tokio::main]
 async fn main() {
     rust_lambda::tracing::init();
     let args: Vec<String> = env::args().collect();
-    let test_target_url = get_target(args)
-        .expect("Usage: LOCAL_DYNAMODB_URL=http://localhost:8000 test localhost:8080");
+    let (test_target_urn, test_username) = get_target(args).expect(
+        "Usage: LOCAL_DYNAMODB_URL=http://localhost:8000 test localhost:8080 test_username",
+    );
 
-    let signer: Option<User> = if test_target_url.contains("localhost") {
+    let test_target_url = if test_target_urn.contains("localhost") {
+        format!("http://{test_target_urn}")
+    } else {
+        format!("https://{test_target_urn}")
+    };
+
+    let signer: Option<User> = if test_target_urn.contains("localhost") {
         let db_client = dynamodb::get_client().await;
         dynamodb::create_table_if_not_exists(&db_client).await;
         Some(
             rust_lambda::model::user::create(
                 db_client,
                 dynamodb::DEFAULT_TABLE_NAME,
-                "test_username",
+                test_username.as_str(),
             )
             .await,
         )
@@ -73,7 +80,8 @@ async fn main() {
         let file = fs::read_to_string(path_value).unwrap();
         let file = file
             .as_str()
-            .replace("example.com", test_target_url.as_str());
+            .replace("example.com", test_target_urn.as_str())
+            .replace("test_username", test_username.as_str());
         let test_cases: TestCases = serde_json::from_str(&file).unwrap();
         let mut last_regex_capture = String::new();
         for mut test in test_cases {
@@ -83,10 +91,7 @@ async fn main() {
 
             let request = &mut test.request;
             let actual_response: reqwest::Response;
-            let mut url = format!(
-                "http://{test_target_url}{}",
-                &request.raw_path.as_ref().unwrap()
-            );
+            let mut url = format!("{test_target_url}{}", &request.raw_path.as_ref().unwrap());
             if &request.request_context.http.method == "POST" {
                 println!(
                     "{} {} {}",

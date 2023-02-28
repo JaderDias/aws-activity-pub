@@ -59,7 +59,7 @@ html_coverage_report:
 integration_test:
 	RUST_LOG="test=info" \
 	LOCAL_DYNAMODB_URL=http://localhost:8000 \
-		./target/debug/examples/test localhost:8080
+		./target/debug/examples/test localhost:8080 test_username
 
 kill_service_running_in_background:
 	pkill rust_lambda || true
