@@ -1,9 +1,7 @@
 use rocket::http::ContentType;
 
 #[derive(rocket::Responder)]
-pub enum NodeInfo {
-    A(String, ContentType),
-}
+pub struct NodeInfo(String, ContentType);
 
 #[rocket::get("/nodeinfo/2.0")]
 pub fn handler() -> NodeInfo {
@@ -26,5 +24,5 @@ pub fn handler() -> NodeInfo {
         "http://nodeinfo.diaspora.software/ns/schema/2.0#,",
     ));
 
-    NodeInfo::A(doc.to_string(), content_type)
+    NodeInfo(doc.to_string(), content_type)
 }

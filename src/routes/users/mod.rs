@@ -20,9 +20,7 @@ pub fn routes() -> Vec<rocket::Route> {
 }
 
 #[derive(rocket::Responder)]
-pub enum UserResponse {
-    A(String, ContentType),
-}
+pub struct UserResponse(String, ContentType);
 
 #[rocket::get("/users/<username>")]
 pub async fn handler(
@@ -112,7 +110,7 @@ pub async fn handler(
             url: Some(format!("{}/@{username}", settings.base_url)),
             extra: serde_json::Value::Null,
         });
-        return Some(UserResponse::A(body.to_string(), content_type));
+        return Some(UserResponse(body.to_string(), content_type));
     }
 
     None
