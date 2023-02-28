@@ -12,18 +12,6 @@
       "requestContext": {
         "accountId": "123456789012",
         "apiId": "api-id",
-        "authentication": {
-          "clientCert": {
-            "clientCertPem": "CERT_CONTENT",
-            "subjectDN": "www.example.com",
-            "issuerDN": "Example issuer",
-            "serialNumber": "a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1",
-            "validity": {
-              "notBefore": "May 28 12:30:02 2019 GMT",
-              "notAfter": "Aug  5 09:36:04 2021 GMT"
-            }
-          }
-        },
         "authorizer": {
           "jwt": {
             "claims": {
@@ -56,7 +44,7 @@
       }
     },
     "expected_response": {
-      "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<XRD xmlns=\"http://docs.oasis-open.org/ns/xri/xrd-1.0\">\n  <Link rel=\"lrdd\" template=\"https://example.com/.well-known/webfinger?resource={uri}\" type=\"application/xrd+xml\" />\n</XRD>",
+      "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<XRD xmlns=\"http://docs.oasis-open.org/ns/xri/xrd-1.0\">\n  <Link rel=\"lrdd\" template=\"TARGET_URL_PLACEHOLDER/.well-known/webfinger?resource={uri}\" type=\"application/xrd+xml\" />\n</XRD>",
       "cookies": [],
       "headers": {
         "content-type": "application/xrd+xml"

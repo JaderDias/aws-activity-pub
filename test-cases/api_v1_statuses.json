@@ -14,7 +14,7 @@
         "authentication": {
           "clientCert": {
             "clientCertPem": "CERT_CONTENT",
-            "subjectDN": "www.example.com",
+            "subjectDN": "www.TARGET_URN_PLACEHOLDER",
             "issuerDN": "Example issuer",
             "serialNumber": "a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1",
             "validity": {
@@ -81,7 +81,7 @@
       "to": ["https://www.w3.org/ns/activitystreams#Public"],
       "sensitive": false,
       "inReplyToAtomUri": null,
-      "conversation": "tag:example.com,2019-04-28:objectId=1754000:objectType=Conversation",
+      "conversation": "tag:TARGET_URN_PLACEHOLDER,2019-04-28:objectId=1754000:objectType=Conversation",
       "content": "test_content",
       "attachment": [],
       "tag": []
@@ -104,25 +104,13 @@
     "request": {
       "version": "2.0",
       "routeKey": "$default",
-      "rawPath": "/users/test_username/statuses/1234567890123456789",
+      "rawPath": "/users/TARGET_USERNAME_PLACEHOLDER/statuses/1234567890123456789",
       "rawQueryString": "",
       "cookies": [],
       "headers": {},
       "requestContext": {
         "accountId": "123456789012",
         "apiId": "api-id",
-        "authentication": {
-          "clientCert": {
-            "clientCertPem": "CERT_CONTENT",
-            "subjectDN": "www.example.com",
-            "issuerDN": "Example issuer",
-            "serialNumber": "a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1",
-            "validity": {
-              "notBefore": "May 28 12:30:02 2019 GMT",
-              "notAfter": "Aug  5 09:36:04 2021 GMT"
-            }
-          }
-        },
         "authorizer": {
           "jwt": {
             "claims": {
@@ -136,7 +124,7 @@
         "domainPrefix": "id",
         "http": {
           "method": "GET",
-          "path": "/users/test_username/statuses/1234567890123456789",
+          "path": "/users/TARGET_USERNAME_PLACEHOLDER/statuses/1234567890123456789",
           "protocol": "HTTP/1.1",
           "sourceIp": "192.0.2.1",
           "userAgent": "agent"
@@ -186,12 +174,12 @@
         }
       ],
       "attachment": [],
-      "id": "https://example.com/users/test_username/statuses/1234567890123456789",
+      "id": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER/statuses/1234567890123456789",
       "type": "Note",
       "published": "2019-04-28T20:58:40Z",
       "to": ["https://www.w3.org/ns/activitystreams#Public"],
       "sensitive": false,
-      "conversation": "tag:example.com,2019-04-28:objectId=1754000:objectType=Conversation",
+      "conversation": "tag:TARGET_URN_PLACEHOLDER,2019-04-28:objectId=1754000:objectType=Conversation",
       "content": "test_content",
       "tag": []
     },

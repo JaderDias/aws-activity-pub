@@ -29,10 +29,9 @@ pub async fn handler(
     username: &str,
     settings: &rocket::State<crate::settings::Settings>,
 ) -> Option<UserResponse> {
-    let domain = settings.domain_name.as_str();
     if let Some(user) = crate::model::user::get(username, settings).await {
         let public_key = rsa::der_to_pem(user.public_key.as_ref().unwrap());
-        let user_uri = format!("https://{domain}/users/{username}");
+        let user_uri = format!("{}/users/{username}", settings.base_url);
         let context: serde_json::Value = serde_json::from_str(
             r#"[
             "https://www.w3.org/ns/activitystreams",
@@ -110,7 +109,7 @@ pub async fn handler(
             summary: Some(String::new()),
             tag: Some(Vec::new()),
             to: None,
-            url: Some(format!("https://{domain}/@{username}")),
+            url: Some(format!("{}/@{username}", settings.base_url)),
             extra: serde_json::Value::Null,
         });
         return Some(UserResponse::A(body.to_string(), content_type));

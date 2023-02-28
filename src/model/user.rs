@@ -64,17 +64,28 @@ impl crate::activitypub::signer::Signer for User {
 /// # Panics
 ///
 /// Will panic if it can´t get the user.
-pub async fn get(username: &str, settings: &rocket::State<Settings>) -> Option<User> {
+pub async fn get_item(
+    username: &str,
+    db_client: &aws_sdk_dynamodb::Client,
+    table_name: &str,
+) -> aws_sdk_dynamodb::output::GetItemOutput {
     let partition = format!("users/{username}");
-    let get_item_output = crate::dynamodb::get_item(
-        &settings.db_client,
-        &settings.table_name,
+    crate::dynamodb::get_item(
+        &db_client,
+        table_name,
         partition.as_str(),
         "user",
         "private_key, public_key, published_unix_time_seconds",
     )
     .await
-    .unwrap();
+    .unwrap()
+}
+
+/// # Panics
+///
+/// Will panic if it can´t get the user.
+pub async fn get(username: &str, settings: &rocket::State<Settings>) -> Option<User> {
+    let get_item_output = get_item(username, &settings.db_client, &settings.table_name).await;
     if let Some(item) = get_item_output.item {
         let user: User = serde_dynamo::from_item(item).unwrap();
         return Some(user);
@@ -100,7 +111,7 @@ pub async fn get_public_key(
 ///
 /// Will panic if it can´t generate the private key.
 pub async fn create(
-    db_client: aws_sdk_dynamodb::Client,
+    db_client: &aws_sdk_dynamodb::Client,
     table_name: &str,
     preferred_username: &str,
 ) -> User {
@@ -114,7 +125,7 @@ pub async fn create(
         published_unix_time_seconds: since_unix.as_secs(),
     };
     let values = serde_dynamo::to_item(&user).unwrap();
-    crate::dynamodb::put_item(&db_client, table_name, partition.as_str(), "user", values)
+    crate::dynamodb::put_item(db_client, table_name, partition.as_str(), "user", values)
         .await
         .unwrap();
     user

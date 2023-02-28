@@ -5,27 +5,15 @@
       "version": "2.0",
       "routeKey": "$default",
       "rawPath": "/.well-known/webfinger",
-      "rawQueryString": "resource=acct:test_username@example.com",
+      "rawQueryString": "resource=acct:TARGET_USERNAME_PLACEHOLDER@TARGET_URN_PLACEHOLDER",
       "cookies": [],
       "headers": {},
       "queryStringParameters": {
-        "resource": "acct:test_username@example.com"
+        "resource": "acct:TARGET_USERNAME_PLACEHOLDER@TARGET_URN_PLACEHOLDER"
       },
       "requestContext": {
         "accountId": "123456789012",
         "apiId": "api-id",
-        "authentication": {
-          "clientCert": {
-            "clientCertPem": "CERT_CONTENT",
-            "subjectDN": "www.example.com",
-            "issuerDN": "Example issuer",
-            "serialNumber": "a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1",
-            "validity": {
-              "notBefore": "May 28 12:30:02 2019 GMT",
-              "notAfter": "Aug  5 09:36:04 2021 GMT"
-            }
-          }
-        },
         "authorizer": {
           "jwt": {
             "claims": {
@@ -54,7 +42,7 @@
         "timeEpoch": 1583348638390
       },
       "pathParameters": {
-        "resource": "acct:test_username@example.com"
+        "resource": "acct:TARGET_USERNAME_PLACEHOLDER@TARGET_URN_PLACEHOLDER"
       },
       "isBase64Encoded": false,
       "stageVariables": {
@@ -76,12 +64,12 @@
     "expected_body_json": {
       "links": [
         {
-          "href": "https://example.com/@test_username",
+          "href": "TARGET_URL_PLACEHOLDER/@TARGET_USERNAME_PLACEHOLDER",
           "rel": "self",
           "type": "application/activity+json"
         }
       ],
-      "subject": "acct:test_username@example.com"
+      "subject": "acct:TARGET_USERNAME_PLACEHOLDER@TARGET_URN_PLACEHOLDER"
     }
   },
   {
@@ -90,11 +78,11 @@
       "version": "2.0",
       "routeKey": "$default",
       "rawPath": "/.well-known/webfinger",
-      "rawQueryString": "resource=acct:non_existing_user@example.com",
+      "rawQueryString": "resource=acct:non_existing_user@TARGET_URN_PLACEHOLDER",
       "cookies": [],
       "headers": {},
       "queryStringParameters": {
-        "resource": "acct:non_existing_user@example.com"
+        "resource": "acct:non_existing_user@TARGET_URN_PLACEHOLDER"
       },
       "requestContext": {
         "accountId": "123456789012",
@@ -102,7 +90,7 @@
         "authentication": {
           "clientCert": {
             "clientCertPem": "CERT_CONTENT",
-            "subjectDN": "www.example.com",
+            "subjectDN": "www.TARGET_URN_PLACEHOLDER",
             "issuerDN": "Example issuer",
             "serialNumber": "a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1",
             "validity": {
@@ -136,7 +124,7 @@
         "timeEpoch": 1583348638390
       },
       "pathParameters": {
-        "resource": "acct:non_existing_user@example.com"
+        "resource": "acct:non_existing_user@TARGET_URN_PLACEHOLDER"
       },
       "isBase64Encoded": false,
       "stageVariables": {

@@ -18,13 +18,17 @@ pub async fn handler(
     }
     let username = sub_split[0];
     let domain = sub_split[1];
+    if domain != settings.domain_name {
+        return None;
+    }
+
     if let Some(_) = user::get(username, settings).await {
         return Some(Json(serde_json::json!({
           "subject": resource,
           "links": [{
             "rel": "self",
             "type": "application/activity+json",
-            "href": format!("https://{domain}/@{username}")
+            "href": format!("{}/@{username}", settings.base_url)
           }]
         })));
     }

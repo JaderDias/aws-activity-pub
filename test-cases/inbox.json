@@ -4,19 +4,18 @@
     "request": {
       "version": "2.0",
       "routeKey": "$default",
-      "rawPath": "/users/test_username/inbox",
+      "rawPath": "/users/TARGET_USERNAME_PLACEHOLDER/inbox",
       "rawQueryString": "",
       "headers": {
         "x-amzn-tls-version": "TLSv1.2",
         "x-forwarded-proto": "https",
-        "signature": "keyId=\"https://example.com/users/test_username#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date digest content-type\",signature=\"SIGNATURE_PLACEHOLDER\"",
+        "signature": "keyId=\"SIGNER_URL_PLACEHOLDER/users/SIGNER_USERNAME_PLACEHOLDER#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date digest content-type\",signature=\"SIGNATURE_PLACEHOLDER\"",
         "x-forwarded-port": "443",
         "x-forwarded-for": "162.19.31.97",
         "via": "1.1 449a51e3fb5bfe1fe97ced981c9a5b4e.cloudfront.net (CloudFront)",
         "x-amzn-tls-cipher-suite": "ECDHE-RSA-AES128-GCM-SHA256",
         "x-amzn-trace-id": "Root=1-63f3e787-5625d0b94c7acdc91dc25d74",
-        "digest": "SHA-256=MXMcGEtsEj/Bqg5ZVZkHoZFyJe7k7avi1Hnc5rVXMzU=",
-        "host": "example.com",
+        "host": "TARGET_URN_PLACEHOLDER",
         "content-type": "application/activity+json",
         "accept-encoding": "gzip",
         "x-amz-cf-id": "8o65jbh76x7rSXVSN0vL0tXyoShuczOQSf8WYL3ueK_ALpBwAn_lUw==",
@@ -26,7 +25,7 @@
         "accountId": "anonymous",
         "http": {
           "method": "POST",
-          "path": "/users/test_username/inbox",
+          "path": "/users/TARGET_USERNAME_PLACEHOLDER/inbox",
           "protocol": "HTTP/1.1",
           "sourceIp": "15.158.44.245",
           "userAgent": "Amazon CloudFront"
@@ -41,10 +40,10 @@
     },
     "request_body_json": {
       "@context": "https://www.w3.org/ns/activitystreams",
-      "id": "https://example.com/a568596b-e6a0-4a5f-a5b1-9167756d4b68",
+      "id": "SIGNER_URL_PLACEHOLDER/a568596b-e6a0-4a5f-a5b1-9167756d4b68",
       "type": "Follow",
-      "actor": "https://example.com/users/test_username",
-      "object": "https://example.com/users/test_username"
+      "actor": "SIGNER_URL_PLACEHOLDER/users/SIGNER_USERNAME_PLACEHOLDER",
+      "object": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER"
     },
     "expected_response": {
       "cookies": [],
@@ -57,10 +56,10 @@
     },
     "expected_body_json": {
       "@context": "https://www.w3.org/ns/activitystreams",
-      "id": "https://example.com/a568596b-e6a0-4a5f-a5b1-9167756d4b68",
+      "id": "SIGNER_URL_PLACEHOLDER/a568596b-e6a0-4a5f-a5b1-9167756d4b68",
       "type": "Follow",
-      "actor": "https://example.com/users/test_username",
-      "object": "https://example.com/users/test_username"
+      "actor": "SIGNER_URL_PLACEHOLDER/users/SIGNER_USERNAME_PLACEHOLDER",
+      "object": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER"
     }
   }
 ]

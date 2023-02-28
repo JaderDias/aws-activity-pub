@@ -12,11 +12,11 @@ pub async fn handler(
     }
 
     let status_id = crate::faas_snowflake_id::get_id(settings.node_id).to_string();
-    let username = "test_username"; // TODO: replace with authenticated username
+    let username = "target_username"; // TODO: replace with authenticated username
     let partition = format!("users/{username}/statuses");
     object.id = Some(format!(
-        "https://{}/{}/{}",
-        settings.domain_name,
+        "{}/{}/{}",
+        settings.base_url,
         partition.as_str(),
         status_id.as_str(),
     ));

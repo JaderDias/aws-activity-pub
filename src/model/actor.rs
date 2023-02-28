@@ -7,6 +7,8 @@ use openssl::{
     sign::Verifier,
 };
 
+use tracing::{event, Level};
+
 pub async fn get_public_key(
     actor_id: &str,
     settings: &rocket::State<Settings>,
@@ -38,6 +40,10 @@ fn get_domain(actor_id: &str) -> Result<&str, String> {
 impl crate::activitypub::verifier::Verifier for PKey<Public> {
     /// Verify if the signature is valid
     fn verify(&self, data: &str, signature: &[u8]) -> Result<bool, String> {
+        event!(
+            Level::DEBUG,
+            public_key = hex::encode(self.public_key_to_der().unwrap())
+        );
         let mut verifier = Verifier::new(MessageDigest::sha256(), &self)
             .map_err(|e| format!("Failed to create verifier {e:?}"))?;
         verifier

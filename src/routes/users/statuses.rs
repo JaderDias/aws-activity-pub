@@ -1,6 +1,7 @@
 use crate::activitypub::object::Object;
 use aws_sdk_dynamodb::model::AttributeValue;
 use rocket::serde::json::Json;
+use tracing::{event, Level};
 
 #[rocket::get("/users/<username>/statuses/<status_id>")]
 pub async fn handler(
@@ -8,6 +9,7 @@ pub async fn handler(
     status_id: &str,
     settings: &rocket::State<crate::settings::Settings>,
 ) -> Option<Json<Object>> {
+    event!(Level::DEBUG, username = username, status_id = status_id);
     let partition = format!("users/{username}/statuses");
     let get_item_output = settings.db_client
         .get_item()

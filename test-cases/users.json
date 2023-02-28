@@ -4,7 +4,7 @@
     "request": {
       "version": "2.0",
       "routeKey": "$default",
-      "rawPath": "/users/test_username",
+      "rawPath": "/users/TARGET_USERNAME_PLACEHOLDER",
       "rawQueryString": "",
       "cookies": [],
       "headers": {
@@ -15,25 +15,13 @@
           "gzip"
         ],
         "Signature": [
-          "keyId=\"https://example.com/actor#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date accept\",signature=\"wUAArkeEJh4yXkstcC8IgrnSlsRcledOUjo63nqRZrXI0RtoKo369/+j5K7bEFDoJ8psuCnnY9cW+KDgog7Gg2mQjAb1cZa2ffeqFY3PPXqpO+5entfRkAEyYBsrd3CiVn5wz0LEwbOs3XHe1w2wVgoIbSunCE/DN0Ra5tQLriITzBA5YzI26QuQSJzb5sMmMjiTiVocF/i0djqXfLmnjvhyaxsS0i0O8LfPHVPzSSGFHaqzawIL28MZu8J42ha//baJmPozQQquFHKs7lcDcSSGtrvMGjfJYoFy4cMSsSqLH / 8 VRzNR0nXs47ydDwQ9XRpT55LPWL7uRQoeYBAkwA == \""
+          "keyId=\"TARGET_URL_PLACEHOLDER/actor#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date accept\",signature=\"wUAArkeEJh4yXkstcC8IgrnSlsRcledOUjo63nqRZrXI0RtoKo369/+j5K7bEFDoJ8psuCnnY9cW+KDgog7Gg2mQjAb1cZa2ffeqFY3PPXqpO+5entfRkAEyYBsrd3CiVn5wz0LEwbOs3XHe1w2wVgoIbSunCE/DN0Ra5tQLriITzBA5YzI26QuQSJzb5sMmMjiTiVocF/i0djqXfLmnjvhyaxsS0i0O8LfPHVPzSSGFHaqzawIL28MZu8J42ha//baJmPozQQquFHKs7lcDcSSGtrvMGjfJYoFy4cMSsSqLH / 8 VRzNR0nXs47ydDwQ9XRpT55LPWL7uRQoeYBAkwA == \""
         ]
       },
       "queryStringParameters": {},
       "requestContext": {
         "accountId": "123456789012",
         "apiId": "api-id",
-        "authentication": {
-          "clientCert": {
-            "clientCertPem": "CERT_CONTENT",
-            "subjectDN": "www.example.com",
-            "issuerDN": "Example issuer",
-            "serialNumber": "a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1",
-            "validity": {
-              "notBefore": "May 28 12:30:02 2019 GMT",
-              "notAfter": "Aug  5 09:36:04 2021 GMT"
-            }
-          }
-        },
         "authorizer": {
           "jwt": {
             "claims": {
@@ -50,7 +38,7 @@
         "domainPrefix": "id",
         "http": {
           "method": "GET",
-          "path": "/users/test_username",
+          "path": "/users/TARGET_USERNAME_PLACEHOLDER",
           "protocol": "HTTP/1.1",
           "sourceIp": "192.0.2.1",
           "userAgent": "agent"
@@ -135,23 +123,23 @@
           "suspended": "toot:suspended"
         }
       ],
-      "devices": "https://example.com/users/test_username/collections/devices",
+      "devices": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER/collections/devices",
       "discoverable": false,
-      "followers": "https://example.com/users/test_username/followers",
-      "following": "https://example.com/users/test_username/following",
-      "id": "https://example.com/users/test_username",
-      "inbox": "https://example.com/users/test_username/inbox",
+      "followers": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER/followers",
+      "following": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER/following",
+      "id": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER",
+      "inbox": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER/inbox",
       "manuallyApprovesFollowers": false,
-      "name": "test_username",
-      "outbox": "https://example.com/users/test_username/outbox",
-      "preferredUsername": "test_username",
+      "name": "TARGET_USERNAME_PLACEHOLDER",
+      "outbox": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER/outbox",
+      "preferredUsername": "TARGET_USERNAME_PLACEHOLDER",
       "published": "2023-01-19T00:00:00Z",
       "summary": "",
       "type": "Person",
-      "url": "https://example.com/@test_username",
+      "url": "TARGET_URL_PLACEHOLDER/@TARGET_USERNAME_PLACEHOLDER",
       "publicKey": {
-        "id": "https://example.com/users/test_username#main-key",
-        "owner": "https://example.com/users/test_username",
+        "id": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER#main-key",
+        "owner": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER",
         "publicKeyPem": "publicKeyPemPlaceholder"
       },
       "tag": [

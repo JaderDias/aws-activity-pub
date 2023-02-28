@@ -44,6 +44,5 @@ pub async fn handler(
         return Ok(data);
     }
 
-    event!(Level::DEBUG, "Invalid signature or digest");
     return Err(BadRequest(Some("Invalid signature or digest".to_owned())));
 }

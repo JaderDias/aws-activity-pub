@@ -7,7 +7,7 @@ async fn main() {
         rust_lambda::dynamodb::create_table_if_not_exists(&db_client).await;
     }
     let _ = rust_lambda::model::user::create(
-        db_client,
+        &db_client,
         rust_lambda::dynamodb::DEFAULT_TABLE_NAME,
         preferred_username.as_str(),
     )

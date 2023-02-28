@@ -59,7 +59,7 @@ html_coverage_report:
 integration_test:
 	RUST_LOG="test=info" \
 	LOCAL_DYNAMODB_URL=http://localhost:8000 \
-		./target/debug/examples/test localhost:8080 test_username
+		./target/debug/examples/test localhost:8080 target_username localhost:8080 signer_username
 
 kill_service_running_in_background:
 	pkill rust_lambda || true
@@ -80,6 +80,7 @@ run_service_in_background: kill_service_running_in_background
 	CUSTOM_DOMAIN=localhost:8080 \
 		DYNAMODB_TABLE=ServerlessActivityPub \
 		LOCAL_DYNAMODB_URL=http://localhost:8000 \
+		PROTOCOL=http \
 		REGION=eu-west-1 \
 		RUST_LOG="rust_lambda=info" \
 		./target/debug/rust_lambda &

@@ -33,41 +33,69 @@ struct TestCase {
     placeholder: Option<String>,
 }
 
-fn get_target(args: Vec<String>) -> Option<(String, String)> {
-    if args.len() != 3 {
+fn get_target(args: Vec<String>) -> Option<(String, String, String, String)> {
+    if args.len() != 5 {
         return None;
     }
 
-    Some((args[1].clone(), args[2].clone()))
+    Some((
+        args[1].clone(),
+        args[2].clone(),
+        args[3].clone(),
+        args[4].clone(),
+    ))
 }
 
 #[tokio::main]
 async fn main() {
     rust_lambda::tracing::init();
     let args: Vec<String> = env::args().collect();
-    let (test_target_urn, test_username) = get_target(args).expect(
-        "Usage: LOCAL_DYNAMODB_URL=http://localhost:8000 test localhost:8080 test_username",
+    let (target_urn, target_username, signer_urn, signer_username) = get_target(args).expect(
+        "Usage: LOCAL_DYNAMODB_URL=http://localhost:8000 test localhost:8080 target_username localhost:8080 signer_username",
     );
 
-    let test_target_url = if test_target_urn.contains("localhost") {
-        format!("http://{test_target_urn}")
+    let target_url = if target_urn.starts_with("localhost") {
+        format!("http://{target_urn}")
     } else {
-        format!("https://{test_target_urn}")
+        format!("https://{target_urn}")
+    };
+    let signer_url = if signer_urn.starts_with("localhost") {
+        format!("http://{signer_urn}")
+    } else {
+        format!("https://{signer_urn}")
     };
 
-    let signer: Option<User> = if test_target_urn.contains("localhost") {
-        let db_client = dynamodb::get_client().await;
+    let db_client = dynamodb::get_client().await;
+    let target_user: Option<User> = if target_urn.starts_with("localhost") {
         dynamodb::create_table_if_not_exists(&db_client).await;
         Some(
             rust_lambda::model::user::create(
-                db_client,
+                &db_client,
                 dynamodb::DEFAULT_TABLE_NAME,
-                test_username.as_str(),
+                target_username.as_str(),
             )
             .await,
         )
     } else {
         None
+    };
+    let signer: User = if signer_urn.starts_with("localhost") {
+        dynamodb::create_table_if_not_exists(&db_client).await;
+        rust_lambda::model::user::create(
+            &db_client,
+            dynamodb::DEFAULT_TABLE_NAME,
+            signer_username.as_str(),
+        )
+        .await
+    } else {
+        let get_item_output = rust_lambda::model::user::get_item(
+            signer_username.as_str(),
+            &db_client,
+            dynamodb::DEFAULT_TABLE_NAME,
+        )
+        .await;
+        let item = get_item_output.item.unwrap();
+        serde_dynamo::from_item(item).unwrap()
     };
 
     let paths = std::fs::read_dir("./test-cases").unwrap();
@@ -80,8 +108,11 @@ async fn main() {
         let file = fs::read_to_string(path_value).unwrap();
         let file = file
             .as_str()
-            .replace("example.com", test_target_urn.as_str())
-            .replace("test_username", test_username.as_str());
+            .replace("TARGET_URN_PLACEHOLDER", target_urn.as_str())
+            .replace("TARGET_URL_PLACEHOLDER", target_url.as_str())
+            .replace("TARGET_USERNAME_PLACEHOLDER", target_username.as_str())
+            .replace("SIGNER_URL_PLACEHOLDER", signer_url.as_str())
+            .replace("SIGNER_USERNAME_PLACEHOLDER", signer_username.as_str());
         let test_cases: TestCases = serde_json::from_str(&file).unwrap();
         let mut last_regex_capture = String::new();
         for mut test in test_cases {
@@ -91,8 +122,9 @@ async fn main() {
 
             let request = &mut test.request;
             let actual_response: reqwest::Response;
-            let mut url = format!("{test_target_url}{}", &request.raw_path.as_ref().unwrap());
+            let mut url = format!("{target_url}{}", &request.raw_path.as_ref().unwrap());
             if &request.request_context.http.method == "POST" {
+                event!(Level::DEBUG, method = "POST");
                 println!(
                     "{} {} {}",
                     &request.request_context.http.method, &url, &test.name
@@ -105,15 +137,11 @@ async fn main() {
                 }
 
                 let headers = &mut request.headers;
-                if let Some(user) = &signer {
-                    if let Some(_signature_header) = headers.get("signature") {
-                        let digest = rust_lambda::activitypub::digest::Digest::from_body(
-                            &request_body.to_string(),
-                        );
-                        event!(Level::DEBUG, digest = digest);
-                        insert_date(headers);
-                        insert_signature(user, headers, &request.request_context.http);
-                    }
+                if let Some(_signature_header) = headers.get("signature") {
+                    event!(Level::DEBUG, signature_header = "present");
+                    insert_digest(headers, &request_body);
+                    insert_date(headers);
+                    insert_signature(&signer, headers, &request.request_context.http);
                 }
                 actual_response = http_client
                     .post(url)
@@ -152,16 +180,16 @@ async fn main() {
             );
 
             let actual_body_text = actual_response.text().await.unwrap();
-            if let Some(signer) = &signer {
+            if let Some(target_user) = &target_user {
                 if let Some(expected_body) = &mut test.expected_body_json {
                     let expected_object: Result<Object, serde_json::Error> =
                         serde_json::from_value(expected_body.clone());
                     if let Ok(mut expected_object) = expected_object {
                         if let Some(public_key) = expected_object.public_key.as_mut() {
-                            let public_key_der = signer.public_key.as_ref().unwrap();
+                            let public_key_der = target_user.public_key.as_ref().unwrap();
                             public_key.public_key_pem =
                                 rust_lambda::rsa::der_to_pem(public_key_der);
-                            expected_object.published = Some(signer.get_published_time());
+                            expected_object.published = Some(target_user.get_published_time());
                             test.expected_body_json =
                                 Some(serde_json::to_value(expected_object).unwrap());
                         }
@@ -173,6 +201,13 @@ async fn main() {
     }
 }
 
+fn insert_digest(all_headers: &mut HeaderMap, request_body: &str) {
+    let digest = rust_lambda::activitypub::digest::Digest::from_body(request_body);
+    event!(Level::DEBUG, digest = digest);
+    let digest = HeaderValue::from_str(&digest).unwrap();
+    all_headers.insert("digest", digest);
+}
+
 fn insert_date(all_headers: &mut HeaderMap) {
     let date: DateTime<Utc> = SystemTime::now().into();
     let date = format!("{}", date.format("%a, %d %b %Y %T GMT"));
@@ -181,7 +216,7 @@ fn insert_date(all_headers: &mut HeaderMap) {
 }
 
 fn insert_signature(
-    user: &User,
+    signer: &User,
     all_headers: &mut HeaderMap,
     http_description: &ApiGatewayV2httpRequestContextHttpDescription,
 ) {
@@ -192,8 +227,12 @@ fn insert_signature(
         parsed_signature_header.headers.unwrap().as_str(),
         http_description,
     );
-    event!(Level::DEBUG, select_headers = select_headers);
-    let signature = user.sign(&select_headers).unwrap();
+    event!(
+        Level::DEBUG,
+        select_headers = select_headers,
+        public_key = hex::encode(&signer.public_key.as_ref().unwrap()),
+    );
+    let signature = signer.sign(&select_headers).unwrap();
     let signature = general_purpose::STANDARD.encode(signature);
 
     event!(Level::DEBUG, signature = signature);
@@ -210,6 +249,13 @@ fn select_headers(
     query: &str,
     http_description: &ApiGatewayV2httpRequestContextHttpDescription,
 ) -> String {
+    event!(
+        Level::DEBUG,
+        query = query,
+        method = http_description.method.as_ref(),
+        path = http_description.path.as_ref().unwrap(),
+        all_headers = format!("{all_headers:?}"),
+    );
     query
         .split_whitespace()
         .map(|header| {

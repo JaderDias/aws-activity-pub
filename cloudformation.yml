@@ -15,7 +15,6 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: "ServerlessActivityPub"
       AttributeDefinitions:
         - AttributeName: partition_key
           AttributeType: S
@@ -70,5 +69,6 @@ Resources:
       Runtime: "provided.al2"
       Environment:
         Variables:
-          CUSTOM_DOMAIN: "example.com"
+          CUSTOM_DOMAIN: "TARGET_URN_PLACEHOLDER"
           DYNAMODB_TABLE: !Ref "DynamoDBTable"
+          PROTOCOL: "https"
