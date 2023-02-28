@@ -241,7 +241,8 @@ fn assert_body_matches(test: &TestCase, actual_body_text: &String) {
         },
         None => match &test.expected_body_json {
             Some(expected_body_value) => {
-                let actual_body_value: Value = serde_json::from_str(actual_body_text).unwrap();
+                let actual_body_value: Value =
+                    serde_json::from_str(actual_body_text).expect("expected JSON response body");
                 assert_eq!(&actual_body_value, expected_body_value);
                 return;
             }

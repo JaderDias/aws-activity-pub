@@ -47,7 +47,6 @@
       "object": "https://example.com/users/test_username"
     },
     "expected_response": {
-      "body": "",
       "cookies": [],
       "headers": {
         "content-type": "text/plain; charset=utf-8"
@@ -55,6 +54,13 @@
       "isBase64Encoded": false,
       "multiValueHeaders": {},
       "statusCode": 200
+    },
+    "expected_body_json": {
+      "@context": "https://www.w3.org/ns/activitystreams",
+      "id": "https://example.com/a568596b-e6a0-4a5f-a5b1-9167756d4b68",
+      "type": "Follow",
+      "actor": "https://example.com/users/test_username",
+      "object": "https://example.com/users/test_username"
     }
   }
 ]

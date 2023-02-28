@@ -41,7 +41,7 @@ pub async fn handler(
         )
         .await
         .unwrap();
-        return Ok(String::new());
+        return Ok(data);
     }
 
     event!(Level::DEBUG, "Invalid signature or digest");
