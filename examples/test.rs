@@ -134,7 +134,13 @@ async fn main() {
                     "{} {} {}",
                     &request.request_context.http.method, &url, &test.name
                 );
-                actual_response = http_client.get(url).send().await.unwrap();
+                let headers = &request.headers;
+                actual_response = http_client
+                    .get(url)
+                    .headers(headers.clone())
+                    .send()
+                    .await
+                    .unwrap();
             }
             assert_eq!(
                 actual_response.status(),

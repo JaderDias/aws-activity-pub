@@ -1,6 +1,6 @@
 use crate::activitypub::object::{Object, PublicKey};
 use crate::rsa;
-use rocket::serde::json::Json;
+use rocket::http::ContentType;
 
 mod followers;
 mod following;
@@ -19,11 +19,16 @@ pub fn routes() -> Vec<rocket::Route> {
     ]
 }
 
+#[derive(rocket::Responder)]
+pub enum UserResponse {
+    A(String, ContentType),
+}
+
 #[rocket::get("/users/<username>")]
 pub async fn handler(
     username: &str,
     settings: &rocket::State<crate::settings::Settings>,
-) -> Option<Json<serde_json::Value>> {
+) -> Option<UserResponse> {
     let domain = settings.domain_name.as_str();
     if let Some(user) = crate::model::user::get(username, settings).await {
         let public_key = rsa::der_to_pem(user.public_key.as_ref().unwrap());
@@ -70,7 +75,9 @@ pub async fn handler(
         ]"#,
         )
         .unwrap();
-        return Some(Json(serde_json::json!(Object {
+        let content_type =
+            ContentType::new("application", "activity+json").with_params(("charset", "utf-8"));
+        let body = serde_json::json!(Object {
             actor: None,
             atom_uri: None,
             attachment: Some(Vec::new()),
@@ -105,7 +112,8 @@ pub async fn handler(
             to: None,
             url: Some(format!("https://{domain}/@{username}")),
             extra: serde_json::Value::Null,
-        })));
+        });
+        return Some(UserResponse::A(body.to_string(), content_type));
     }
 
     None
