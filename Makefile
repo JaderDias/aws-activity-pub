@@ -59,7 +59,7 @@ html_coverage_report:
 integration_test:
 	RUST_LOG="test=info" \
 	LOCAL_DYNAMODB_URL=http://localhost:8000 \
-		./target/debug/examples/test http://localhost:8080
+		./target/debug/examples/test localhost:8080
 
 kill_service_running_in_background:
 	pkill rust_lambda || true
@@ -77,7 +77,7 @@ refresh_database:
 	docker-compose -f docker/test/docker-compose.yml up --build --detach
 
 run_service_in_background: kill_service_running_in_background
-	CUSTOM_DOMAIN=example.com \
+	CUSTOM_DOMAIN=localhost:8080 \
 		DYNAMODB_TABLE=ServerlessActivityPub \
 		LOCAL_DYNAMODB_URL=http://localhost:8000 \
 		REGION=eu-west-1 \

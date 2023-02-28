@@ -18,7 +18,7 @@ use rust_lambda::model::user::User;
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::env;
-use std::fs::File;
+use std::fs;
 
 type TestCases = Vec<TestCase>;
 
@@ -33,19 +33,21 @@ struct TestCase {
     placeholder: Option<String>,
 }
 
+fn get_target(args: Vec<String>) -> Option<String> {
+    if args.len() != 2 {
+        return None;
+    }
+
+    Some(args[1].clone())
+}
+
 #[tokio::main]
 async fn main() {
     rust_lambda::tracing::init();
     let args: Vec<String> = env::args().collect();
-    if args.len() != 2 {
-        eprintln!(
-            "Usage: LOCAL_DYNAMODB_URL=http://localhost:8000 {} http://localhost:8080",
-            args[0]
-        );
-        return;
-    }
+    let test_target_url = get_target(args)
+        .expect("Usage: LOCAL_DYNAMODB_URL=http://localhost:8000 test localhost:8080");
 
-    let test_target_url = &args[1];
     let signer: Option<User> = if test_target_url.contains("localhost") {
         let db_client = dynamodb::get_client().await;
         dynamodb::create_table_if_not_exists(&db_client).await;
@@ -68,9 +70,11 @@ async fn main() {
     for path in paths {
         let path_value = path.unwrap().path();
         println!("Testing: {}", path_value.display());
-        let file = File::open(path_value).unwrap();
-        let mut file_deserializer = serde_json::Deserializer::from_reader(file);
-        let test_cases = TestCases::deserialize(&mut file_deserializer).unwrap();
+        let file = fs::read_to_string(path_value).unwrap();
+        let file = file
+            .as_str()
+            .replace("example.com", test_target_url.as_str());
+        let test_cases: TestCases = serde_json::from_str(&file).unwrap();
         let mut last_regex_capture = String::new();
         for mut test in test_cases {
             if let Some(body) = &test.request_body_json {
@@ -79,7 +83,10 @@ async fn main() {
 
             let request = &mut test.request;
             let actual_response: reqwest::Response;
-            let mut url = format!("{test_target_url}{}", &request.raw_path.as_ref().unwrap());
+            let mut url = format!(
+                "http://{test_target_url}{}",
+                &request.raw_path.as_ref().unwrap()
+            );
             if &request.request_context.http.method == "POST" {
                 println!(
                     "{} {} {}",

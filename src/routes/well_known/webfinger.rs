@@ -1,12 +1,14 @@
 use crate::model::user;
 use rocket::serde::json::Json;
+use tracing::{event, Level};
 
 #[rocket::get("/.well-known/webfinger?<resource>")]
 pub async fn handler(
     resource: &str,
     settings: &rocket::State<crate::settings::Settings>,
 ) -> Option<Json<serde_json::Value>> {
-    let split = resource.split(':').collect::<Vec<&str>>();
+    let split = resource.splitn(2, ':').collect::<Vec<&str>>();
+    event!(Level::DEBUG, "{:?}", split);
     if split[0] != "acct" || split.len() < 2 {
         return None;
     }
