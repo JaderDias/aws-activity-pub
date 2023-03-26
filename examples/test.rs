@@ -104,7 +104,7 @@ async fn main() {
 
     for path in paths {
         let path_value = path.unwrap().path();
-        println!("Testing: {}", path_value.display());
+        event!(Level::INFO, "Testing {}", path_value.display());
         let file = fs::read_to_string(path_value).unwrap();
         let file = file
             .as_str()
@@ -123,12 +123,14 @@ async fn main() {
             let request = &mut test.request;
             let actual_response: reqwest::Response;
             let mut url = format!("{target_url}{}", &request.raw_path.as_ref().unwrap());
+            event!(
+                Level::INFO,
+                method = &request.request_context.http.method.as_ref(),
+                url = &url,
+                query_string = &request.raw_query_string,
+                test_name = &test.name
+            );
             if &request.request_context.http.method == "POST" {
-                event!(Level::DEBUG, method = "POST");
-                println!(
-                    "{} {} {}",
-                    &request.request_context.http.method, &url, &test.name
-                );
                 let mut request_body = json!(&test.request_body_json).to_string();
                 if let Some(placeholder) = &test.placeholder {
                     request_body = request_body
@@ -143,6 +145,22 @@ async fn main() {
                     insert_date(headers);
                     insert_signature(&signer, headers, &request.request_context.http);
                 }
+                event!(
+                    Level::DEBUG,
+                    "curl -H '{}' -d '{}' {}",
+                    headers
+                        .clone()
+                        .into_iter()
+                        .map(|(key, value)| format!(
+                            "{}: {}",
+                            key.unwrap(),
+                            value.to_str().unwrap()
+                        ))
+                        .collect::<Vec<_>>()
+                        .join("' -H '"),
+                    request_body,
+                    url
+                );
                 actual_response = http_client
                     .post(url)
                     .body(request_body)
@@ -158,10 +176,6 @@ async fn main() {
                 if query_string.is_some() {
                     url = format!("{}?{}", url, query_string.as_ref().unwrap());
                 }
-                println!(
-                    "{} {} {}",
-                    &request.request_context.http.method, &url, &test.name
-                );
                 let headers = &request.headers;
                 actual_response = http_client
                     .get(url)

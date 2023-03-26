@@ -18,6 +18,7 @@
 	test_with_coverage \
 	unit_test \
 	watch
+.SHELLFLAGS = -ec # -e for exiting on errors and -c so that -e doesn't cause unwanted side effects
 
 build:
 	cargo clean -p rust_lambda
