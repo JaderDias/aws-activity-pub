@@ -95,7 +95,7 @@ async fn create(
 ) -> Result<(), String> {
     let domain = get_domain(actor_id)?;
     let partition = format!("actor/{domain}");
-    let values = serde_dynamo::to_item(&object).unwrap();
+    let values = serde_dynamo::to_item(object).unwrap();
     crate::dynamodb::put_item(
         &settings.db_client,
         &settings.table_name,
