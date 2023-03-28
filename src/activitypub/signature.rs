@@ -99,10 +99,10 @@ pub fn verify_http_headers<S: super::verifier::Verifier + ::std::fmt::Debug>(
         return SignatureValidity::Valid; //maybe we shouldn't trust a request without date?
     }
 
-    verify_date(all_headers)
+    verify_date_header(all_headers)
 }
 
-pub fn verify_date(all_headers: &HeaderMap<'_>) -> SignatureValidity {
+pub fn verify_date_header(all_headers: &HeaderMap<'_>) -> SignatureValidity {
     let date = all_headers.get_one("date");
     if date.is_none() {
         event!(Level::DEBUG, "missing date header");
@@ -115,6 +115,10 @@ pub fn verify_date(all_headers: &HeaderMap<'_>) -> SignatureValidity {
         event!(Level::DEBUG, "invalid date header");
         return SignatureValidity::Outdated;
     };
+    verify_date(date)
+}
+
+pub fn verify_date(date: OffsetDateTime) -> SignatureValidity {
     let diff = OffsetDateTime::now_utc() - date;
     let future = Duration::hours(12);
     let past = Duration::hours(-12);
