@@ -23,7 +23,7 @@ license-file = "LICENSE"
 aws-config = "0.54.1"
 aws-sdk-dynamodb = "0.24.0"
 base64 = "0.21.0"
-chrono = "0.4.23"
+chrono = "0.4.24"
 hex = "0.4.3"
 lambda-web = { version = "0.2.1", features = ["rocket05"] }
 openssl = "0.10.45"
