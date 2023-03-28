@@ -405,9 +405,9 @@ dependencies = [
 
 [[package]]
 name = "aws_lambda_events"
-version = "0.7.3"
+version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d376097ccf49a2699d554558267b2735f62ce94ee1840a9f73253ad7c26fbaa7"
+checksum = "765f8851eb42f7c040e9ac68cb762a5aaa6f98c1144ba7ab1d1a1bbe173a5019"
 dependencies = [
  "base64 0.13.1",
  "bytes",
@@ -419,6 +419,7 @@ dependencies = [
  "query_map",
  "serde",
  "serde_derive",
+ "serde_dynamo",
  "serde_json",
  "serde_with",
 ]
