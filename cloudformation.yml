@@ -72,3 +72,8 @@ Resources:
           CUSTOM_DOMAIN: "TARGET_URN_PLACEHOLDER"
           DYNAMODB_TABLE: !Ref "DynamoDBTable"
           PROTOCOL: "https"
+  LambdaFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Join [ '', [ '/aws/lambda/', !Ref "LambdaFunction" ] ]
+      RetentionInDays: 3
