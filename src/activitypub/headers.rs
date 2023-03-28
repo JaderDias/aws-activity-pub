@@ -14,11 +14,10 @@ impl<'r> FromRequest<'r> for Headers<'r> {
             headers.add(header);
         }
         let uri = request.uri();
-        let uri = if let Some(query) = uri.query() {
-            format!("{}?{}", uri.path(), query)
-        } else {
-            uri.path().as_str().to_owned()
-        };
+        let uri = uri.query().map_or_else(
+            || uri.path().as_str().to_owned(),
+            |query| format!("{}?{}", uri.path(), query),
+        );
         headers.add(Header::new(
             "(request-target)",
             format!("{} {}", request.method().as_str().to_lowercase(), uri),
