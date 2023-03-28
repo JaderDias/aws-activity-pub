@@ -22,7 +22,7 @@ pub async fn get_public_key(
     if let Some(actor) = get_from_cache(actor_id, settings).await {
         let public_key = actor.public_key.unwrap();
         let rsa = Rsa::public_key_from_pem(public_key.public_key_pem.as_bytes()).unwrap();
-        return PKey::from_rsa(rsa).map_err(|err| format!("failed to parse public key: {:?}", err));
+        return PKey::from_rsa(rsa).map_err(|err| format!("failed to parse public key: {err:?}"));
     }
 
     Err("actor not found".to_owned())
@@ -44,7 +44,7 @@ impl crate::activitypub::verifier::Verifier for PKey<Public> {
             Level::DEBUG,
             public_key = hex::encode(self.public_key_to_der().unwrap())
         );
-        let mut verifier = Verifier::new(MessageDigest::sha256(), &self)
+        let mut verifier = Verifier::new(MessageDigest::sha256(), self)
             .map_err(|e| format!("Failed to create verifier {e:?}"))?;
         verifier
             .update(data.as_bytes())
@@ -62,7 +62,7 @@ async fn get_from_cache(actor_id: &str, settings: &rocket::State<Settings>) -> O
 
     let actor = get_from_url(actor_id).await;
     create(actor_id, &actor, settings).await.ok()?;
-    return Some(actor);
+    Some(actor)
 }
 
 async fn get_from_db(actor_id: &str, settings: &rocket::State<Settings>) -> Option<Object> {

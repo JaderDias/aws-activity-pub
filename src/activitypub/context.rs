@@ -36,7 +36,7 @@ pub enum Extension {
 }
 
 pub fn default() -> serde_json::Value {
-    return serde_json::from_str(
+    serde_json::from_str(
         r#"[
             "https://www.w3.org/ns/activitystreams",
             "https://w3id.org/security/v1",
@@ -77,5 +77,5 @@ pub fn default() -> serde_json::Value {
             }
         ]"#,
     )
-    .unwrap();
+    .unwrap()
 }

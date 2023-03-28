@@ -105,12 +105,11 @@ pub fn verify_http_headers<S: super::verifier::Verifier + ::std::fmt::Debug>(
         return SignatureValidity::Outdated;
     }
     let date = PrimitiveDateTime::parse(date.unwrap(), &Rfc2822);
-    let date = match date {
-        Ok(date) => date.assume_utc(),
-        Err(_) => {
-            event!(Level::DEBUG, "invalid date header");
-            return SignatureValidity::Outdated;
-        }
+    let date = if let Ok(date) = date {
+        date.assume_utc()
+    } else {
+        event!(Level::DEBUG, "invalid date header");
+        return SignatureValidity::Outdated;
     };
     let diff = OffsetDateTime::now_utc() - date;
     let future = Duration::hours(12);

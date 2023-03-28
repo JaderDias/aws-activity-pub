@@ -29,6 +29,7 @@ pub struct User {
 }
 
 impl User {
+    #[must_use]
     pub fn get_published_time(&self) -> String {
         let published_time =
             OffsetDateTime::from_unix_timestamp(self.published_unix_time_seconds as i64)

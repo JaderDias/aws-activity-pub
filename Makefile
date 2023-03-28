@@ -37,6 +37,7 @@ clippy:
 		-D clippy::pedantic \
 		-D clippy::cargo \
 		-D clippy::nursery \
+		-W clippy::cast-possible-wrap \
 		-W clippy::future_not_send \
 		-W clippy::missing_errors_doc \
 		-W clippy::module_name_repetitions \
