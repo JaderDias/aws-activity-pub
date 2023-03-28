@@ -1,5 +1,5 @@
 use crate::activitypub::digest::Digest;
-use crate::activitypub::signature::{self, SignatureValidity::Valid};
+use crate::activitypub::signature;
 use crate::settings::Settings;
 use rocket::response::status::BadRequest;
 use tracing::{event, Level};
@@ -23,13 +23,7 @@ pub async fn handler(
         .await
         .map_err(|err| BadRequest(Some(err)))?;
     let digest_header = headers.0.get_one("digest").unwrap();
-    if Valid
-        == signature::verify_http_headers(
-            &public_key,
-            &headers.0,
-            &Digest(digest_header.to_owned()),
-        )
-    {
+    if signature::is_valid(&public_key, &headers.0, &Digest(digest_header.to_owned())) {
         let partition = format!("users/{username}/followers");
         let values = serde_dynamo::to_item(&activity).unwrap();
         crate::dynamodb::put_item(
