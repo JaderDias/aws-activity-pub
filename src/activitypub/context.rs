@@ -35,6 +35,7 @@ pub enum Extension {
     Context(Box<Context>),
 }
 
+#[must_use]
 pub fn default() -> serde_json::Value {
     serde_json::from_str(
         r#"[

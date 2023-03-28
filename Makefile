@@ -40,6 +40,7 @@ clippy:
 		-W clippy::cast-possible-wrap \
 		-W clippy::future_not_send \
 		-W clippy::missing_errors_doc \
+		-W clippy::missing_panics_doc \
 		-W clippy::module_name_repetitions \
 		-W clippy::multiple_crate_versions \
 		-W clippy::no_effect_underscore_binding

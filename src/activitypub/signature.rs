@@ -99,6 +99,10 @@ pub fn verify_http_headers<S: super::verifier::Verifier + ::std::fmt::Debug>(
         return SignatureValidity::Valid; //maybe we shouldn't trust a request without date?
     }
 
+    verify_date(all_headers)
+}
+
+pub fn verify_date(all_headers: &HeaderMap<'_>) -> SignatureValidity {
     let date = all_headers.get_one("date");
     if date.is_none() {
         event!(Level::DEBUG, "missing date header");
