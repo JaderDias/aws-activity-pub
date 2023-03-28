@@ -47,3 +47,5 @@ http = "0.2.9"
 regex = "1.7.1"
 tokio = { version = "1", features = ["macros"] }
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["tracing-appender"] # udeps can't detect it, but this dependency is needed
