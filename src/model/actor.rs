@@ -116,9 +116,9 @@ async fn get_from_url(user_url: &str) -> Object {
         .send()
         .await
         .unwrap();
-    println!("{:?}", actual_response);
+    event!(Level::DEBUG, "{actual_response:?}");
     let text = &actual_response.text().await.unwrap();
-    println!("{:?}", text);
+    event!(Level::DEBUG, text);
     serde_json::from_str::<Object>(text).unwrap()
 }
 

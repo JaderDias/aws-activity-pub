@@ -71,7 +71,7 @@ pub async fn get_item(
 ) -> aws_sdk_dynamodb::output::GetItemOutput {
     let partition = format!("users/{username}");
     crate::dynamodb::get_item(
-        &db_client,
+        db_client,
         table_name,
         partition.as_str(),
         "user",
