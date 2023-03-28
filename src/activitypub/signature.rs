@@ -95,7 +95,6 @@ pub fn verify_digest(all_headers: &HeaderMap<'_>, content: &Digest) -> bool {
     let digest = Digest::from_header(digest);
     if !digest.map(|d| d.verify_header(content)).unwrap_or(false) {
         event!(Level::DEBUG, "valid but digest doesn't match");
-        // signature was valid, but body content does not match its digest
         return false;
     }
 
