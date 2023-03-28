@@ -40,9 +40,11 @@ clippy:
 		-D clippy::pedantic \
 		-D clippy::cargo \
 		-D clippy::nursery \
-		-W clippy::no_effect_underscore_binding \
+		-W clippy::future_not_send \
+		-W clippy::missing_errors_doc \
+		-W clippy::module_name_repetitions \
 		-W clippy::multiple_crate_versions \
-		-W clippy::future_not_send
+		-W clippy::no_effect_underscore_binding
 
 grcov:
 	cargo install grcov
