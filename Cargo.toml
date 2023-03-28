@@ -23,7 +23,6 @@ license-file = "LICENSE"
 aws-config = "0.54.1"
 aws-sdk-dynamodb = "0.24.0"
 base64 = "0.21.0"
-chrono = "0.4.24"
 hex = "0.4.3"
 lambda-web = { version = "0.2.1", features = ["rocket05"] }
 openssl = "0.10.48"
@@ -35,6 +34,7 @@ rocket = { version = "0.5.0-rc.3", features = ["json"] }
 serde = { version = "1.0.152", features = ["derive"] }
 serde_dynamo = { version = "4.0.12", features = ["aws-sdk-dynamodb+0_24"] }
 serde_json = { version = "1.0.93", features = ["raw_value"] }
+time = "0.3"
 tracing = { version = "0.1.37" }
 tracing-appender = "0.2.2"
 tracing-log = "0.1.3"

@@ -1,15 +1,14 @@
 // copied from https://github.com/Plume-org/Plume/blob/main/plume-models/src/users.rs
 use crate::settings::Settings;
-use chrono::offset::Utc;
-use chrono::DateTime;
 use openssl::{
     hash::MessageDigest,
     pkey::{PKey, Public},
     rsa::Rsa,
     sign::Signer,
 };
+use time::{format_description, OffsetDateTime};
 
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
 
@@ -31,10 +30,12 @@ pub struct User {
 
 impl User {
     pub fn get_published_time(&self) -> String {
-        let published_time = Duration::from_secs(self.published_unix_time_seconds);
-        let published_time = SystemTime::UNIX_EPOCH + published_time;
-        let published_time: DateTime<Utc> = published_time.into();
-        published_time.format("%d/%m/%Y %T").to_string()
+        let published_time =
+            OffsetDateTime::from_unix_timestamp(self.published_unix_time_seconds as i64)
+                .expect("OffsetDateTime::from_unix_timestamp");
+
+        let format = format_description::parse("%d/%m/%Y %T").unwrap();
+        published_time.format(&format).unwrap()
     }
 }
 

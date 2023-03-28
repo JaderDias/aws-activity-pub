@@ -1,8 +1,9 @@
 // copied from https://github.com/Plume-org/Plume/blob/main/plume-common/src/activity_pub/sign.rs
 use super::digest::Digest;
 use base64::{engine::general_purpose, Engine as _};
-use chrono::{offset::Utc, Duration, NaiveDateTime};
 use rocket::http::HeaderMap;
+use time::format_description::well_known::Rfc2822;
+use time::{Duration, OffsetDateTime, PrimitiveDateTime};
 use tracing::{event, Level};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -103,12 +104,15 @@ pub fn verify_http_headers<S: super::verifier::Verifier + ::std::fmt::Debug>(
         event!(Level::DEBUG, "missing date header");
         return SignatureValidity::Outdated;
     }
-    let date = NaiveDateTime::parse_from_str(date.unwrap(), "%a, %d %h %Y %T GMT");
-    if date.is_err() {
-        event!(Level::DEBUG, "invalid date header");
-        return SignatureValidity::Outdated;
-    }
-    let diff = Utc::now().naive_utc() - date.unwrap();
+    let date = PrimitiveDateTime::parse(date.unwrap(), &Rfc2822);
+    let date = match date {
+        Ok(date) => date.assume_utc(),
+        Err(_) => {
+            event!(Level::DEBUG, "invalid date header");
+            return SignatureValidity::Outdated;
+        }
+    };
+    let diff = OffsetDateTime::now_utc() - date;
     let future = Duration::hours(12);
     let past = Duration::hours(-12);
     if diff < future && diff > past {

@@ -4,10 +4,10 @@ use aws_lambda_events::apigw::{
 };
 use aws_lambda_events::encodings::Body;
 use base64::{engine::general_purpose, Engine as _};
-use std::time::SystemTime;
+use time::format_description::well_known::Rfc2822;
+use time::OffsetDateTime;
 use tracing::{event, Level};
 
-use chrono::{offset::Utc, DateTime};
 use http::header::{HeaderMap, HeaderValue};
 use regex::Regex;
 use rust_lambda::activitypub::object::Object;
@@ -223,8 +223,8 @@ fn insert_digest(all_headers: &mut HeaderMap, request_body: &str) {
 }
 
 fn insert_date(all_headers: &mut HeaderMap) {
-    let date: DateTime<Utc> = SystemTime::now().into();
-    let date = format!("{}", date.format("%a, %d %b %Y %T GMT"));
+    let date: OffsetDateTime = OffsetDateTime::now_utc();
+    let date = date.format(&Rfc2822).unwrap();
     let date = HeaderValue::from_str(&date).unwrap();
     all_headers.insert("date", date);
 }
