@@ -26,6 +26,7 @@ impl<'r> FromRequest<'r> for Headers<'r> {
     }
 }
 
+#[must_use]
 pub fn select(headers: &HeaderMap<'_>, query: &str) -> String {
     query
         .split_whitespace()

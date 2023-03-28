@@ -51,7 +51,7 @@ pub fn parse_header(signature_header: &str) -> SignatureHeader {
 pub fn verify_http_headers<S: super::verifier::Verifier + ::std::fmt::Debug>(
     sender: &S,
     all_headers: &HeaderMap<'_>,
-    data: &Digest,
+    content: &Digest,
 ) -> SignatureValidity {
     event!(Level::DEBUG, "verify_http_headers");
     let signature_header = all_headers.get_one("Signature");
@@ -88,7 +88,7 @@ pub fn verify_http_headers<S: super::verifier::Verifier + ::std::fmt::Debug>(
     }
     let digest = all_headers.get_one("digest").unwrap_or("");
     let digest = Digest::from_header(digest);
-    if !digest.map(|d| d.verify_header(data)).unwrap_or(false) {
+    if !digest.map(|d| d.verify_header(content)).unwrap_or(false) {
         event!(Level::DEBUG, "valid but digest doesn't match");
         // signature was valid, but body content does not match its digest
         return SignatureValidity::Invalid;
