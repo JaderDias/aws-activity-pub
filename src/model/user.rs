@@ -94,6 +94,9 @@ pub async fn get(username: &str, settings: &rocket::State<Settings>) -> Option<U
     None
 }
 
+/// # Errors
+///
+/// Returns an error if the user is not found.
 pub async fn get_public_key(
     username: &str,
     settings: &rocket::State<Settings>,

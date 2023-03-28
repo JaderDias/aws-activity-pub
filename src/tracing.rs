@@ -2,6 +2,9 @@ use tracing_log::LogTracer;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::{EnvFilter, Registry};
 
+/// # Panics
+///
+/// Will panic if can´t set the default tracing subscriber.
 pub fn init() {
     LogTracer::init().unwrap();
     let format = tracing_subscriber::fmt::format()
