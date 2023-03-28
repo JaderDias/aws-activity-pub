@@ -1,9 +1,7 @@
-.PHONY: \
-	all \
+.PHONY: all clean test \
 	build \
 	build_with_profile \
 	check \
-	clean \
 	clippy \
 	grcov \
 	html_coverage_report \
@@ -14,7 +12,6 @@
 	refresh_database \
 	run_service_in_background \
 	scan_table \
-	test \
 	test_with_coverage \
 	unit_test \
 	watch
