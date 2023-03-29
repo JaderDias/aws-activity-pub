@@ -46,6 +46,14 @@ fn get_target(args: Vec<String>) -> Option<(String, String, String, String)> {
     ))
 }
 
+fn add_protocol(urn: &str) -> String {
+    if urn.starts_with("localhost") {
+        format!("http://{urn}")
+    } else {
+        format!("https://{urn}")
+    }
+}
+
 #[tokio::main]
 async fn main() {
     rust_lambda::tracing::init();
@@ -54,16 +62,8 @@ async fn main() {
         "Usage: LOCAL_DYNAMODB_URL=http://localhost:8000 test localhost:8080 target_username localhost:8080 signer_username",
     );
 
-    let target_url = if target_urn.starts_with("localhost") {
-        format!("http://{target_urn}")
-    } else {
-        format!("https://{target_urn}")
-    };
-    let signer_url = if signer_urn.starts_with("localhost") {
-        format!("http://{signer_urn}")
-    } else {
-        format!("https://{signer_urn}")
-    };
+    let target_url = add_protocol(target_urn.as_str());
+    let signer_url = add_protocol(signer_urn.as_str());
 
     let db_client = dynamodb::get_client().await;
     let target_user: Option<User> = if target_urn.starts_with("localhost") {
