@@ -45,7 +45,7 @@ pub async fn handler(
             discoverable: Some(false),
             followers: Some(format!("{user_uri}/followers")),
             following: Some(format!("{user_uri}/following")),
-            id: Some(format!("{user_uri}")),
+            id: Some(user_uri.clone()),
             in_reply_to: None,
             in_reply_to_atom_uri: None,
             inbox: Some(format!("{user_uri}/inbox")),

@@ -128,8 +128,7 @@ pub async fn create(
         public_key: Some(keypair.public_key_to_der().unwrap()),
         published_unix_time_seconds: since_unix.as_secs(),
     };
-    let values = serde_dynamo::to_item(&user).unwrap();
-    crate::dynamodb::put_item(db_client, table_name, partition.as_str(), "user", values)
+    crate::dynamodb::put_item(db_client, table_name, partition.as_str(), "user", &user)
         .await
         .unwrap();
     user

@@ -22,7 +22,7 @@ pub async fn handler(
         return None;
     }
 
-    if let Some(_) = user::get(username, settings).await {
+    if (user::get(username, settings).await).is_some() {
         return Some(Json(serde_json::json!({
           "subject": resource,
           "links": [{

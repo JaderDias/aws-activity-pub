@@ -18,25 +18,24 @@ pub async fn handler(
     let activity: serde_json::Value = serde_json::from_str(&data).unwrap();
     let actor_id = activity["actor"]
         .as_str()
-        .ok_or(BadRequest(Some("Missing actor id for activity".to_owned())))?;
+        .ok_or_else(|| BadRequest(Some("Missing actor id for activity".to_owned())))?;
     let public_key = crate::model::actor::get_public_key(actor_id, settings)
         .await
         .map_err(|err| BadRequest(Some(err)))?;
     let digest_header = headers.0.get_one("digest").unwrap();
     if signature::is_valid(&public_key, &headers.0, &Digest(digest_header.to_owned())) {
         let partition = format!("users/{username}/followers");
-        let values = serde_dynamo::to_item(&activity).unwrap();
         crate::dynamodb::put_item(
             &settings.db_client,
             &settings.table_name,
             partition.as_str(),
             actor_id,
-            values,
+            &activity,
         )
         .await
         .unwrap();
         return Ok(data);
     }
 
-    return Err(BadRequest(Some("Invalid signature or digest".to_owned())));
+    Err(BadRequest(Some("Invalid signature or digest".to_owned())))
 }

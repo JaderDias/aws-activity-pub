@@ -21,13 +21,12 @@ pub async fn handler(
         status_id.as_str(),
     ));
 
-    let values = serde_dynamo::to_item(object).unwrap();
     crate::dynamodb::put_item(
         &settings.db_client,
         &settings.table_name,
         partition.as_str(),
         status_id.as_str(),
-        values,
+        object,
     )
     .await
     .unwrap();

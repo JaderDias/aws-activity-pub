@@ -1,10 +1,11 @@
 use aws_sdk_dynamodb::error::{GetItemError, PutItemError};
-use aws_sdk_dynamodb::model::AttributeValue;
 use aws_sdk_dynamodb::model::{
-    AttributeDefinition, KeySchemaElement, KeyType, ProvisionedThroughput, ScalarAttributeType,
+    AttributeDefinition, AttributeValue, KeySchemaElement, KeyType, ProvisionedThroughput,
+    ScalarAttributeType,
 };
 use aws_sdk_dynamodb::types::SdkError;
 use aws_sdk_dynamodb::Client;
+use std::collections::HashMap;
 
 pub const DEFAULT_TABLE_NAME: &str = "ServerlessActivityPub";
 pub const PARTITION_KEY_NAME: &str = "partition_key";
@@ -36,20 +37,26 @@ pub async fn get_item(
 /// # Errors
 ///
 /// Will return `Err` if a connection to the database is no properly established.
-pub async fn put_item<S: std::hash::BuildHasher>(
+pub async fn put_item<S: std::hash::BuildHasher, T: serde::Serialize + std::marker::Send>(
     client: &Client,
     dynamodb_table_name: &str,
     partition: &str,
     sort_value: &str,
-    values: std::collections::HashMap<String, AttributeValue, S>,
-) -> PutItemResult {
+    values: T,
+) -> PutItemResult
+where
+    HashMap<std::string::String, AttributeValue, S>: From<serde_dynamo::Item>,
+{
     let mut table = client
         .put_item()
         .table_name(dynamodb_table_name)
         .item(PARTITION_KEY_NAME, AttributeValue::S(partition.to_owned()))
         .item(SORT_KEY_NAME, AttributeValue::S(sort_value.to_owned()));
-    for (key, value) in values {
-        table = table.item(key, value);
+    {
+        let values: HashMap<String, AttributeValue, S> = serde_dynamo::to_item(values).unwrap();
+        for (key, value) in values {
+            table = table.item(key, value);
+        }
     }
 
     table.send().await
