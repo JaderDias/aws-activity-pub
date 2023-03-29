@@ -113,4 +113,4 @@ unit_test:
 	cargo test
 
 watch:
-	cargo watch --clear
+	cargo watch --clear -x 'build --all-targets'

@@ -2,12 +2,15 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Lambda function with dynamodb table.
 Parameters:
-  LambdaCodeBucket:
+  CodeBucket:
     Type: String
     Description: The name of the S3 bucket
-  LambdaCodeObjectKey:
+  DynamodbStreamLambdaCodeObjectKey:
     Type: String
-    Description: The key of the S3 object containing the lambda code
+    Description: The key of the S3 object containing the DynamodbStream lambda code
+  WebServiceCodeObjectKey:
+    Type: String
+    Description: The key of the S3 object containing the WebService lambda code
 Resources:
   # DynamoDB Table
   DynamoDBTable:
@@ -28,8 +31,10 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
-  # IAM Role for Lambda
-  LambdaExecutionRole:
+      StreamSpecification:
+        StreamViewType: "NEW_AND_OLD_IMAGES"
+  # IAM Roles
+  WebServiceLambdaExecutionRole:
     Type: "AWS::IAM::Role"
     Properties:
       AssumeRolePolicyDocument:
@@ -57,27 +62,103 @@ Resources:
                   - "dynamodb:UpdateItem"
                   - "dynamodb:DeleteItem"
                 Resource: !GetAtt ["DynamoDBTable", "Arn"]
-  # Lambda Function
-  LambdaFunction:
+  DynamodbStreamLambdaExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AWSLambdaExecute"
+      Policies:
+        - PolicyName: "dynamodb-access"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "dynamodb:Query"
+                  - "dynamodb:Scan"
+                  - "dynamodb:GetItem"
+                  - "dynamodb:PutItem"
+                  - "dynamodb:UpdateItem"
+                  - "dynamodb:DeleteItem"
+                Resource: !GetAtt [ "DynamoDBTable", "Arn" ]
+        - PolicyName: DynamoDBStreamPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:GetRecords'
+                  - 'dynamodb:GetShardIterator'
+                  - 'dynamodb:DescribeStream'
+                  - 'dynamodb:ListStreams'
+                Resource: !GetAtt "DynamoDBTable.StreamArn"
+  # Lambda Functions
+  WebServiceLambdaFunction:
     Type: "AWS::Lambda::Function"
     Properties:
       Code:
-        S3Bucket: !Ref "LambdaCodeBucket"
-        S3Key: !Ref "LambdaCodeObjectKey"
+        S3Bucket: !Ref "CodeBucket"
+        S3Key: !Ref "WebServiceCodeObjectKey"
       Handler: "function.handler"
-      Role: !GetAtt ["LambdaExecutionRole", "Arn"]
+      Role: !GetAtt ["WebServiceLambdaExecutionRole", "Arn"]
       Runtime: "provided.al2"
       Environment:
         Variables:
           CUSTOM_DOMAIN: "TARGET_URN_PLACEHOLDER"
           DYNAMODB_TABLE: !Ref "DynamoDBTable"
           PROTOCOL: "https"
-  LambdaFunctionLogGroup:
+  WebServiceLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DeletionPolicy: Retain
-    UpdateReplacePolicy: Retain
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
     Properties:
       LogGroupName: !Sub
         - '/aws/lambda/${FunctionName}'
-        - FunctionName: !Ref "LambdaFunction"
+        - FunctionName: !Ref "WebServiceLambdaFunction"
       RetentionInDays: 3
+  DynamodbStreamLambdaFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Code:
+        S3Bucket: !Ref "CodeBucket"
+        S3Key: !Ref "DynamodbStreamLambdaCodeObjectKey"
+      Handler: "function.handler"
+      Role: !GetAtt ["DynamodbStreamLambdaExecutionRole", "Arn"]
+      Runtime: "provided.al2"
+      Environment:
+        Variables:
+          CUSTOM_DOMAIN: "TARGET_URN_PLACEHOLDER"
+          DYNAMODB_TABLE: !Ref "DynamoDBTable"
+          PROTOCOL: "https"
+  DynamodbStreamLambdaFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      LogGroupName: !Sub
+        - '/aws/lambda/${FunctionName}'
+        - FunctionName: !Ref "DynamodbStreamLambdaFunction"
+      RetentionInDays: 3
+  DynamodbStreamLambdaFunctionPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !Ref "DynamodbStreamLambdaFunction"
+      Principal: "dynamodb.amazonaws.com"
+      SourceArn: !GetAtt ["DynamoDBTable", "Arn"]
+  DynamoDBTableLambdaEventSource:
+    Type: "AWS::Lambda::EventSourceMapping"
+    Properties:
+      EventSourceArn: !GetAtt "DynamoDBTable.StreamArn"
+      FunctionName: !Ref "DynamodbStreamLambdaFunction"
+      StartingPosition: "LATEST"
+      Enabled: true
