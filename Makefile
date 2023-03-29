@@ -84,7 +84,7 @@ run_service_in_background: kill_service_running_in_background
 		LOCAL_DYNAMODB_URL=http://localhost:8000 \
 		PROTOCOL=http \
 		REGION=eu-west-1 \
-		RUST_LOG="rust_lambda=info" \
+		RUST_LOG="rocket=warn,rust_lambda=info" \
 		./target/debug/rust_lambda &
 
 scan_table:
