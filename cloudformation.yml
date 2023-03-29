@@ -74,6 +74,10 @@ Resources:
           PROTOCOL: "https"
   LambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
-      LogGroupName: !Join [ '', [ '/aws/lambda/', !Ref "LambdaFunction" ] ]
+      LogGroupName: !Sub
+        - '/aws/lambda/${FunctionName}'
+        - FunctionName: !Ref "LambdaFunction"
       RetentionInDays: 3
