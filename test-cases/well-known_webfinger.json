@@ -64,7 +64,7 @@
     "expected_body_json": {
       "links": [
         {
-          "href": "TARGET_URL_PLACEHOLDER/@TARGET_USERNAME_PLACEHOLDER",
+          "href": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER",
           "rel": "self",
           "type": "application/activity+json"
         }

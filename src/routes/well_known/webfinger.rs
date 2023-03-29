@@ -28,7 +28,7 @@ pub async fn handler(
           "links": [{
             "rel": "self",
             "type": "application/activity+json",
-            "href": format!("{}/@{username}", settings.base_url)
+            "href": format!("{}/users/{username}", settings.base_url)
           }]
         })));
     }
