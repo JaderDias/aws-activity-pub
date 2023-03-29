@@ -6,7 +6,7 @@ use openssl::{
     rsa::Rsa,
     sign::Signer,
 };
-use time::{format_description, OffsetDateTime};
+use time::{format_description::well_known::Rfc3339, OffsetDateTime};
 
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -35,8 +35,7 @@ impl User {
             OffsetDateTime::from_unix_timestamp(self.published_unix_time_seconds as i64)
                 .expect("OffsetDateTime::from_unix_timestamp");
 
-        let format = format_description::parse("%d/%m/%Y %T").unwrap();
-        published_time.format(&format).unwrap()
+        published_time.format(&Rfc3339).unwrap()
     }
 }
 

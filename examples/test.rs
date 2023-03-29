@@ -4,7 +4,7 @@ use aws_lambda_events::apigw::{
 };
 use aws_lambda_events::encodings::Body;
 use base64::{engine::general_purpose, Engine as _};
-use time::format_description::well_known::Rfc2822;
+use time::format_description::well_known::{Rfc2822, Rfc3339};
 use time::OffsetDateTime;
 use tracing::{event, Level};
 
@@ -203,7 +203,10 @@ async fn main() {
                             let public_key_der = target_user.public_key.as_ref().unwrap();
                             public_key.public_key_pem =
                                 rust_lambda::rsa::der_to_pem(public_key_der);
-                            expected_object.published = Some(target_user.get_published_time());
+                            if let Some(published) = expected_object.published.as_mut() {
+                                OffsetDateTime::parse(published, &Rfc3339).unwrap();
+                                expected_object.published = Some(target_user.get_published_time());
+                            }
                             test.expected_body_json =
                                 Some(serde_json::to_value(expected_object).unwrap());
                         }
