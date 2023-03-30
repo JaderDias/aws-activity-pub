@@ -7,7 +7,6 @@ use aws_sdk_dynamodb::types::SdkError;
 use aws_sdk_dynamodb::Client;
 use std::collections::HashMap;
 
-pub const DEFAULT_TABLE_NAME: &str = "ServerlessActivityPub";
 pub const PARTITION_KEY_NAME: &str = "partition_key";
 pub const SORT_KEY_NAME: &str = "sort_key";
 
@@ -95,8 +94,8 @@ async fn table_exists(client: &aws_sdk_dynamodb::Client, table: &str) -> bool {
 /// # Panics
 ///
 /// Will panic if can´t create the table.
-pub async fn create_table_if_not_exists(client: &aws_sdk_dynamodb::Client) {
-    if table_exists(client, DEFAULT_TABLE_NAME).await {
+pub async fn create_table_if_not_exists(client: &aws_sdk_dynamodb::Client, table_name: &str) {
+    if table_exists(client, table_name).await {
         return;
     }
 
@@ -127,7 +126,7 @@ pub async fn create_table_if_not_exists(client: &aws_sdk_dynamodb::Client) {
 
     client
         .create_table()
-        .table_name(DEFAULT_TABLE_NAME)
+        .table_name(table_name)
         .key_schema(partition_schema_element)
         .key_schema(sort_schema_element)
         .attribute_definitions(partition_attribute_definition)

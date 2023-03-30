@@ -33,8 +33,8 @@ struct TestCase {
     placeholder: Option<String>,
 }
 
-fn get_target(args: Vec<String>) -> Option<(String, String, String, String)> {
-    if args.len() != 5 {
+fn get_target(args: Vec<String>) -> Option<(String, String, String, String, String)> {
+    if args.len() != 6 {
         return None;
     }
 
@@ -43,6 +43,7 @@ fn get_target(args: Vec<String>) -> Option<(String, String, String, String)> {
         args[2].clone(),
         args[3].clone(),
         args[4].clone(),
+        args[5].clone(),
     ))
 }
 
@@ -58,42 +59,31 @@ fn add_protocol(urn: &str) -> String {
 async fn main() {
     rust_lambda::tracing::init();
     let args: Vec<String> = env::args().collect();
-    let (target_urn, target_username, signer_urn, signer_username) = get_target(args).expect(
-        "Usage: LOCAL_DYNAMODB_URL=http://localhost:8000 test localhost:8080 target_username localhost:8080 signer_username",
+    let (target_urn, target_username, signer_urn, signer_username, table_name) = get_target(args).expect(
+        "Usage: LOCAL_DYNAMODB_URL=http://localhost:8000 test localhost:8080 target_username localhost:8080 signer_username dynamodb_table_name",
     );
 
+    let table_name = table_name.as_str();
     let target_url = add_protocol(target_urn.as_str());
     let signer_url = add_protocol(signer_urn.as_str());
 
     let db_client = dynamodb::get_client().await;
     let target_user: Option<User> = if target_urn.starts_with("localhost") {
-        dynamodb::create_table_if_not_exists(&db_client).await;
+        dynamodb::create_table_if_not_exists(&db_client, table_name).await;
         Some(
-            rust_lambda::model::user::create(
-                &db_client,
-                dynamodb::DEFAULT_TABLE_NAME,
-                target_username.as_str(),
-            )
-            .await,
+            rust_lambda::model::user::create(&db_client, table_name, target_username.as_str())
+                .await,
         )
     } else {
         None
     };
     let signer: User = if signer_urn.starts_with("localhost") {
-        dynamodb::create_table_if_not_exists(&db_client).await;
-        rust_lambda::model::user::create(
-            &db_client,
-            dynamodb::DEFAULT_TABLE_NAME,
-            signer_username.as_str(),
-        )
-        .await
+        dynamodb::create_table_if_not_exists(&db_client, table_name).await;
+        rust_lambda::model::user::create(&db_client, table_name, signer_username.as_str()).await
     } else {
-        let get_item_output = rust_lambda::model::user::get_item(
-            signer_username.as_str(),
-            &db_client,
-            dynamodb::DEFAULT_TABLE_NAME,
-        )
-        .await;
+        let get_item_output =
+            rust_lambda::model::user::get_item(signer_username.as_str(), &db_client, table_name)
+                .await;
         let item = get_item_output.item.unwrap();
         serde_dynamo::from_item(item).unwrap()
     };

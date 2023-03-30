@@ -61,7 +61,7 @@ html_coverage_report:
 integration_test:
 	RUST_LOG="test=info" \
 	LOCAL_DYNAMODB_URL=http://localhost:8000 \
-		./target/debug/examples/test localhost:8080 target_username localhost:8080 signer_username
+		./target/debug/examples/test localhost:8080 target_username localhost:8080 signer_username LocalDynamodbTable
 
 kill_service_running_in_background:
 	pkill rust_lambda || true
@@ -80,7 +80,7 @@ refresh_database:
 
 run_service_in_background: kill_service_running_in_background
 	CUSTOM_DOMAIN=localhost:8080 \
-		DYNAMODB_TABLE=ServerlessActivityPub \
+		DYNAMODB_TABLE=LocalDynamodbTable \
 		LOCAL_DYNAMODB_URL=http://localhost:8000 \
 		PROTOCOL=http \
 		REGION=eu-west-1 \
@@ -94,7 +94,7 @@ scan_table:
 	@if ! grep -F '[localhost]' <~/.aws/credentials; then \
 		echo "[localhost]\naws_access_key_id = ANY_ACCESS_KEY_WILL_DO\naws_secret_access_key = ANY_SECRET_KEY_WILL_DO" >>~/.aws/credentials; \
 	fi
-	aws dynamodb scan --table-name ServerlessActivityPub --endpoint-url http://localhost:8000 --profile localhost
+	aws dynamodb scan --table-name LocalDynamodbTable --endpoint-url http://localhost:8000 --profile localhost
 
 test: \
 	refresh_database \
