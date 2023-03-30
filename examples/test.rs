@@ -129,7 +129,7 @@ async fn main() {
                         &request.request_context.http.path.as_ref().unwrap(),
                         headers,
                         &request_body,
-                        &signer,
+                        signer.private_key.as_ref().unwrap(),
                         &signature_key_id.as_str(),
                     );
                 }

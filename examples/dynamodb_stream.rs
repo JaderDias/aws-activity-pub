@@ -102,7 +102,7 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
                     path,
                     &mut headers,
                     &request_body,
-                    &user,
+                    user.private_key.as_ref().unwrap(),
                     &signature_key_id.as_str(),
                 );
                 event!(

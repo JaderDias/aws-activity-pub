@@ -4,5 +4,4 @@ pub mod headers;
 pub mod object;
 pub mod request;
 pub mod signature;
-pub mod signer;
 pub mod verifier;

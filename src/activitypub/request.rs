@@ -1,23 +1,24 @@
 use http::header::{HeaderMap, HeaderValue};
+use openssl::{hash::MessageDigest, pkey::PKey, rsa::Rsa, sign::Signer};
 use time::format_description::well_known::Rfc2822;
 use time::OffsetDateTime;
 
 use base64::{engine::general_purpose, Engine as _};
 use tracing::{event, Level};
 
-const SELECT_HEADERS: &'static str = "(request-target) host date digest content-type";
+const SELECT_HEADERS: &str = "(request-target) host date digest content-type";
 
-pub fn request<T: super::signer::Signer>(
+pub fn request(
     method: &str,
     path: &str,
     all_headers: &mut HeaderMap,
     request_body: &str,
-    signer: &T,
+    private_key: &[u8],
     signature_key_id: &str,
 ) {
-    insert_digest(all_headers, &request_body);
+    insert_digest(all_headers, request_body);
     insert_date(all_headers);
-    insert_signature(method, path, all_headers, signer, signature_key_id);
+    insert_signature(method, path, all_headers, private_key, signature_key_id);
 }
 
 fn insert_digest(all_headers: &mut HeaderMap, request_body: &str) {
@@ -34,21 +35,21 @@ fn insert_date(all_headers: &mut HeaderMap) {
     all_headers.insert("date", date);
 }
 
-fn insert_signature<T: super::signer::Signer>(
+fn insert_signature(
     method: &str,
     path: &str,
     all_headers: &mut HeaderMap,
-    signer: &T,
+    private_key: &[u8],
     signature_key_id: &str,
 ) {
     let select_headers = select_headers(method, path, all_headers, SELECT_HEADERS);
-    let signature = signer.sign(&select_headers).unwrap();
+    let signature = sign(private_key, &select_headers).unwrap();
     let signature = general_purpose::STANDARD.encode(signature);
     event!(Level::DEBUG, signature = signature);
     let signature_header = format!("keyId=\"{signature_key_id}\",algorithm=\"rsa-sha256\",headers=\"{SELECT_HEADERS}\",signature=\"{signature}\"");
     let signature_header = HeaderValue::from_str(signature_header.as_str()).unwrap();
     all_headers.insert("signature", signature_header);
-    event!(Level::DEBUG, all_headers = format!("{:?}", all_headers));
+    event!(Level::DEBUG, all_headers = format!("{all_headers:?}"));
 }
 
 fn select_headers(method: &str, path: &str, all_headers: &HeaderMap, query: &str) -> String {
@@ -73,4 +74,20 @@ fn select_headers(method: &str, path: &str, all_headers: &HeaderMap, query: &str
         })
         .collect::<Vec<_>>()
         .join("\n")
+}
+
+fn sign(private_key: &[u8], to_sign: &str) -> Result<Vec<u8>, String> {
+    let key = PKey::from_rsa(
+        Rsa::private_key_from_der(private_key)
+            .map_err(|e| format!("Failed to private_key_from_der {e:?}"))?,
+    )
+    .map_err(|e| format!("Failed to from_rsa {e:?}"))?;
+    let mut signer = Signer::new(MessageDigest::sha256(), &key)
+        .map_err(|e| format!("Failed to create signer {e:?}"))?;
+    signer
+        .update(to_sign.as_bytes())
+        .map_err(|e| format!("Failed to update signer {e:?}"))?;
+    signer
+        .sign_to_vec()
+        .map_err(|e| format!("Failed to sign_to_vec {e:?}"))
 }

@@ -1,15 +1,13 @@
 // copied from https://github.com/Plume-org/Plume/blob/main/plume-models/src/users.rs
 use crate::settings::Settings;
-use openssl::{
-    hash::MessageDigest,
-    pkey::{PKey, Public},
-    rsa::Rsa,
-    sign::Signer,
-};
 use time::{format_description::well_known::Rfc3339, OffsetDateTime};
 
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use openssl::{
+    pkey::{PKey, Public},
+    rsa::Rsa,
+};
 use serde::{Deserialize, Serialize};
 
 const KEYSIZE: u32 = 4096;
@@ -36,25 +34,6 @@ impl User {
                 .expect("OffsetDateTime::from_unix_timestamp");
 
         published_time.format(&Rfc3339).unwrap()
-    }
-}
-
-impl crate::activitypub::signer::Signer for User {
-    /// Sign some data with the signer keypair
-    fn sign(&self, to_sign: &str) -> Result<Vec<u8>, String> {
-        let key = PKey::from_rsa(
-            Rsa::private_key_from_der(self.private_key.as_ref().unwrap())
-                .map_err(|e| format!("Failed to private_key_from_der {e:?}"))?,
-        )
-        .map_err(|e| format!("Failed to from_rsa {e:?}"))?;
-        let mut signer = Signer::new(MessageDigest::sha256(), &key)
-            .map_err(|e| format!("Failed to create signer {e:?}"))?;
-        signer
-            .update(to_sign.as_bytes())
-            .map_err(|e| format!("Failed to update signer {e:?}"))?;
-        signer
-            .sign_to_vec()
-            .map_err(|e| format!("Failed to sign_to_vec {e:?}"))
     }
 }
 
