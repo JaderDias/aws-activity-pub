@@ -1,18 +1,11 @@
-use aws_lambda_events::apigw::{
-    ApiGatewayV2httpRequest, ApiGatewayV2httpRequestContextHttpDescription,
-    ApiGatewayV2httpResponse,
-};
+use aws_lambda_events::apigw::{ApiGatewayV2httpRequest, ApiGatewayV2httpResponse};
 use aws_lambda_events::encodings::Body;
-use base64::{engine::general_purpose, Engine as _};
-use time::format_description::well_known::{Rfc2822, Rfc3339};
+use time::format_description::well_known::Rfc3339;
 use time::OffsetDateTime;
 use tracing::{event, Level};
 
-use http::header::{HeaderMap, HeaderValue};
 use regex::Regex;
 use rust_lambda::activitypub::object::Object;
-use rust_lambda::activitypub::signature;
-use rust_lambda::activitypub::signer::Signer;
 use rust_lambda::dynamodb;
 use rust_lambda::model::user::User;
 use serde::Deserialize;
@@ -66,6 +59,7 @@ async fn main() {
     let table_name = table_name.as_str();
     let target_url = add_protocol(target_urn.as_str());
     let signer_url = add_protocol(signer_urn.as_str());
+    let signature_key_id = format!("{signer_url}/users/{signer_username}#main-key");
 
     let db_client = dynamodb::get_client().await;
     let target_user: Option<User> = if target_urn.starts_with("localhost") {
@@ -129,11 +123,15 @@ async fn main() {
                 }
 
                 let headers = &mut request.headers;
-                if let Some(_signature_header) = headers.get("signature") {
-                    event!(Level::DEBUG, signature_header = "present");
-                    insert_digest(headers, &request_body);
-                    insert_date(headers);
-                    insert_signature(&signer, headers, &request.request_context.http);
+                if let Some(_host) = headers.get("host") {
+                    rust_lambda::activitypub::request::request(
+                        &request.request_context.http.method.as_ref(),
+                        &request.request_context.http.path.as_ref().unwrap(),
+                        headers,
+                        &request_body,
+                        &signer,
+                        &signature_key_id.as_str(),
+                    );
                 }
                 event!(
                     Level::DEBUG,
@@ -206,81 +204,6 @@ async fn main() {
             last_regex_capture = assert_body_matches_with_replacement(&test, &actual_body_text);
         }
     }
-}
-
-fn insert_digest(all_headers: &mut HeaderMap, request_body: &str) {
-    let digest = rust_lambda::activitypub::digest::Digest::from_body(request_body);
-    event!(Level::DEBUG, digest = digest);
-    let digest = HeaderValue::from_str(&digest).unwrap();
-    all_headers.insert("digest", digest);
-}
-
-fn insert_date(all_headers: &mut HeaderMap) {
-    let date: OffsetDateTime = OffsetDateTime::now_utc();
-    let date = date.format(&Rfc2822).unwrap();
-    let date = HeaderValue::from_str(&date).unwrap();
-    all_headers.insert("date", date);
-}
-
-fn insert_signature(
-    signer: &User,
-    all_headers: &mut HeaderMap,
-    http_description: &ApiGatewayV2httpRequestContextHttpDescription,
-) {
-    let signature_header = all_headers.get("signature").unwrap();
-    let parsed_signature_header = signature::parse_header(signature_header.to_str().unwrap());
-    let select_headers = select_headers(
-        all_headers,
-        parsed_signature_header.headers.unwrap().as_str(),
-        http_description,
-    );
-    event!(
-        Level::DEBUG,
-        select_headers = select_headers,
-        public_key = hex::encode(&signer.public_key.as_ref().unwrap()),
-    );
-    let signature = signer.sign(&select_headers).unwrap();
-    let signature = general_purpose::STANDARD.encode(signature);
-
-    event!(Level::DEBUG, signature = signature);
-    let signature_header = signature_header.to_str().unwrap().to_owned();
-    let signature_header =
-        signature_header.replace("SIGNATURE_PLACEHOLDER", format!("{}", signature).as_str());
-    let signature_header = HeaderValue::from_str(signature_header.as_str()).unwrap();
-    all_headers.insert("signature", signature_header);
-    event!(Level::DEBUG, all_headers = format!("{:?}", all_headers));
-}
-
-fn select_headers(
-    all_headers: &HeaderMap,
-    query: &str,
-    http_description: &ApiGatewayV2httpRequestContextHttpDescription,
-) -> String {
-    event!(
-        Level::DEBUG,
-        query = query,
-        method = http_description.method.as_ref(),
-        path = http_description.path.as_ref().unwrap(),
-        all_headers = format!("{all_headers:?}"),
-    );
-    query
-        .split_whitespace()
-        .map(|header| {
-            if header == "(request-target)" {
-                return format!(
-                    "(request-target): {} {}",
-                    http_description.method.as_ref().to_lowercase(),
-                    http_description.path.as_ref().unwrap()
-                );
-            }
-            format!(
-                "{}: {}",
-                header.to_lowercase(),
-                all_headers.get(header).unwrap().to_str().unwrap_or("")
-            )
-        })
-        .collect::<Vec<_>>()
-        .join("\n")
 }
 
 fn assert_body_matches_with_replacement(test: &TestCase, actual_body_text: &String) -> String {

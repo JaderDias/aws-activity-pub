@@ -1,7 +1,7 @@
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = std::env::args().collect();
-    if args.len() != 2 {
+    if args.len() != 3 {
         panic!("Usage: create_user username dynamodb_table_name")
     }
     let preferred_username = args[1].clone();

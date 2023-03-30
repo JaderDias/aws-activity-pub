@@ -9,7 +9,6 @@
       "headers": {
         "x-amzn-tls-version": "TLSv1.2",
         "x-forwarded-proto": "https",
-        "signature": "keyId=\"SIGNER_URL_PLACEHOLDER/users/SIGNER_USERNAME_PLACEHOLDER#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date digest content-type\",signature=\"SIGNATURE_PLACEHOLDER\"",
         "x-forwarded-port": "443",
         "x-forwarded-for": "162.19.31.97",
         "via": "1.1 449a51e3fb5bfe1fe97ced981c9a5b4e.cloudfront.net (CloudFront)",

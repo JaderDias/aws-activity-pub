@@ -24,6 +24,7 @@ aws-config = "0.54.1"
 aws-sdk-dynamodb = "0.24.0"
 base64 = "0.21.0"
 hex = "0.4.3"
+http = "0.2.9"
 lambda-web = { version = "0.2.1", features = ["rocket05"] }
 openssl = "0.10.48"
 rand = "0.8.5"
@@ -44,7 +45,6 @@ serde_bytes = "0.11.9"
 [dev-dependencies]
 aws_lambda_events = "0.8.2"
 aws_lambda_events_extended = "0.1.0"
-http = "0.2.9"
 lambda_runtime = "0.7.3"
 regex = "1.7.1"
 tokio = { version = "1", features = ["macros"] }

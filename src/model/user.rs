@@ -40,10 +40,6 @@ impl User {
 }
 
 impl crate::activitypub::signer::Signer for User {
-    fn get_key_id(&self) -> String {
-        format!("{}#main-key", self.preferred_username.as_ref().unwrap())
-    }
-
     /// Sign some data with the signer keypair
     fn sign(&self, to_sign: &str) -> Result<Vec<u8>, String> {
         let key = PKey::from_rsa(
