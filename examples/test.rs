@@ -124,7 +124,7 @@ async fn main() {
 
                 let headers = &mut request.headers;
                 if let Some(_host) = headers.get("host") {
-                    rust_lambda::activitypub::request::request(
+                    rust_lambda::activitypub::request::sign(
                         &request.request_context.http.method.as_ref(),
                         &request.request_context.http.path.as_ref().unwrap(),
                         headers,

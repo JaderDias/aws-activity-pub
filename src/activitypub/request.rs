@@ -8,7 +8,7 @@ use tracing::{event, Level};
 
 const SELECT_HEADERS: &str = "(request-target) host date digest content-type";
 
-pub fn request(
+pub fn sign(
     method: &str,
     path: &str,
     all_headers: &mut HeaderMap,
@@ -43,7 +43,7 @@ fn insert_signature(
     signature_key_id: &str,
 ) {
     let select_headers = select_headers(method, path, all_headers, SELECT_HEADERS);
-    let signature = sign(private_key, &select_headers).unwrap();
+    let signature = get_signature(private_key, &select_headers).unwrap();
     let signature = general_purpose::STANDARD.encode(signature);
     event!(Level::DEBUG, signature = signature);
     let signature_header = format!("keyId=\"{signature_key_id}\",algorithm=\"rsa-sha256\",headers=\"{SELECT_HEADERS}\",signature=\"{signature}\"");
@@ -76,7 +76,7 @@ fn select_headers(method: &str, path: &str, all_headers: &HeaderMap, query: &str
         .join("\n")
 }
 
-fn sign(private_key: &[u8], to_sign: &str) -> Result<Vec<u8>, String> {
+fn get_signature(private_key: &[u8], to_sign: &str) -> Result<Vec<u8>, String> {
     let key = PKey::from_rsa(
         Rsa::private_key_from_der(private_key)
             .map_err(|e| format!("Failed to private_key_from_der {e:?}"))?,

@@ -44,7 +44,7 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
                 .get(dynamodb::PARTITION_KEY_NAME)
                 .and_then(|v| v.s.clone())
                 .unwrap();
-            println!("New item with ID: {:?}", partition);
+            event!(Level::DEBUG, "New item with ID: {partition}");
             let split_partition = partition.split("/").collect::<Vec<&str>>();
             if split_partition.len() != 3 {
                 continue;
@@ -97,7 +97,7 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
                     HeaderValue::from_str("application/activity+json").unwrap(),
                 );
                 headers.insert("Host", HeaderValue::from_str(split_url[2]).unwrap());
-                rust_lambda::activitypub::request::request(
+                rust_lambda::activitypub::request::sign(
                     METHOD,
                     path,
                     &mut headers,
