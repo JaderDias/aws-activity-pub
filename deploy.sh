@@ -5,17 +5,43 @@ if [ -z "$S3_BUCKET" ]; then
 	exit 1
 fi
 
-mkdir -p dist/web_service ||
-	exit 1
-mkdir -p dist/dynamodb_stream ||
-	exit 1
+function create_zip() {
+  local dir=$1
+  local zip_file=$2
+  zip -jr "$zip_file" "$dir" \
+    || exit 1
+}
+
+function get_md5sum() {
+  local file=$1
+  if uname -a | grep Darwin; then
+    md5 "$file" | cut -d' ' -f4
+  else
+    md5sum "$file" | cut -d' ' -f1
+  fi
+}
+
+function upload() {
+  local dir=$1
+  local zip_file="$dir.zip"
+  create_zip "$dir" "$zip_file"
+  local md5sum
+  md5sum=$(get_md5sum "$zip_file")
+  aws s3 cp "$zip_file" "s3://$S3_BUCKET/$md5sum" \
+    || exit 1
+  echo "$md5sum"
+}
+
+rm dist/*.zip
+mkdir -p dist/dynamodb_stream
+mkdir -p dist/web_service
 if uname -a | grep x86_64; then
 	docker-compose -f docker/build/docker-compose.yml up \
 		--build \
 		--exit-code-from amazonlinux2 ||
 		exit 1
 	cp target/release/rust_lambda dist/web_service/bootstrap
-	cp target/release/rust_lambda dist/dynamodb_stream/bootstrap
+	cp target/release/examples/dynamodb_stream dist/dynamodb_stream/bootstrap
 else
 	# Faster compilation on Mac Apple Silicon
 	rustup target install x86_64-unknown-linux-musl &&
@@ -29,26 +55,15 @@ else
 	cp target/x86_64-unknown-linux-musl/release/rust_lambda dist/web_service/bootstrap
 	cp target/x86_64-unknown-linux-musl/release/examples/dynamodb_stream dist/dynamodb_stream/bootstrap
 fi
-rm dist/web_service.zip
-zip -jr dist/web_service.zip dist/web_service ||
-	exit 1
-rm dist/dynamodb_stream.zip
-zip -jr dist/dynamodb_stream.zip dist/dynamodb_stream ||
-	exit 1
-if uname -a | grep Darwin; then
-	WEB_SERVICE_CODE_OBJECT_KEY=$(md5 dist/web_service.zip | cut -d' ' -f4)
-	DYNAMODB_STREAM_CODE_OBJECT_KEY=$(md5 dist/dynamodb_stream.zip | cut -d' ' -f4)
-else
-	WEB_SERVICE_CODE_OBJECT_KEY=$(md5sum dist/web_service.zip | cut -d' ' -f1)
-	DYNAMODB_STREAM_CODE_OBJECT_KEY=$(md5sum dist/dynamodb_stream.zip | cut -d' ' -f1)
-fi
-aws s3 cp dist/web_service.zip "s3://$S3_BUCKET/$WEB_SERVICE_CODE_OBJECT_KEY" &&
-aws s3 cp dist/dynamodb_stream.zip "s3://$S3_BUCKET/$DYNAMODB_STREAM_CODE_OBJECT_KEY" &&
-	aws cloudformation deploy \
-		--template-file cloudformation.yml \
-		--stack-name "rust-lambda" \
-		--parameter-overrides \
-		  "CodeBucket=$S3_BUCKET" \
-		  "DynamodbStreamLambdaCodeObjectKey=$WEB_SERVICE_CODE_OBJECT_KEY" \
-		  "WebServiceCodeObjectKey=$DYNAMODB_STREAM_CODE_OBJECT_KEY" \
-		--capabilities CAPABILITY_IAM
+DYNAMODB_STREAM_CODE_OBJECT_KEY=$(upload dist/dynamodb_stream | tail -n1)
+WEB_SERVICE_CODE_OBJECT_KEY=$(upload dist/web_service | tail -n1)
+echo "DYNAMODB_STREAM_CODE_OBJECT_KEY $DYNAMODB_STREAM_CODE_OBJECT_KEY"
+echo "WEB_SERVICE_CODE_OBJECT_KEY $WEB_SERVICE_CODE_OBJECT_KEY"
+aws cloudformation deploy \
+  --capabilities CAPABILITY_IAM \
+  --parameter-overrides \
+    "CodeBucket=$S3_BUCKET" \
+    "DynamodbStreamCodeObjectKey=$DYNAMODB_STREAM_CODE_OBJECT_KEY" \
+    "WebServiceCodeObjectKey=$WEB_SERVICE_CODE_OBJECT_KEY" \
+  --stack-name "rust-lambda" \
+  --template-file cloudformation.yml

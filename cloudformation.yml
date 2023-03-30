@@ -5,7 +5,7 @@ Parameters:
   CodeBucket:
     Type: String
     Description: The name of the S3 bucket
-  DynamodbStreamLambdaCodeObjectKey:
+  DynamodbStreamCodeObjectKey:
     Type: String
     Description: The key of the S3 object containing the DynamodbStream lambda code
   WebServiceCodeObjectKey:
@@ -130,7 +130,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: !Ref "CodeBucket"
-        S3Key: !Ref "DynamodbStreamLambdaCodeObjectKey"
+        S3Key: !Ref "DynamodbStreamCodeObjectKey"
       Handler: "function.handler"
       Role: !GetAtt ["DynamodbStreamLambdaExecutionRole", "Arn"]
       Runtime: "provided.al2"
