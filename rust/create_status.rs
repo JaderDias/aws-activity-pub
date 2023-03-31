@@ -1,4 +1,4 @@
-use rust_lambda::{activitypub, faas_snowflake_id};
+use library::{activitypub, faas_snowflake_id};
 
 #[tokio::main]
 async fn main() {
@@ -9,7 +9,7 @@ async fn main() {
     let preferred_username = args[1].clone();
     let table_name = args[2].clone();
     let table_name = table_name.as_str();
-    let db_client = rust_lambda::dynamodb::get_client().await;
+    let db_client = library::dynamodb::get_client().await;
     let partition = format!("users/{preferred_username}/statuses");
     let node_id = faas_snowflake_id::get_node_id();
     let sort_value = faas_snowflake_id::get_id(node_id).to_string();
@@ -50,7 +50,7 @@ async fn main() {
         url: Some("https://example.com/@test_username".to_owned()),
         extra: serde_json::Value::Null,
     };
-    rust_lambda::dynamodb::put_item(
+    library::dynamodb::put_item(
         &db_client,
         table_name,
         partition.as_str(),

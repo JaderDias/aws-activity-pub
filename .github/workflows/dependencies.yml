@@ -56,8 +56,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: cargo outdated
-      - run: cargo outdated --depth 1 --exit-code 1
+      - run: cargo outdated --workspace
+      - run: cargo outdated -e --workspace --exit-code 1
 
   check-unused:
     runs-on: ubuntu-latest
@@ -68,4 +68,5 @@ jobs:
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
       - run: cargo install cargo-udeps --locked
-      - run: cargo udeps --all-targets
+      - run: cargo udeps --workspace
+      - run: cargo udeps --examples

@@ -1,30 +1,16 @@
-use aws_lambda_events::apigw::{ApiGatewayV2httpRequest, ApiGatewayV2httpResponse};
-use aws_lambda_events::encodings::Body;
+use test::TestCases;
 use time::format_description::well_known::Rfc3339;
 use time::OffsetDateTime;
 use tracing::{event, Level};
 
-use regex::Regex;
-use rust_lambda::activitypub::object::Object;
-use rust_lambda::dynamodb;
-use rust_lambda::model::user::User;
-use serde::Deserialize;
-use serde_json::{json, Value};
+use library::activitypub::object::Object;
+use library::dynamodb;
+use library::model::user::User;
 use std::env;
 use std::fs;
 
-type TestCases = Vec<TestCase>;
-
-#[derive(Deserialize)]
-struct TestCase {
-    name: String,
-    request: ApiGatewayV2httpRequest,
-    request_body_json: Option<Value>,
-    expected_response: ApiGatewayV2httpResponse,
-    expected_body_json: Option<Value>,
-    regex: Option<String>,
-    placeholder: Option<String>,
-}
+mod assert;
+mod test;
 
 fn get_target(args: Vec<String>) -> Option<(String, String, String, String, String)> {
     if args.len() != 6 {
@@ -50,7 +36,7 @@ fn add_protocol(urn: &str) -> String {
 
 #[tokio::main]
 async fn main() {
-    rust_lambda::tracing::init();
+    library::trace::init();
     let args: Vec<String> = env::args().collect();
     let (target_urn, target_username, signer_urn, signer_username, table_name) = get_target(args).expect(
         "Usage: LOCAL_DYNAMODB_URL=http://localhost:8000 test localhost:8080 target_username localhost:8080 signer_username dynamodb_table_name",
@@ -64,20 +50,16 @@ async fn main() {
     let db_client = dynamodb::get_client().await;
     let target_user: Option<User> = if target_urn.starts_with("localhost") {
         dynamodb::create_table_if_not_exists(&db_client, table_name).await;
-        Some(
-            rust_lambda::model::user::create(&db_client, table_name, target_username.as_str())
-                .await,
-        )
+        Some(library::model::user::create(&db_client, table_name, target_username.as_str()).await)
     } else {
         None
     };
     let signer: User = if signer_urn.starts_with("localhost") {
         dynamodb::create_table_if_not_exists(&db_client, table_name).await;
-        rust_lambda::model::user::create(&db_client, table_name, signer_username.as_str()).await
+        library::model::user::create(&db_client, table_name, signer_username.as_str()).await
     } else {
         let get_item_output =
-            rust_lambda::model::user::get_item(signer_username.as_str(), &db_client, table_name)
-                .await;
+            library::model::user::get_item(signer_username.as_str(), &db_client, table_name).await;
         let item = get_item_output.item.unwrap();
         serde_dynamo::from_item(item).unwrap()
     };
@@ -115,7 +97,7 @@ async fn main() {
                 test_name = &test.name
             );
             if &request.request_context.http.method == "POST" {
-                let mut request_body = json!(&test.request_body_json).to_string();
+                let mut request_body = serde_json::json!(&test.request_body_json).to_string();
                 if let Some(placeholder) = &test.placeholder {
                     request_body = request_body
                         .to_string()
@@ -124,7 +106,7 @@ async fn main() {
 
                 let headers = &mut request.headers;
                 if let Some(_host) = headers.get("host") {
-                    rust_lambda::activitypub::request::sign(
+                    library::activitypub::request::sign(
                         &request.request_context.http.method.as_ref(),
                         &request.request_context.http.path.as_ref().unwrap(),
                         headers,
@@ -189,8 +171,7 @@ async fn main() {
                     if let Ok(mut expected_object) = expected_object {
                         if let Some(public_key) = expected_object.public_key.as_mut() {
                             let public_key_der = target_user.public_key.as_ref().unwrap();
-                            public_key.public_key_pem =
-                                rust_lambda::rsa::der_to_pem(public_key_der);
+                            public_key.public_key_pem = library::rsa::der_to_pem(public_key_der);
                             if let Some(published) = expected_object.published.as_mut() {
                                 OffsetDateTime::parse(published, &Rfc3339).unwrap();
                                 expected_object.published = Some(target_user.get_published_time());
@@ -201,48 +182,7 @@ async fn main() {
                     }
                 }
             }
-            last_regex_capture = assert_body_matches_with_replacement(&test, &actual_body_text);
+            last_regex_capture = assert::body_matches_with_replacement(&test, &actual_body_text);
         }
-    }
-}
-
-fn assert_body_matches_with_replacement(test: &TestCase, actual_body_text: &String) -> String {
-    if let Some(regex) = &test.regex {
-        let compiled_regex = Regex::new(regex).unwrap();
-        if let Some(r#match) = compiled_regex.find(actual_body_text) {
-            let replaced_text = compiled_regex
-                .replace_all(actual_body_text, test.placeholder.as_ref().unwrap())
-                .to_string();
-            assert_body_matches(test, &replaced_text);
-            return r#match.as_str().to_owned();
-        }
-    }
-
-    assert_body_matches(test, actual_body_text);
-    String::new()
-}
-
-fn assert_body_matches(test: &TestCase, actual_body_text: &String) {
-    match &test.expected_response.body {
-        Some(expected_body) => match expected_body {
-            Body::Text(expected_body_text) => {
-                assert_eq!(actual_body_text, expected_body_text);
-                return;
-            }
-            _ => {
-                assert!(false)
-            }
-        },
-        None => match &test.expected_body_json {
-            Some(expected_body_value) => {
-                let actual_body_value: Value =
-                    serde_json::from_str(actual_body_text).expect("expected JSON response body");
-                assert_eq!(&actual_body_value, expected_body_value);
-                return;
-            }
-            None => {
-                assert_eq!(actual_body_text, &String::new());
-            }
-        },
     }
 }

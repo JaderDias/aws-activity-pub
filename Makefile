@@ -18,15 +18,15 @@
 .SHELLFLAGS = -ec # -e for exiting on errors and -c so that -e doesn't cause unwanted side effects
 
 build:
-	cargo clean -p rust_lambda
-	cargo build --all-targets
+	cargo clean -p web_service || true
+	cargo build --workspace
 
 build_with_profile:
 	cargo clean
 	CARGO_INCREMENTAL=0 \
 		RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort" \
 		RUSTDOCFLAGS="-Cpanic=abort" \
-		cargo build --all-targets
+		cargo build --workspace
 
 check: clippy
 	cargo fmt --all -- --check
@@ -59,13 +59,13 @@ html_coverage_report:
 	$(MAKE) grcov TYPE_PARAM=html OUTPUT=coverage
 
 integration_test:
-	RUST_LOG="test=info" \
+	RUST_LOG="web_service_test=info" \
 	LOCAL_DYNAMODB_URL=http://localhost:8000 \
-		./target/debug/examples/test localhost:8080 target_username localhost:8080 signer_username LocalDynamodbTable
+		./target/debug/web_service_test localhost:8080 target_username localhost:8080 signer_username LocalDynamodbTable
 
 kill_service_running_in_background:
-	pkill rust_lambda || true
-	pkill -9 rust_lambda || true
+	pkill web_service || true
+	pkill -9 web_service || true
 
 lcov:
 	$(MAKE) grcov TYPE_PARAM=lcov OUTPUT=lcov.info
@@ -84,8 +84,8 @@ run_service_in_background: kill_service_running_in_background
 		LOCAL_DYNAMODB_URL=http://localhost:8000 \
 		PROTOCOL=http \
 		REGION=eu-west-1 \
-		RUST_LOG="rocket=warn,rust_lambda=info" \
-		./target/debug/rust_lambda &
+		RUST_LOG="rocket=warn,web_service=info" \
+		./target/debug/web_service &
 
 scan_table:
 	@if ! grep -F '[profile localhost]' <~/.aws/config; then \
@@ -107,7 +107,8 @@ test_with_coverage: \
 	refresh_database \
 	build_with_profile \
 	run_service_in_background \
-
+	integration_test \
+	html_coverage_report
 
 unit_test:
 	cargo test

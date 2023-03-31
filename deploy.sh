@@ -40,8 +40,8 @@ if uname -a | grep x86_64; then
 		--build \
 		--exit-code-from amazonlinux2 ||
 		exit 1
-	cp target/release/rust_lambda dist/web_service/bootstrap
-	cp target/release/examples/dynamodb_stream dist/dynamodb_stream/bootstrap
+	cp target/release/web_service dist/web_service/bootstrap
+	cp target/release/dynamodb_stream dist/dynamodb_stream/bootstrap
 else
 	# Faster compilation on Mac Apple Silicon
 	rustup target install x86_64-unknown-linux-musl &&
@@ -49,11 +49,11 @@ else
 			RUSTFLAGS="-C linker=x86_64-linux-musl-gcc" \
 			cargo build \
 			  --release \
-			  --all-targets \
+			  --workspace \
 			  --target x86_64-unknown-linux-musl ||
 		exit 1
-	cp target/x86_64-unknown-linux-musl/release/rust_lambda dist/web_service/bootstrap
-	cp target/x86_64-unknown-linux-musl/release/examples/dynamodb_stream dist/dynamodb_stream/bootstrap
+	cp target/x86_64-unknown-linux-musl/release/web_service dist/web_service/bootstrap
+	cp target/x86_64-unknown-linux-musl/release/dynamodb_stream dist/dynamodb_stream/bootstrap
 fi
 DYNAMODB_STREAM_CODE_OBJECT_KEY=$(upload dist/dynamodb_stream | tail -n1)
 WEB_SERVICE_CODE_OBJECT_KEY=$(upload dist/web_service | tail -n1)

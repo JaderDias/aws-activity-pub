@@ -1,5 +1,5 @@
-use crate::activitypub::object::{Object, PublicKey};
-use crate::rsa;
+use library::activitypub::object::{Object, PublicKey};
+use library::rsa;
 use rocket::http::ContentType;
 
 mod followers;
@@ -25,9 +25,9 @@ pub struct UserResponse(String, ContentType);
 #[rocket::get("/users/<username>")]
 pub async fn handler(
     username: &str,
-    settings: &rocket::State<crate::settings::Settings>,
+    settings: &rocket::State<library::settings::Settings>,
 ) -> Option<UserResponse> {
-    if let Some(user) = crate::model::user::get(username, settings).await {
+    if let Some(user) = library::model::user::get(username, settings).await {
         let public_key = rsa::der_to_pem(user.public_key.as_ref().unwrap());
         let user_uri = format!("{}/users/{username}", settings.base_url);
         let content_type =
@@ -39,7 +39,7 @@ pub async fn handler(
             attributed_to: None,
             cc: None,
             content: None,
-            context: crate::activitypub::context::default(),
+            context: library::activitypub::context::default(),
             conversation: None,
             devices: Some(format!("{user_uri}/collections/devices")),
             discoverable: Some(false),

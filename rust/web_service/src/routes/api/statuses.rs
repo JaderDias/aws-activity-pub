@@ -1,9 +1,9 @@
-use crate::activitypub::object::Object;
+use library::activitypub::object::Object;
 
 #[rocket::post("/api/v1/statuses", data = "<status>")]
 pub async fn handler(
     status: rocket::serde::json::Json<Object>,
-    settings: &rocket::State<crate::settings::Settings>,
+    settings: &rocket::State<library::settings::Settings>,
 ) -> Option<String> {
     let mut object = status.into_inner();
     let object_type = object.r#type.as_str();
@@ -11,7 +11,7 @@ pub async fn handler(
         return None;
     }
 
-    let status_id = crate::faas_snowflake_id::get_id(settings.node_id).to_string();
+    let status_id = library::faas_snowflake_id::get_id(settings.node_id).to_string();
     let username = "target_username"; // TODO: replace with authenticated username
     let partition = format!("users/{username}/statuses");
     object.id = Some(format!(
@@ -21,7 +21,7 @@ pub async fn handler(
         status_id.as_str(),
     ));
 
-    crate::dynamodb::put_item(
+    library::dynamodb::put_item(
         &settings.db_client,
         &settings.table_name,
         partition.as_str(),

@@ -1,5 +1,5 @@
-use crate::activitypub::object::Object;
 use aws_sdk_dynamodb::model::AttributeValue;
+use library::activitypub::object::Object;
 use rocket::serde::json::Json;
 use tracing::{event, Level};
 
@@ -7,15 +7,15 @@ use tracing::{event, Level};
 pub async fn handler(
     username: &str,
     status_id: &str,
-    settings: &rocket::State<crate::settings::Settings>,
+    settings: &rocket::State<library::settings::Settings>,
 ) -> Option<Json<Object>> {
     event!(Level::DEBUG, username = username, status_id = status_id);
     let partition = format!("users/{username}/statuses");
     let get_item_output = settings.db_client
         .get_item()
         .table_name(&settings.table_name)
-        .key(crate::dynamodb::PARTITION_KEY_NAME, AttributeValue::S(partition))
-        .key(crate::dynamodb::SORT_KEY_NAME, AttributeValue::S(status_id.to_owned()))
+        .key(library::dynamodb::PARTITION_KEY_NAME, AttributeValue::S(partition))
+        .key(library::dynamodb::SORT_KEY_NAME, AttributeValue::S(status_id.to_owned()))
         .projection_expression("#context, attachment, id, #type, inReplyToAtomUri, published, #to, #sensitive, conversation, content, tag")
         .expression_attribute_names("#context", "@context")
         .expression_attribute_names("#sensitive", "sensitive")

@@ -61,7 +61,7 @@
         "outbound": []
       },
       "software": {
-        "name": "rust_lambda",
+        "name": "aws_activity_pub",
         "version": 1
       },
       "usage": {

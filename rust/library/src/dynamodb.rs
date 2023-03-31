@@ -6,6 +6,7 @@ use aws_sdk_dynamodb::model::{
 use aws_sdk_dynamodb::types::SdkError;
 use aws_sdk_dynamodb::Client;
 use std::collections::HashMap;
+use tracing::{event, Level};
 
 pub const PARTITION_KEY_NAME: &str = "partition_key";
 pub const SORT_KEY_NAME: &str = "sort_key";
@@ -63,7 +64,7 @@ where
 
 pub async fn get_client() -> Client {
     if let Ok(url) = std::env::var("LOCAL_DYNAMODB_URL") {
-        println!("Using local dynamodb at {url}");
+        event!(Level::DEBUG, "Using local dynamodb at {url}");
         get_local_client(url).await
     } else {
         let config = aws_config::load_from_env().await;
@@ -83,7 +84,7 @@ pub async fn get_local_client(local_dynamodb_url: String) -> Client {
 
 async fn table_exists(client: &aws_sdk_dynamodb::Client, table: &str) -> bool {
     let table_list = client.list_tables().send().await.unwrap();
-    println!("tables {table_list:?}");
+    event!(Level::DEBUG, "tables {table_list:?}");
     table_list
         .table_names()
         .as_ref()

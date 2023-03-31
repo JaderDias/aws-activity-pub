@@ -1,0 +1,29 @@
+[package]
+name = "dynamodb_stream"
+version = "0.1.0"
+edition = "2021"
+
+# Starting in Rust 1.62 you can use `cargo add` to add dependencies 
+# to your project.
+#
+# If you're using an older Rust version,
+# download cargo-edit(https://github.com/killercup/cargo-edit#installation) 
+# to install the `add` subcommand.
+#
+# Running `cargo add DEPENDENCY_NAME` will
+# add the latest version of a dependency to the list,
+# and it will keep the alphabetic ordering for you.
+
+[dependencies]
+aws_lambda_events_extended = "0.1.0"
+aws-sdk-dynamodb = "0.24.0"
+http = "0.2.9"
+lambda_runtime = "0.7.3"
+library = { path = "../library/" }
+reqwest = { version = "0.11.14", default-features = false, features = [
+    "rustls-tls",
+] }
+serde_dynamo = { version = "4.0.12", features = ["aws-sdk-dynamodb+0_24"] }
+serde_json = { version = "1.0.93", features = ["raw_value"] }
+tokio = { version = "1", features = ["macros"] }
+tracing = { version = "0.1.37" }

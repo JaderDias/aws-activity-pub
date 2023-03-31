@@ -10,5 +10,5 @@ services:
       - /bin/sh
       - -c
       - |
-        /root/.cargo/bin/cargo build --release --all-targets && \
+        /root/.cargo/bin/cargo build --release --workspace && \
         /bin/chmod -R go=u /volume/target/release

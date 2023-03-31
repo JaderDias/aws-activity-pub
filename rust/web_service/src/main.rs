@@ -1,28 +1,21 @@
-use crate::settings::Settings;
 use lambda_web::{is_running_on_lambda, launch_rocket_on_lambda, LambdaError};
+use library::settings::Settings;
 use std::env::var;
 
-mod activitypub;
-mod dynamodb;
-mod faas_snowflake_id;
-mod model;
 mod routes;
-pub mod rsa;
-pub mod settings;
-mod tracing;
 
 #[rocket::main]
 async fn main() -> Result<(), LambdaError> {
-    tracing::init();
+    library::trace::init();
 
     let domain_name = var("CUSTOM_DOMAIN").unwrap();
     let rocket = rocket::build()
         .mount("/", routes::routes())
         .manage(Settings {
             base_url: format!("{}://{domain_name}", var("PROTOCOL").unwrap()),
-            db_client: dynamodb::get_client().await,
+            db_client: library::dynamodb::get_client().await,
             domain_name,
-            node_id: faas_snowflake_id::get_node_id(),
+            node_id: library::faas_snowflake_id::get_node_id(),
             table_name: var("DYNAMODB_TABLE").unwrap(),
         });
 

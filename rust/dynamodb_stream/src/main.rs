@@ -1,7 +1,7 @@
 use aws_lambda_events_extended::dynamodb::DynamoDBEvent;
 use http::header::{HeaderMap, HeaderValue};
 use lambda_runtime::{service_fn, Error, LambdaEvent};
-use rust_lambda::{activitypub::object::Object, dynamodb, model};
+use library::{activitypub::object::Object, dynamodb, model};
 use serde_json::{json, Value};
 use std::collections::HashMap;
 use tracing::{event, Level};
@@ -97,7 +97,7 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
                     HeaderValue::from_str("application/activity+json").unwrap(),
                 );
                 headers.insert("Host", HeaderValue::from_str(split_url[2]).unwrap());
-                rust_lambda::activitypub::request::sign(
+                library::activitypub::request::sign(
                     METHOD,
                     path,
                     &mut headers,

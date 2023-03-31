@@ -8,7 +8,7 @@ pub fn handler() -> NodeInfo {
     let doc = serde_json::json!({
         "version": 2.0,
         "software": {
-            "name": "rust_lambda",
+            "name": "aws_activity_pub",
             "version": 1 // TODO: add version
         },
         "protocols": ["activitypub"],

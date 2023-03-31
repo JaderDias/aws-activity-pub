@@ -1,6 +1,6 @@
-use crate::activitypub::object::Object;
-use crate::settings::Settings;
 use aws_sdk_dynamodb::model::AttributeValue;
+use library::activitypub::object::Object;
+use library::settings::Settings;
 use rocket::serde::json::Json;
 
 #[rocket::get("/users/<username>/outbox")]
@@ -13,7 +13,7 @@ pub async fn handler(username: &str, settings: &rocket::State<Settings>) -> Json
         .key_condition_expression("#partition_key = :valueToMatch")
         .expression_attribute_names(
             "#partition_key",
-            crate::dynamodb::PARTITION_KEY_NAME.to_owned(),
+            library::dynamodb::PARTITION_KEY_NAME.to_owned(),
         )
         .expression_attribute_values(":valueToMatch", AttributeValue::S(partition))
         .limit(20)

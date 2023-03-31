@@ -15,7 +15,7 @@ pub fn routes() -> Vec<rocket::Route> {
 #[rocket::get("/<path>")]
 async fn handler(
     path: &str,
-    settings: &rocket::State<crate::settings::Settings>,
+    settings: &rocket::State<library::settings::Settings>,
 ) -> Option<users::UserResponse> {
     if path.len() < 2 || !path.starts_with('@') {
         return None;
