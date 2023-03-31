@@ -26,11 +26,13 @@ const EPOCH_MILLISECONDS_SHIFT: u64 = SEQUENCE_BITS + NODE_BITS; // 22 bits, the
 const EPOCH_MILLISECONDS_BITS: u64 = 64 - EPOCH_MILLISECONDS_SHIFT; // 42 bits
 const EPOCH_MILLISECONDS_MASK: u64 = (1 << EPOCH_MILLISECONDS_BITS) - 1;
 
+#[must_use]
 pub fn get_node_id() -> u64 {
     let mut rng = thread_rng();
     rng.gen_range(0..NODE_RANGE)
 }
 
+#[must_use]
 pub fn get_id(node_id: u64) -> u64 {
     get_id_with_timestamp(node_id, SystemTime::now())
 }
