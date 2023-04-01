@@ -29,7 +29,10 @@
               "claim1": "value1",
               "claim2": "value2"
             },
-            "scopes": ["scope1", "scope2"]
+            "scopes": [
+              "scope1",
+              "scope2"
+            ]
           }
         },
         "domainName": "id.execute-api.us-east-1.amazonaws.com",
@@ -78,7 +81,9 @@
       "summary": null,
       "inReplyTo": null,
       "published": "2019-04-28T20:58:40Z",
-      "to": ["https://www.w3.org/ns/activitystreams#Public"],
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
       "sensitive": false,
       "inReplyToAtomUri": null,
       "conversation": "tag:TARGET_URN_PLACEHOLDER,2019-04-28:objectId=1754000:objectType=Conversation",
@@ -96,8 +101,10 @@
       "multiValueHeaders": {},
       "statusCode": 200
     },
-    "regex": "[0-9]{19}",
-    "placeholder": "1234567890123456789"
+    "cross_request_replace": {
+      "regex": "[0-9]{19}",
+      "placeholder": "1234567890123456789"
+    }
   },
   {
     "name": "verify if own status was created",
@@ -117,7 +124,10 @@
               "claim1": "value1",
               "claim2": "value2"
             },
-            "scopes": ["scope1", "scope2"]
+            "scopes": [
+              "scope1",
+              "scope2"
+            ]
           }
         },
         "domainName": "id.execute-api.us-east-1.amazonaws.com",
@@ -177,13 +187,17 @@
       "id": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER/statuses/1234567890123456789",
       "type": "Note",
       "published": "2019-04-28T20:58:40Z",
-      "to": ["https://www.w3.org/ns/activitystreams#Public"],
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
       "sensitive": false,
       "conversation": "tag:TARGET_URN_PLACEHOLDER,2019-04-28:objectId=1754000:objectType=Conversation",
       "content": "test_content",
       "tag": []
     },
-    "regex": "[0-9]{19}",
-    "placeholder": "1234567890123456789"
+    "cross_request_replace": {
+      "regex": "[0-9]{19}",
+      "placeholder": "1234567890123456789"
+    }
   }
 ]

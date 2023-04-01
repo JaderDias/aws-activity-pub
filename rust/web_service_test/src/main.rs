@@ -1,9 +1,6 @@
 use test::TestCases;
-use time::format_description::well_known::Rfc3339;
-use time::OffsetDateTime;
 use tracing::{event, Level};
 
-use library::activitypub::object::Object;
 use library::dynamodb;
 use library::model::user::User;
 use std::env;
@@ -50,12 +47,10 @@ async fn main() {
     let signature_key_id = format!("{signer_url}/users/{signer_username}#main-key");
 
     let db_client = dynamodb::get_client().await;
-    let target_user: Option<User> = if target_domain.starts_with("localhost") {
+    if target_domain.starts_with("localhost") {
         dynamodb::create_table_if_not_exists(&db_client, table_name).await;
-        Some(library::model::user::create(&db_client, table_name, target_username.as_str()).await)
-    } else {
-        None
-    };
+        Some(library::model::user::create(&db_client, table_name, target_username.as_str()).await);
+    }
     let signer: User = if signer_domain.starts_with("localhost") {
         dynamodb::create_table_if_not_exists(&db_client, table_name).await;
         library::model::user::create(&db_client, table_name, signer_username.as_str()).await
@@ -100,10 +95,9 @@ async fn main() {
             );
             if &request.request_context.http.method == "POST" {
                 let mut request_body = serde_json::json!(&test.request_body_json).to_string();
-                if let Some(placeholder) = &test.placeholder {
+                if let Some(replace) = &test.cross_request_replace {
                     request_body = request_body
-                        .to_string()
-                        .replace(placeholder, last_regex_capture.as_str());
+                        .replace(replace.placeholder.as_str(), last_regex_capture.as_str());
                 }
 
                 let headers = &mut request.headers;
@@ -141,8 +135,8 @@ async fn main() {
                     .await
                     .unwrap();
             } else {
-                if let Some(placeholder) = &test.placeholder {
-                    url = url.replace(placeholder, last_regex_capture.as_str());
+                if let Some(replace) = &test.cross_request_replace {
+                    url = url.replace(replace.placeholder.as_str(), last_regex_capture.as_str());
                 }
                 let query_string = &request.raw_query_string;
                 if query_string.is_some() {
@@ -166,25 +160,7 @@ async fn main() {
             );
 
             let actual_body_text = actual_response.text().await.unwrap();
-            if let Some(target_user) = &target_user {
-                if let Some(expected_body) = &mut test.expected_body_json {
-                    let expected_object: Result<Object, serde_json::Error> =
-                        serde_json::from_value(expected_body.clone());
-                    if let Ok(mut expected_object) = expected_object {
-                        if let Some(public_key) = expected_object.public_key.as_mut() {
-                            let public_key_der = target_user.public_key.as_ref().unwrap();
-                            public_key.public_key_pem = library::rsa::der_to_pem(public_key_der);
-                            if let Some(published) = expected_object.published.as_mut() {
-                                OffsetDateTime::parse(published, &Rfc3339).unwrap();
-                                expected_object.published = Some(target_user.get_published_time());
-                            }
-                            test.expected_body_json =
-                                Some(serde_json::to_value(expected_object).unwrap());
-                        }
-                    }
-                }
-            }
-            last_regex_capture = assert::body_matches_with_replacement(&test, &actual_body_text);
+            last_regex_capture = assert::body_matches_with_replacement(&test, actual_body_text);
         }
     }
 }

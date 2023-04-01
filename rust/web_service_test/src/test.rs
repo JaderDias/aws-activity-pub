@@ -12,6 +12,12 @@ pub struct TestCase {
     pub request_body_json: Option<Value>,
     pub expected_response: ApiGatewayV2httpResponse,
     pub expected_body_json: Option<Value>,
-    pub regex: Option<String>,
-    pub placeholder: Option<String>,
+    pub cross_request_replace: Option<Replace>,
+    pub response_replace: Option<Vec<Replace>>,
+}
+
+#[derive(Deserialize)]
+pub struct Replace {
+    pub regex: String,
+    pub placeholder: String,
 }
