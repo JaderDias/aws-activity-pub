@@ -1,4 +1,3 @@
-mod api;
 mod nodeinfo;
 mod users;
 mod well_known;
@@ -6,7 +5,6 @@ mod well_known;
 pub fn routes() -> Vec<rocket::Route> {
     rocket::routes![handler, nodeinfo::handler]
         .into_iter()
-        .chain(api::routes().into_iter())
         .chain(users::routes().into_iter())
         .chain(well_known::routes().into_iter())
         .collect()
