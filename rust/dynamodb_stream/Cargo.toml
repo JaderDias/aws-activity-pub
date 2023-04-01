@@ -1,7 +1,13 @@
 [package]
-name = "dynamodb_stream"
-version = "0.1.0"
+categories = ["webservice"]
+description = "Lambda that consumes the stream of changes to a DynamoDb table"
 edition = "2021"
+keywords = ["aws", "aws-lambda", "amazon dynamodb"]
+license-file = "LICENSE"
+readme = "README.md"
+name = "dynamodb_stream"
+repository = "https://github.com/JaderDias/aws-activity-pub"
+version = "0.1.0"
 
 # Starting in Rust 1.62 you can use `cargo add` to add dependencies 
 # to your project.

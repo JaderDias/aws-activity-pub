@@ -6,7 +6,7 @@ use serde_json::{json, Value};
 use std::collections::HashMap;
 use tracing::{event, Level};
 
-const METHOD: &'static str = "POST";
+const METHOD: &str = "POST";
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -45,7 +45,7 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
                 .and_then(|v| v.s.clone())
                 .unwrap();
             event!(Level::DEBUG, "New item with ID: {partition}");
-            let split_partition = partition.split("/").collect::<Vec<&str>>();
+            let split_partition = partition.split('/').collect::<Vec<&str>>();
             if split_partition.len() != 3 {
                 continue;
             }
@@ -103,7 +103,7 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
                     &mut headers,
                     &request_body,
                     user.private_key.as_ref().unwrap(),
-                    &signature_key_id.as_str(),
+                    signature_key_id.as_str(),
                 );
                 event!(
                     Level::DEBUG,
@@ -124,7 +124,7 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
                 http_client
                     .post(url)
                     .body(request_body)
-                    .headers(headers.to_owned())
+                    .headers(headers.clone())
                     .send()
                     .await
                     .unwrap();

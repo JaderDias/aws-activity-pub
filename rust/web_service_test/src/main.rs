@@ -12,7 +12,7 @@ use std::fs;
 mod assert;
 mod test;
 
-fn get_target(args: Vec<String>) -> Option<(String, String, String, String, String)> {
+fn get_target(args: &[String]) -> Option<(String, String, String, String, String)> {
     if args.len() != 6 {
         return None;
     }
@@ -26,35 +26,37 @@ fn get_target(args: Vec<String>) -> Option<(String, String, String, String, Stri
     ))
 }
 
-fn add_protocol(urn: &str) -> String {
-    if urn.starts_with("localhost") {
-        format!("http://{urn}")
+fn add_protocol(domain: &str) -> String {
+    if domain.starts_with("localhost") {
+        format!("http://{domain}")
     } else {
-        format!("https://{urn}")
+        format!("https://{domain}")
     }
 }
 
 #[tokio::main]
+#[allow(clippy::too_many_lines)]
 async fn main() {
     library::trace::init();
     let args: Vec<String> = env::args().collect();
-    let (target_urn, target_username, signer_urn, signer_username, table_name) = get_target(args).expect(
+    let (target_domain, target_username, signer_domain, signer_username, table_name)
+     = get_target(&args).expect(
         "Usage: LOCAL_DYNAMODB_URL=http://localhost:8000 test localhost:8080 target_username localhost:8080 signer_username dynamodb_table_name",
     );
 
     let table_name = table_name.as_str();
-    let target_url = add_protocol(target_urn.as_str());
-    let signer_url = add_protocol(signer_urn.as_str());
+    let target_url = add_protocol(target_domain.as_str());
+    let signer_url = add_protocol(signer_domain.as_str());
     let signature_key_id = format!("{signer_url}/users/{signer_username}#main-key");
 
     let db_client = dynamodb::get_client().await;
-    let target_user: Option<User> = if target_urn.starts_with("localhost") {
+    let target_user: Option<User> = if target_domain.starts_with("localhost") {
         dynamodb::create_table_if_not_exists(&db_client, table_name).await;
         Some(library::model::user::create(&db_client, table_name, target_username.as_str()).await)
     } else {
         None
     };
-    let signer: User = if signer_urn.starts_with("localhost") {
+    let signer: User = if signer_domain.starts_with("localhost") {
         dynamodb::create_table_if_not_exists(&db_client, table_name).await;
         library::model::user::create(&db_client, table_name, signer_username.as_str()).await
     } else {
@@ -74,7 +76,7 @@ async fn main() {
         let file = fs::read_to_string(path_value).unwrap();
         let file = file
             .as_str()
-            .replace("TARGET_URN_PLACEHOLDER", target_urn.as_str())
+            .replace("TARGET_URN_PLACEHOLDER", target_domain.as_str())
             .replace("TARGET_URL_PLACEHOLDER", target_url.as_str())
             .replace("TARGET_USERNAME_PLACEHOLDER", target_username.as_str())
             .replace("SIGNER_URL_PLACEHOLDER", signer_url.as_str())
@@ -107,12 +109,12 @@ async fn main() {
                 let headers = &mut request.headers;
                 if let Some(_host) = headers.get("host") {
                     library::activitypub::request::sign(
-                        &request.request_context.http.method.as_ref(),
-                        &request.request_context.http.path.as_ref().unwrap(),
+                        request.request_context.http.method.as_ref(),
+                        request.request_context.http.path.as_ref().unwrap(),
                         headers,
                         &request_body,
                         signer.private_key.as_ref().unwrap(),
-                        &signature_key_id.as_str(),
+                        signature_key_id.as_str(),
                     );
                 }
                 event!(
@@ -134,7 +136,7 @@ async fn main() {
                 actual_response = http_client
                     .post(url)
                     .body(request_body)
-                    .headers(headers.to_owned())
+                    .headers(headers.clone())
                     .send()
                     .await
                     .unwrap();
@@ -155,8 +157,8 @@ async fn main() {
                     .unwrap();
             }
             assert_eq!(
-                actual_response.status(),
-                test.expected_response.status_code as u16
+                i64::from(actual_response.status().as_u16()),
+                test.expected_response.status_code
             );
             assert_eq!(
                 actual_response.headers().get("content-type"),

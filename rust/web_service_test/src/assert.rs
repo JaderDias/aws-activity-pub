@@ -19,15 +19,15 @@ pub fn body_matches_with_replacement(test: &TestCase, actual_body_text: &String)
     String::new()
 }
 
+#[allow(clippy::option_if_let_else)]
 fn assert_body_matches(test: &TestCase, actual_body_text: &String) {
     match &test.expected_response.body {
         Some(expected_body) => match expected_body {
             Body::Text(expected_body_text) => {
                 assert_eq!(actual_body_text, expected_body_text);
-                return;
             }
             _ => {
-                assert!(false)
+               panic!("Expected response body isn't Text")
             }
         },
         None => match &test.expected_body_json {
@@ -35,7 +35,6 @@ fn assert_body_matches(test: &TestCase, actual_body_text: &String) {
                 let actual_body_value: Value =
                     serde_json::from_str(actual_body_text).expect("expected JSON response body");
                 assert_eq!(&actual_body_value, expected_body_value);
-                return;
             }
             None => {
                 assert_eq!(actual_body_text, &String::new());

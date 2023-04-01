@@ -1,7 +1,13 @@
 [package]
-name = "web_service_test"
-version = "0.1.0"
+categories = ["integration tests"]
+description = "Integration tests for any ActivityPub implementation"
 edition = "2021"
+keywords = ["aws", "aws-lambda", "amazon dynamodb"]
+license-file = "LICENSE"
+readme = "README.md"
+name = "web_service_test"
+repository = "https://github.com/JaderDias/aws-activity-pub"
+version = "0.1.0"
 
 # Starting in Rust 1.62 you can use `cargo add` to add dependencies 
 # to your project.

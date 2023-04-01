@@ -1,8 +1,13 @@
 [package]
-name = "library"
+categories = ["library"]
 description = "Common code"
-version = "0.1.0"
 edition = "2021"
+keywords = ["aws", "aws-lambda", "amazon dynamodb"]
+license-file = "LICENSE"
+readme = "README.md"
+name = "library"
+repository = "https://github.com/JaderDias/aws-activity-pub"
+version = "0.1.0"
 
 # Starting in Rust 1.62 you can use `cargo add` to add dependencies 
 # to your project.

@@ -1,12 +1,12 @@
 [package]
-name = "aws-activitypub"
-description = "Example minimal ActivityPub serverless implementation in Rust using AWS infrastructure"
-repository = "https://github.com/JaderDias/aws-activity-pub"
 categories = ["webservice"]
-keywords = ["aws", "aws-lambda", "amazon dynamodb"]
-version = "0.1.0"
+description = "Example minimal ActivityPub serverless implementation in Rust using AWS infrastructure"
 edition = "2021"
+keywords = ["aws", "aws-lambda", "amazon dynamodb"]
 license-file = "LICENSE"
+name = "aws-activitypub"
+repository = "https://github.com/JaderDias/aws-activity-pub"
+version = "0.1.0"
 
 [workspace]
 members = [
