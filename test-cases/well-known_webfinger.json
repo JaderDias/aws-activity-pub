@@ -53,11 +53,11 @@
     "expected_response": {
        "cookies": [],
       "headers": {
-        "content-type": "application/json"
+        "content-type": "application/jrd+json; charset=utf-8"
       },
       "isBase64Encoded": false,
       "multiValueHeaders": {
-        "content-type": "application/json"
+        "content-type": "application/jrd+json; charset=utf-8"
       },
       "statusCode": 200
     },
