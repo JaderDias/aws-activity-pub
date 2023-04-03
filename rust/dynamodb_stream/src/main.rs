@@ -20,10 +20,20 @@ fn dynamodb_event_to_map(
 ) -> HashMap<String, aws_sdk_dynamodb::model::AttributeValue> {
     let mut items = HashMap::new();
     for (key, value) in stream {
-        items.insert(
-            key,
-            aws_sdk_dynamodb::model::AttributeValue::S(value.s.clone().unwrap()),
-        );
+        if let Some(s) = value.s {
+            items.insert(key, aws_sdk_dynamodb::model::AttributeValue::S(s.clone()));
+        } else if let Some(n) = value.n {
+            items.insert(key, aws_sdk_dynamodb::model::AttributeValue::N(n.clone()));
+        } else if let Some(bool) = value.bool {
+            items.insert(
+                key,
+                aws_sdk_dynamodb::model::AttributeValue::Bool(bool.clone()),
+            );
+        } else if let Some(ss) = value.ss {
+            items.insert(key, aws_sdk_dynamodb::model::AttributeValue::Ss(ss.clone()));
+        } else if let Some(ns) = value.ns {
+            items.insert(key, aws_sdk_dynamodb::model::AttributeValue::Ns(ns.clone()));
+        }
     }
     items
 }
