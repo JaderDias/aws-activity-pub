@@ -10,6 +10,7 @@ const METHOD: &str = "POST";
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    library::trace::init();
     let func = service_fn(func);
     lambda_runtime::run(func).await?;
     Ok(())
