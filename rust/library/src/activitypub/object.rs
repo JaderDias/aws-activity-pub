@@ -21,7 +21,7 @@ pub struct Object {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<String>,
     #[serde(rename = "@context")]
-    pub context: serde_json::Value,
+    pub context: Option<serde_json::Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub conversation: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
