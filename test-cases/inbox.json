@@ -18,7 +18,7 @@
         "content-type": "application/activity+json",
         "accept-encoding": "gzip",
         "x-amz-cf-id": "8o65jbh76x7rSXVSN0vL0tXyoShuczOQSf8WYL3ueK_ALpBwAn_lUw==",
-        "user-agent": "Amazon CloudFront"
+        "user-agent": "http.rb/5.1.1 (Mastodon/4.1.0; +SIGNER_URL_PLACEHOLDER/)"
       },
       "requestContext": {
         "accountId": "anonymous",
@@ -27,7 +27,7 @@
           "path": "/users/TARGET_USERNAME_PLACEHOLDER/inbox",
           "protocol": "HTTP/1.1",
           "sourceIp": "15.158.44.245",
-          "userAgent": "Amazon CloudFront"
+          "userAgent": "http.rb/5.1.1 (Mastodon/4.1.0; +SIGNER_URL_PLACEHOLDER/)"
         },
         "requestId": "249deea0-ccc6-4771-a7b5-cc8dd454a7f6",
         "routeKey": "$default",
