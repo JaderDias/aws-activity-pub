@@ -44,14 +44,14 @@
       }
     },
     "expected_response": {
-      "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<XRD xmlns=\"http://docs.oasis-open.org/ns/xri/xrd-1.0\">\n  <Link rel=\"lrdd\" template=\"TARGET_URL_PLACEHOLDER/.well-known/webfinger?resource={uri}\" type=\"application/xrd+xml\" />\n</XRD>",
+      "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<XRD xmlns=\"http://docs.oasis-open.org/ns/xri/xrd-1.0\">\n  <Link rel=\"lrdd\" template=\"TARGET_URL_PLACEHOLDER/.well-known/webfinger?resource={uri}\"/>\n</XRD>\n",
       "cookies": [],
       "headers": {
-        "content-type": "application/xrd+xml"
+        "content-type": "application/xrd+xml; charset=utf-8"
       },
       "isBase64Encoded": false,
       "multiValueHeaders": {
-        "content-type": "application/xrd+xml"
+        "content-type": "application/xrd+xml; charset=utf-8"
       },
       "statusCode": 200
     }
