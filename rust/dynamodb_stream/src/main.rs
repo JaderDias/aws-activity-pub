@@ -69,9 +69,7 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
             let status: Object = serde_dynamo::from_item(status).unwrap();
             let username = split_partition[1];
             let signature_key_id = format!("https://{domain_name}/users/{username}#main-key");
-            let user_partition = format!("users/{username}");
-            let get_item_output =
-                model::user::get_item(user_partition.as_str(), &db_client, &table_name).await;
+            let get_item_output = model::user::get_item(username, &db_client, &table_name).await;
             let item = get_item_output.item.unwrap();
             let user: model::user::User = serde_dynamo::from_item(item).unwrap();
 
