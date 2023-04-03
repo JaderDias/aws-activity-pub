@@ -12,7 +12,7 @@ pub async fn handler(
     settings: &rocket::State<Settings>,
 ) -> Result<String, BadRequest<String>> {
     for header in headers.0.iter() {
-        event!(Level::DEBUG, "{} = {}", header.name(), header.value());
+        event!(Level::DEBUG, "{}: {}", header.name(), header.value());
     }
 
     event!(Level::DEBUG, "body = {data}");
