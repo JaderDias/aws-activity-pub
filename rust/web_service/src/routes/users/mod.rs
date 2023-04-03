@@ -60,7 +60,7 @@ pub async fn handler(
                 public_key_pem: public_key,
             }),
             published: Some(user.get_published_time()),
-            r#type: "Person".to_owned(),
+            r#type: Some("Person".to_owned()),
             sensitive: None,
             summary: Some(String::new()),
             tag: Some(Vec::new()),

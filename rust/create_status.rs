@@ -40,7 +40,7 @@ async fn main() {
         preferred_username: None,
         public_key: None,
         published: Some("2023-01-19T00:00:00Z".to_owned()),
-        r#type: "Note".to_owned(),
+        r#type: Some("Note".to_owned()),
         sensitive: Some(false),
         summary: None,
         tag: Some(Vec::new()),

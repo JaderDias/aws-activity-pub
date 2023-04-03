@@ -59,7 +59,7 @@ pub struct Object {
     pub public_key: Option<PublicKey>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published: Option<String>,
-    pub r#type: String,
+    pub r#type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sensitive: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]

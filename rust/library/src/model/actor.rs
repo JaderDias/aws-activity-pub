@@ -167,7 +167,7 @@ aQIDAQAB
                 .to_owned(),
             }),
             published: Some("2023-01-19T00:00:00Z".to_owned()),
-            r#type: "Person".to_owned(),
+            r#type: Some("Person".to_owned()),
             sensitive: None,
             summary: Some(String::new()),
             tag: Some(Vec::new()),
