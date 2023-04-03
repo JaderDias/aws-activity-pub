@@ -24,6 +24,7 @@ pub async fn get_item(
     sort_value: &str,
     projection_expression: &str,
 ) -> GetItemResult {
+    event!(Level::DEBUG, "Get item: table {dynamodb_table_name} partition {partition} sort_value {sort_value} projection_expression {projection_expression}");
     client
         .get_item()
         .table_name(dynamodb_table_name)
