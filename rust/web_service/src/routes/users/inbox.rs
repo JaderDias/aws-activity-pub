@@ -15,6 +15,7 @@ pub async fn handler(
         event!(Level::DEBUG, "{} = {}", header.name(), header.value());
     }
 
+    event!(Level::DEBUG, "body = {data}");
     let activity: serde_json::Value = serde_json::from_str(&data).unwrap();
     let actor_id = activity["actor"]
         .as_str()
