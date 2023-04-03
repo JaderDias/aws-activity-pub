@@ -4,15 +4,13 @@
 	check \
 	clippy \
 	grcov \
-	html_coverage_report \
 	integration_test \
-	kill_service_running_in_background \
-	lcov \
-	nightly_toolchain \
 	refresh_database \
 	run_service_in_background \
 	scan_table \
 	test_with_coverage \
+	test_with_html_coverage \
+	test_with_lcov \
 	unit_test \
 	watch
 .SHELLFLAGS = -ec # -e for exiting on errors and -c so that -e doesn't cause unwanted side effects
@@ -55,30 +53,17 @@ grcov:
 		--ignore-not-existing \
 		-o ./target/debug/$(OUTPUT)
 
-html_coverage_report:
-	$(MAKE) grcov TYPE_PARAM=html OUTPUT=coverage
-
 integration_test:
 	RUST_LOG="web_service_test=info" \
 	LOCAL_DYNAMODB_URL=http://localhost:8000 \
 		./target/debug/web_service_test localhost:8080 target_username localhost:8080 signer_username LocalDynamodbTable
 
-kill_service_running_in_background:
-	pkill web_service || true
-	pkill -9 web_service || true
-
-lcov:
-	$(MAKE) grcov TYPE_PARAM=lcov OUTPUT=lcov.info
-
-nightly_toolchain:
-	rustup update nightly
-	rustup default nightly
-
 refresh_database:
 	docker-compose -f docker/test/docker-compose.yml kill
 	docker-compose -f docker/test/docker-compose.yml up --build --detach
 
-run_service_in_background: kill_service_running_in_background
+run_service_in_background:
+	@./kill_web_service.sh
 	CUSTOM_DOMAIN=localhost:8080 \
 		DYNAMODB_TABLE=LocalDynamodbTable \
 		LOCAL_DYNAMODB_URL=http://localhost:8000 \
@@ -103,12 +88,19 @@ test: \
 	integration_test
 
 test_with_coverage: \
-	nightly_toolchain \
 	refresh_database \
 	build_with_profile \
 	run_service_in_background \
-	integration_test \
-	html_coverage_report
+	integration_test
+	@./kill_web_service.sh
+
+test_with_html_coverage: \
+	test_with_coverage
+	$(MAKE) grcov TYPE_PARAM=html OUTPUT=coverage
+
+test_with_lcov: \
+	test_with_coverage
+	$(MAKE) grcov TYPE_PARAM=lcov OUTPUT=lcov.info
 
 unit_test:
 	cargo test
