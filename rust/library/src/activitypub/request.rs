@@ -31,6 +31,7 @@ fn insert_digest(all_headers: &mut HeaderMap, request_body: &str) {
 fn insert_date(all_headers: &mut HeaderMap) {
     let date: OffsetDateTime = OffsetDateTime::now_utc();
     let date = date.format(&Rfc2822).unwrap();
+    let date = date.as_str().replace("+0000", "GMT");
     let date = HeaderValue::from_str(&date).unwrap();
     all_headers.insert("date", date);
 }
