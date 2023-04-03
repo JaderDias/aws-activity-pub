@@ -49,7 +49,7 @@ async fn main() {
     let db_client = dynamodb::get_client().await;
     if target_domain.starts_with("localhost") {
         dynamodb::create_table_if_not_exists(&db_client, table_name).await;
-        Some(library::model::user::create(&db_client, table_name, target_username.as_str()).await);
+        library::model::user::create(&db_client, table_name, target_username.as_str()).await;
     }
     let signer: User = if signer_domain.starts_with("localhost") {
         dynamodb::create_table_if_not_exists(&db_client, table_name).await;

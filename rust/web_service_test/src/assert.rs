@@ -12,25 +12,25 @@ pub fn body_matches_with_replacement(test: &TestCase, actual_body_text: String) 
     let mut actual_body_text = actual_body_text;
     if let Some(response_replace) = &test.response_replace {
         for replace in response_replace {
-            actual_body_text = regex_replace(actual_body_text.as_str(), &replace);
+            actual_body_text = regex_replace(actual_body_text.as_str(), replace);
         }
     }
 
     if let Some(replace) = &test.cross_request_replace {
-        let compiled_regex = Regex::new(&replace.regex.as_str()).unwrap();
+        let compiled_regex = Regex::new(replace.regex.as_str()).unwrap();
         if let Some(r#match) = compiled_regex.find(actual_body_text.as_str()) {
-            let actual_body = regex_replace(actual_body_text.as_str(), &replace);
-            assert_body_matches(test, actual_body);
+            let actual_body = regex_replace(actual_body_text.as_str(), replace);
+            assert_body_matches(test, actual_body.as_str());
             return r#match.as_str().to_owned();
         }
     }
 
-    assert_body_matches(test, actual_body_text);
+    assert_body_matches(test, actual_body_text.as_str());
     String::new()
 }
 
 #[allow(clippy::option_if_let_else)]
-fn assert_body_matches(test: &TestCase, actual_body_text: String) {
+fn assert_body_matches(test: &TestCase, actual_body_text: &str) {
     match &test.expected_response.body {
         Some(expected_body) => match expected_body {
             Body::Text(expected_body_text) => {
@@ -42,8 +42,8 @@ fn assert_body_matches(test: &TestCase, actual_body_text: String) {
         },
         None => match &test.expected_body_json {
             Some(expected_body_value) => {
-                let actual_body_value: Value = serde_json::from_str(actual_body_text.as_str())
-                    .expect("expected JSON response body");
+                let actual_body_value: Value =
+                    serde_json::from_str(actual_body_text).expect("expected JSON response body");
                 assert_eq!(&actual_body_value, expected_body_value);
             }
             None => {
