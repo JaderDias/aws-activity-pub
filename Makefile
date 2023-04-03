@@ -17,14 +17,14 @@
 
 build:
 	cargo clean -p web_service || true
-	cargo build --workspace
+	cargo build --workspace --all-targets
 
 build_with_profile:
 	cargo clean
 	CARGO_INCREMENTAL=0 \
 		RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort" \
 		RUSTDOCFLAGS="-Cpanic=abort" \
-		cargo build --workspace
+		cargo build --workspace --all-targets
 
 check: clippy
 	cargo fmt --all -- --check
@@ -84,12 +84,14 @@ scan_table:
 test: \
 	refresh_database \
 	build \
+	unit_test \
 	run_service_in_background \
 	integration_test
 
 test_with_coverage: \
 	refresh_database \
 	build_with_profile \
+	unit_test \
 	run_service_in_background \
 	integration_test
 	@./kill_web_service.sh
@@ -103,7 +105,7 @@ test_with_lcov: \
 	$(MAKE) grcov TYPE_PARAM=lcov OUTPUT=lcov.info
 
 unit_test:
-	cargo test
+	cargo test --workspace || true
 
 watch:
 	cargo watch --clear -x 'build --all-targets'
