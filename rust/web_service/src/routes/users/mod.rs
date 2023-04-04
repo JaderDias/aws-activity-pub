@@ -53,6 +53,7 @@ pub async fn handler(
             name: Some(username.to_owned()),
             object: None,
             outbox: Some(format!("{user_uri}/outbox")),
+            partition_key: None,
             preferred_username: Some(username.to_owned()),
             public_key: Some(PublicKey {
                 id: format!("{user_uri}#main-key"),
@@ -62,6 +63,7 @@ pub async fn handler(
             published: Some(user.get_published_time()),
             r#type: Some("Person".to_owned()),
             sensitive: None,
+            sort_key: None,
             summary: Some(String::new()),
             tag: Some(Vec::new()),
             to: None,

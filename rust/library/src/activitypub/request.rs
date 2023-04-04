@@ -23,7 +23,6 @@ pub fn sign(
 
 fn insert_digest(all_headers: &mut HeaderMap, request_body: &str) {
     let digest = super::digest::Digest::from_body(request_body);
-    event!(Level::DEBUG, digest = digest);
     let digest = HeaderValue::from_str(&digest).unwrap();
     all_headers.insert("digest", digest);
 }
@@ -85,6 +84,7 @@ fn get_signature(private_key: &[u8], to_sign: &str) -> Result<Vec<u8>, String> {
     .map_err(|e| format!("Failed to from_rsa {e:?}"))?;
     let mut signer = Signer::new(MessageDigest::sha256(), &key)
         .map_err(|e| format!("Failed to create signer {e:?}"))?;
+    event!(Level::DEBUG, to_sign = to_sign);
     signer
         .update(to_sign.as_bytes())
         .map_err(|e| format!("Failed to update signer {e:?}"))?;

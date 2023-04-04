@@ -10,11 +10,14 @@ impl Digest {
     pub fn from_body(body: &str) -> String {
         let mut hasher =
             Hasher::new(MessageDigest::sha256()).expect("Digest::digest: initialization error");
+
+        event!(Level::DEBUG, body = body);
         hasher
             .update(body.as_bytes())
             .expect("Digest::digest: content insertion error");
         let res = general_purpose::STANDARD
             .encode(hasher.finish().expect("Digest::digest: finalizing error"));
+        event!(Level::DEBUG, digest = res);
         format!("SHA-256={res}")
     }
 
@@ -79,5 +82,23 @@ impl Digest {
                 }
             },
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_from_body() {
+        // Arrange
+        let body = r#"{"content":"test content","@context":null,"conversation":"tag:g4rxofniv3ethj5t4dgyma7dmy0wnukp.lambda-url.eu-central-1.on.aws,2019-04-28:objectId=1754000:objectType=Conversation","discoverable":false,"id":"https://g4rxofniv3ethj5t4dgyma7dmy0wnukp.lambda-url.eu-central-1.on.aws/users/test_username/statuses/7049093257877979136","published":"2023-01-19T00:00:00Z","type":"Note","sensitive":false,"url":"https://g4rxofniv3ethj5t4dgyma7dmy0wnukp.lambda-url.eu-central-1.on.aws/@test_username","partition_key":"users/sample_user8/statuses"}"#;
+        let expected = "SHA-256=r5I/bD57JCWgwOaiBiS/RKDbaifG5qdlJNdTZfTWR1Q=";
+
+        // Act
+        let actual = Digest::from_body(body);
+
+        // Assert
+        assert_eq!(expected, actual);
     }
 }

@@ -97,7 +97,7 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
                 let url = follower.actor.unwrap();
                 let url = format!("{url}/inbox");
                 let split_url = url.splitn(4, '/').collect::<Vec<&str>>();
-                let path = split_url[3];
+                let path = format!("/{}", split_url[3]);
                 let status = status.clone();
                 let request_body = serde_json::to_string(&status).unwrap();
                 let mut headers = HeaderMap::new();
@@ -108,7 +108,7 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
                 headers.insert("Host", HeaderValue::from_str(split_url[2]).unwrap());
                 library::activitypub::request::sign(
                     METHOD,
-                    path,
+                    path.as_str(),
                     &mut headers,
                     &request_body,
                     user.private_key.as_ref().unwrap(),

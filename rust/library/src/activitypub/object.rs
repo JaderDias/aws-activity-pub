@@ -51,6 +51,8 @@ pub struct Object {
     pub object: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub outbox: Option<String>,
+    #[serde(skip_serializing)]
+    pub partition_key: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "preferredUsername")]
     pub preferred_username: Option<String>,
@@ -62,6 +64,8 @@ pub struct Object {
     pub r#type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sensitive: Option<bool>,
+    #[serde(skip_serializing)]
+    pub sort_key: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub summary: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
