@@ -15,9 +15,10 @@ pub fn sign(
     request_body: &str,
     private_key: &[u8],
     signature_key_id: &str,
+    time_provider: &dyn crate::time_provider::TimeProvider,
 ) {
     insert_digest(all_headers, request_body);
-    insert_date(all_headers);
+    insert_date(all_headers, time_provider);
     insert_signature(method, path, all_headers, private_key, signature_key_id);
 }
 
@@ -27,8 +28,11 @@ fn insert_digest(all_headers: &mut HeaderMap, request_body: &str) {
     all_headers.insert("digest", digest);
 }
 
-fn insert_date(all_headers: &mut HeaderMap) {
-    let date: OffsetDateTime = OffsetDateTime::now_utc();
+fn insert_date(
+    all_headers: &mut HeaderMap,
+    time_provider: &dyn crate::time_provider::TimeProvider,
+) {
+    let date: OffsetDateTime = time_provider.now_utc();
     let date = date.format(&Rfc2822).unwrap();
     let date = date.as_str().replace("+0000", "GMT");
     let date = HeaderValue::from_str(&date).unwrap();

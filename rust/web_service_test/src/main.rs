@@ -109,6 +109,7 @@ async fn main() {
                         &request_body,
                         signer.private_key.as_ref().unwrap(),
                         signature_key_id.as_str(),
+                        &time::OffsetDateTime::UNIX_EPOCH,
                     );
                 }
                 event!(
