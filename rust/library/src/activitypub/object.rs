@@ -8,19 +8,17 @@ use std::fmt::Debug;
 pub struct Object {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "atomUri")]
+    #[serde(rename = "atomUri", skip_serializing_if = "Option::is_none")]
     pub atom_uri: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attachment: Option<Vec<Attachment>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "attributedTo")]
+    #[serde(rename = "attributedTo", skip_serializing_if = "Option::is_none")]
     pub attributed_to: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cc: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<String>,
-    #[serde(rename = "@context")]
+    #[serde(rename = "@context", skip_serializing_if = "Option::is_none")]
     pub context: Option<serde_json::Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub conversation: Option<String>,
@@ -34,16 +32,16 @@ pub struct Object {
     pub following: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "inReplyTo")]
+    #[serde(rename = "inReplyTo", skip_serializing_if = "Option::is_none")]
     pub in_reply_to: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "inReplyToAtomUri")]
+    #[serde(rename = "inReplyToAtomUri", skip_serializing_if = "Option::is_none")]
     pub in_reply_to_atom_uri: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inbox: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "manuallyApprovesFollowers")]
+    #[serde(
+        rename = "manuallyApprovesFollowers",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub manually_approves_followers: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -53,14 +51,14 @@ pub struct Object {
     pub outbox: Option<String>,
     #[serde(skip_serializing)]
     pub partition_key: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "preferredUsername")]
+    #[serde(rename = "preferredUsername", skip_serializing_if = "Option::is_none")]
     pub preferred_username: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "publicKey")]
     pub public_key: Option<PublicKey>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sensitive: Option<bool>,

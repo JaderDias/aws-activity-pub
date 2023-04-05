@@ -24,6 +24,7 @@ async fn main() -> Result<(), Error> {
 fn dynamodb_event_to_map(
     stream: HashMap<String, aws_lambda_events_extended::dynamodb::AttributeValue>,
 ) -> HashMap<String, aws_sdk_dynamodb::model::AttributeValue> {
+    event!(Level::DEBUG, "dynamodb_event_to_map: {stream:?}");
     let mut items = HashMap::new();
     for (key, value) in stream {
         if let Some(s) = value.s {
@@ -183,6 +184,39 @@ mod tests {
         fn now_utc(&self) -> OffsetDateTime {
             OffsetDateTime::UNIX_EPOCH
         }
+    }
+
+    #[test]
+    fn test_dynamodb_event_to_map() {
+        // Arrange
+        let mut stream =
+            HashMap::<String, aws_lambda_events_extended::dynamodb::AttributeValue>::new();
+        stream.insert(
+            "@context".to_owned(),
+            aws_lambda_events_extended::dynamodb::AttributeValue {
+                b: None,
+                bool: None,
+                bs: None,
+                l: None,
+                m: None,
+                n: None,
+                ns: None,
+                null: None,
+                s: Some("context".to_owned()),
+                ss: None,
+            },
+        );
+        let mut expected = HashMap::<String, aws_sdk_dynamodb::model::AttributeValue>::new();
+        expected.insert(
+            "@context".to_owned(),
+            aws_sdk_dynamodb::model::AttributeValue::S("context".to_owned()),
+        );
+
+        // Act
+        let actual = dynamodb_event_to_map(stream);
+
+        // Assert
+        assert_eq!(expected, actual);
     }
 
     #[tokio::test]
