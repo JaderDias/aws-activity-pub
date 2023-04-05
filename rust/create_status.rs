@@ -30,7 +30,7 @@ async fn main() {
         followers: None,
         following: None,
         id: Some(format!(
-            "https://{domain}/users/test_username/statuses/{sort_value}"
+            "https://{domain}/users/{preferred_username}/statuses/{sort_value}"
         )),
         in_reply_to: None,
         in_reply_to_atom_uri: None,
@@ -51,7 +51,7 @@ async fn main() {
         to: Some(vec![
             "https://www.w3.org/ns/activitystreams#Public".to_owned()
         ]),
-        url: Some(format!("https://{domain}/@test_username")),
+        url: Some(format!("https://{domain}/@{preferred_username}")),
         extra: serde_json::Value::Null,
     };
     library::dynamodb::put_item(

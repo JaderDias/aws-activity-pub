@@ -6,6 +6,6 @@ pub trait TimeProvider {
 
 impl TimeProvider for OffsetDateTime {
     fn now_utc(&self) -> OffsetDateTime {
-        OffsetDateTime::now_utc()
+        Self::now_utc()
     }
 }

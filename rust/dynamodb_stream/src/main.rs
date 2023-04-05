@@ -21,30 +21,6 @@ async fn main() -> Result<(), Error> {
     Ok(())
 }
 
-fn dynamodb_event_to_map(
-    stream: HashMap<String, aws_lambda_events_extended::dynamodb::AttributeValue>,
-) -> HashMap<String, aws_sdk_dynamodb::model::AttributeValue> {
-    event!(Level::DEBUG, "dynamodb_event_to_map: {stream:?}");
-    let mut items = HashMap::new();
-    for (key, value) in stream {
-        if let Some(s) = value.s {
-            items.insert(key, aws_sdk_dynamodb::model::AttributeValue::S(s.clone()));
-        } else if let Some(n) = value.n {
-            items.insert(key, aws_sdk_dynamodb::model::AttributeValue::N(n.clone()));
-        } else if let Some(bool) = value.bool {
-            items.insert(
-                key,
-                aws_sdk_dynamodb::model::AttributeValue::Bool(bool.clone()),
-            );
-        } else if let Some(ss) = value.ss {
-            items.insert(key, aws_sdk_dynamodb::model::AttributeValue::Ss(ss.clone()));
-        } else if let Some(ns) = value.ns {
-            items.insert(key, aws_sdk_dynamodb::model::AttributeValue::Ns(ns.clone()));
-        }
-    }
-    items
-}
-
 async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
     let (event, _context) = event.into_parts();
     let json_value = serde_json::to_value(event)?;
@@ -71,6 +47,7 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
                 continue;
             }
 
+            event!(Level::DEBUG, "dynamodb_event_to_map: {new_image:?}");
             let status = dynamodb_event_to_map(new_image);
             let status: Object = serde_dynamo::from_item(status).unwrap();
             let username = split_partition[1];
@@ -106,8 +83,7 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
                     signature_key_id.as_str(),
                     &follower,
                     &OffsetDateTime::UNIX_EPOCH,
-                )
-                .await;
+                );
                 event!(
                     Level::DEBUG,
                     "curl -H '{}' -d '{}' {}",
@@ -138,7 +114,44 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
     Ok(json!({ "message": "Success" }))
 }
 
-async fn get_notification(
+fn dynamodb_event_to_map(
+    stream: HashMap<String, aws_lambda_events_extended::dynamodb::AttributeValue>,
+) -> HashMap<String, aws_sdk_dynamodb::model::AttributeValue> {
+    let mut items = HashMap::new();
+    for (key, value) in stream {
+        items.insert(key, convert(&value).clone());
+    }
+    items
+}
+
+fn convert(
+    value: &aws_lambda_events_extended::dynamodb::AttributeValue,
+) -> aws_sdk_dynamodb::model::AttributeValue {
+    if let Some(bool) = &value.bool {
+        return aws_sdk_dynamodb::model::AttributeValue::Bool(*bool);
+    }
+    if let Some(l) = &value.l {
+        return aws_sdk_dynamodb::model::AttributeValue::L(
+            l.iter().map(convert).collect::<Vec<_>>(),
+        );
+    }
+    if let Some(m) = &value.m {
+        return aws_sdk_dynamodb::model::AttributeValue::M(dynamodb_event_to_map(m.clone()));
+    }
+    if let Some(ns) = &value.ns {
+        return aws_sdk_dynamodb::model::AttributeValue::Ns(ns.clone());
+    }
+    if let Some(s) = &value.s {
+        return aws_sdk_dynamodb::model::AttributeValue::S(s.clone());
+    }
+    if let Some(ss) = &value.ss {
+        return aws_sdk_dynamodb::model::AttributeValue::Ss(ss.clone());
+    }
+
+    panic!("empty attribute value");
+}
+
+fn get_notification(
     status: &Object,
     user: &User,
     signature_key_id: &str,
@@ -189,10 +202,10 @@ mod tests {
     #[test]
     fn test_dynamodb_event_to_map() {
         // Arrange
-        let mut stream =
+        let mut context =
             HashMap::<String, aws_lambda_events_extended::dynamodb::AttributeValue>::new();
-        stream.insert(
-            "@context".to_owned(),
+        context.insert(
+            "PropertyValue".to_owned(),
             aws_lambda_events_extended::dynamodb::AttributeValue {
                 b: None,
                 bool: None,
@@ -202,14 +215,86 @@ mod tests {
                 n: None,
                 ns: None,
                 null: None,
-                s: Some("context".to_owned()),
+                s: Some("schema:PropertyValue".to_owned()),
                 ss: None,
             },
         );
+        let mut stream =
+            HashMap::<String, aws_lambda_events_extended::dynamodb::AttributeValue>::new();
+        stream.insert(
+            "partition_key".to_owned(),
+            aws_lambda_events_extended::dynamodb::AttributeValue {
+                b: None,
+                bool: None,
+                bs: None,
+                l: None,
+                m: None,
+                n: None,
+                ns: None,
+                null: None,
+                s: Some("users/sample_user/statuses".to_owned()),
+                ss: None,
+            },
+        );
+        stream.insert(
+            "@context".to_owned(),
+            aws_lambda_events_extended::dynamodb::AttributeValue {
+                b: None,
+                bool: None,
+                bs: None,
+                l: Some(vec![
+                    aws_lambda_events_extended::dynamodb::AttributeValue {
+                        b: None,
+                        bool: None,
+                        bs: None,
+                        l: None,
+                        m: None,
+                        n: None,
+                        ns: None,
+                        null: None,
+                        s: Some("https://www.w3.org/ns/activitystreams".to_owned()),
+                        ss: None,
+                    },
+                    aws_lambda_events_extended::dynamodb::AttributeValue {
+                        b: None,
+                        bool: None,
+                        bs: None,
+                        l: None,
+                        m: Some(context),
+                        n: None,
+                        ns: None,
+                        null: None,
+                        s: None,
+                        ss: None,
+                    },
+                ]),
+                m: None,
+                n: None,
+                ns: None,
+                null: None,
+                s: None,
+                ss: None,
+            },
+        );
+        let mut expected_context =
+            HashMap::<String, aws_sdk_dynamodb::model::AttributeValue>::new();
+        expected_context.insert(
+            "PropertyValue".to_string(),
+            aws_sdk_dynamodb::model::AttributeValue::S("schema:PropertyValue".to_owned()),
+        );
         let mut expected = HashMap::<String, aws_sdk_dynamodb::model::AttributeValue>::new();
         expected.insert(
+            "partition_key".to_owned(),
+            aws_sdk_dynamodb::model::AttributeValue::S("users/sample_user/statuses".to_owned()),
+        );
+        expected.insert(
             "@context".to_owned(),
-            aws_sdk_dynamodb::model::AttributeValue::S("context".to_owned()),
+            aws_sdk_dynamodb::model::AttributeValue::L(vec![
+                aws_sdk_dynamodb::model::AttributeValue::S(
+                    "https://www.w3.org/ns/activitystreams".to_owned(),
+                ),
+                aws_sdk_dynamodb::model::AttributeValue::M(expected_context),
+            ]),
         );
 
         // Act
@@ -219,8 +304,8 @@ mod tests {
         assert_eq!(expected, actual);
     }
 
-    #[tokio::test]
-    async fn test_notify_follower() {
+    #[test]
+    fn test_notify_follower() {
         // Arrange
         let domain = "example.com";
         let username = "test_username";
@@ -339,7 +424,7 @@ mod tests {
 
         // Act
         let (actual_url, actual_request_body, actual_headers) =
-            get_notification(&status, &user, signature_key_id, &follower, &time_provider).await;
+            get_notification(&status, &user, signature_key_id, &follower, &time_provider);
 
         // Assert
         assert_eq!(expected_url, actual_url);
