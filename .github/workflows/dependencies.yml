@@ -3,11 +3,13 @@ name: Dependencies
 on:
   pull_request:
     paths:
+      - "**/dependencies.yml"
       - "**/Cargo.lock"
       - "**/Cargo.toml"
       - "deny.toml"
   push:
     paths:
+      - "**/dependencies.yml"
       - "**/Cargo.lock"
       - "**/Cargo.toml"
       - "deny.toml"
