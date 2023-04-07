@@ -57,6 +57,21 @@ pub async fn page(username: &str, settings: &rocket::State<Settings>) -> Outbox 
         .unwrap();
     let items = response.items().unwrap();
     let body: Vec<Object> = serde_dynamo::from_items(items.to_vec()).unwrap();
+    let body = body
+        .into_iter()
+        .map(|object| {
+            serde_json::json!({
+                    "@context": "https://www.w3.org/ns/activitystreams",
+                    "id": format!("{}/activity", object.id.as_ref().unwrap()),
+                    "type": "Create",
+                    "actor": object.actor.as_ref().unwrap(),
+                    "published": object.published.as_ref().unwrap(),
+                    "to": object.to.as_ref().unwrap(),
+                    "cc": object.cc.as_ref().unwrap(),
+                    "object": &object
+            })
+        })
+        .collect::<Vec<serde_json::Value>>();
     let id = format!("{}/users/{username}/outbox", settings.base_url);
     let body = Json(serde_json::json!({
         "@context":[

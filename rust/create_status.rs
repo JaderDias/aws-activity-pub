@@ -17,10 +17,7 @@ async fn main() {
     let sort_value = faas_snowflake_id::get_id(node_id).to_string();
     let published_time = OffsetDateTime::now_utc();
     let status = activitypub::object::Object {
-        actor: Some(format!(
-            "https://{domain}/users/{preferred_username}
-        "
-        )),
+        actor: Some(format!("https://{domain}/users/{preferred_username}")),
         atom_uri: None,
         attachment: Some(Vec::new()),
         attributed_to: None,
