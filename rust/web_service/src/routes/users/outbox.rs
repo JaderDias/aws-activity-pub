@@ -1,4 +1,4 @@
-use aws_sdk_dynamodb::model::AttributeValue;
+use aws_sdk_dynamodb::types::AttributeValue;
 use library::activitypub::object::Object;
 use library::settings::Settings;
 use rocket::serde::json::Json;

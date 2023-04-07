@@ -1,9 +1,10 @@
-use aws_sdk_dynamodb::error::{GetItemError, PutItemError};
-use aws_sdk_dynamodb::model::{
+use aws_sdk_dynamodb::error::SdkError;
+use aws_sdk_dynamodb::operation::get_item::{GetItemError, GetItemOutput};
+use aws_sdk_dynamodb::operation::put_item::{PutItemError, PutItemOutput};
+use aws_sdk_dynamodb::types::{
     AttributeDefinition, AttributeValue, KeySchemaElement, KeyType, ProvisionedThroughput,
     ScalarAttributeType,
 };
-use aws_sdk_dynamodb::types::SdkError;
 use aws_sdk_dynamodb::Client;
 use std::collections::HashMap;
 use tracing::{event, Level};
@@ -11,8 +12,8 @@ use tracing::{event, Level};
 pub const PARTITION_KEY_NAME: &str = "partition_key";
 pub const SORT_KEY_NAME: &str = "sort_key";
 
-pub type GetItemResult = Result<aws_sdk_dynamodb::output::GetItemOutput, SdkError<GetItemError>>;
-pub type PutItemResult = Result<aws_sdk_dynamodb::output::PutItemOutput, SdkError<PutItemError>>;
+pub type GetItemResult = Result<GetItemOutput, SdkError<GetItemError>>;
+pub type PutItemResult = Result<PutItemOutput, SdkError<PutItemError>>;
 
 /// # Errors
 ///

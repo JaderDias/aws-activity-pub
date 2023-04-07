@@ -1,4 +1,5 @@
 use aws_lambda_events_extended::dynamodb::DynamoDBEvent;
+use aws_sdk_dynamodb::types::AttributeValue as AttributeValue2;
 use http::header::{HeaderMap, HeaderValue};
 use lambda_runtime::{service_fn, Error, LambdaEvent};
 use library::{
@@ -67,7 +68,7 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
                 )
                 .expression_attribute_values(
                     ":valueToMatch",
-                    aws_sdk_dynamodb::model::AttributeValue::S(followers_partition),
+                    AttributeValue2::S(followers_partition),
                 )
                 .limit(20)
                 .scan_index_forward(false)
@@ -116,7 +117,7 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
 
 fn dynamodb_event_to_map(
     stream: HashMap<String, aws_lambda_events_extended::dynamodb::AttributeValue>,
-) -> HashMap<String, aws_sdk_dynamodb::model::AttributeValue> {
+) -> HashMap<String, AttributeValue2> {
     let mut items = HashMap::new();
     for (key, value) in stream {
         items.insert(key, convert(&value).clone());
@@ -124,28 +125,24 @@ fn dynamodb_event_to_map(
     items
 }
 
-fn convert(
-    value: &aws_lambda_events_extended::dynamodb::AttributeValue,
-) -> aws_sdk_dynamodb::model::AttributeValue {
+fn convert(value: &aws_lambda_events_extended::dynamodb::AttributeValue) -> AttributeValue2 {
     if let Some(bool) = &value.bool {
-        return aws_sdk_dynamodb::model::AttributeValue::Bool(*bool);
+        return AttributeValue2::Bool(*bool);
     }
     if let Some(l) = &value.l {
-        return aws_sdk_dynamodb::model::AttributeValue::L(
-            l.iter().map(convert).collect::<Vec<_>>(),
-        );
+        return AttributeValue2::L(l.iter().map(convert).collect::<Vec<_>>());
     }
     if let Some(m) = &value.m {
-        return aws_sdk_dynamodb::model::AttributeValue::M(dynamodb_event_to_map(m.clone()));
+        return AttributeValue2::M(dynamodb_event_to_map(m.clone()));
     }
     if let Some(ns) = &value.ns {
-        return aws_sdk_dynamodb::model::AttributeValue::Ns(ns.clone());
+        return AttributeValue2::Ns(ns.clone());
     }
     if let Some(s) = &value.s {
-        return aws_sdk_dynamodb::model::AttributeValue::S(s.clone());
+        return AttributeValue2::S(s.clone());
     }
     if let Some(ss) = &value.ss {
-        return aws_sdk_dynamodb::model::AttributeValue::Ss(ss.clone());
+        return AttributeValue2::Ss(ss.clone());
     }
 
     panic!("empty attribute value");
@@ -276,24 +273,21 @@ mod tests {
                 ss: None,
             },
         );
-        let mut expected_context =
-            HashMap::<String, aws_sdk_dynamodb::model::AttributeValue>::new();
+        let mut expected_context = HashMap::<String, AttributeValue2>::new();
         expected_context.insert(
             "PropertyValue".to_string(),
-            aws_sdk_dynamodb::model::AttributeValue::S("schema:PropertyValue".to_owned()),
+            AttributeValue2::S("schema:PropertyValue".to_owned()),
         );
-        let mut expected = HashMap::<String, aws_sdk_dynamodb::model::AttributeValue>::new();
+        let mut expected = HashMap::<String, AttributeValue2>::new();
         expected.insert(
             "partition_key".to_owned(),
-            aws_sdk_dynamodb::model::AttributeValue::S("users/sample_user/statuses".to_owned()),
+            AttributeValue2::S("users/sample_user/statuses".to_owned()),
         );
         expected.insert(
             "@context".to_owned(),
-            aws_sdk_dynamodb::model::AttributeValue::L(vec![
-                aws_sdk_dynamodb::model::AttributeValue::S(
-                    "https://www.w3.org/ns/activitystreams".to_owned(),
-                ),
-                aws_sdk_dynamodb::model::AttributeValue::M(expected_context),
+            AttributeValue2::L(vec![
+                AttributeValue2::S("https://www.w3.org/ns/activitystreams".to_owned()),
+                AttributeValue2::M(expected_context),
             ]),
         );
 

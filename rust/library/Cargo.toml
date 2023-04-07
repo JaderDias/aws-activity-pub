@@ -21,12 +21,12 @@ version = "0.1.0"
 # and it will keep the alphabetic ordering for you.
 
 [dependencies]
-aws-config = "0.54.1"
-aws-sdk-dynamodb = "0.24.0"
+aws-config = "0.55.0"
+aws-sdk-dynamodb = "0.25"
 base64 = "0.21.0"
 hex = "0.4.3"
 http = "0.2.9"
-openssl = "0.10.48"
+openssl = "0.10.49"
 rand = "0.8.5"
 regex = "1.7.1"
 serde_bytes = "0.11.9"
@@ -35,7 +35,7 @@ reqwest = { version = "0.11.14", default-features = false, features = [
 ] }
 rocket = { version = "0.5.0-rc.3", features = ["json"] }
 serde = { version = "1.0.152", features = ["derive"] }
-serde_dynamo = { version = "4.0.12", features = ["aws-sdk-dynamodb+0_24"] }
+serde_dynamo = { version = "4.2", features = ["aws-sdk-dynamodb+0_25"] }
 serde_json = { version = "1.0.93", features = ["raw_value"] }
 time = "0.3"
 tokio = { version = "1", features = ["macros"] }
