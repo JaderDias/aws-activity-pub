@@ -16,8 +16,10 @@ pub fn routes() -> Vec<rocket::Route> {
         inbox::handler,
         outbox::handler,
         outbox::page,
-        statuses::handler,
     ]
+    .into_iter()
+    .chain(statuses::routes().into_iter())
+    .collect()
 }
 
 #[derive(rocket::Responder)]

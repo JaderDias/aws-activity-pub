@@ -1,4 +1,5 @@
 use library::{activitypub, faas_snowflake_id};
+use time::{format_description::well_known::Rfc3339, OffsetDateTime};
 
 #[tokio::main]
 async fn main() {
@@ -14,12 +15,18 @@ async fn main() {
     let partition = format!("users/{preferred_username}/statuses");
     let node_id = faas_snowflake_id::get_node_id();
     let sort_value = faas_snowflake_id::get_id(node_id).to_string();
+    let published_time = OffsetDateTime::now_utc();
     let status = activitypub::object::Object {
-        actor: None,
+        actor: Some(format!(
+            "https://{domain}/users/{preferred_username}
+        "
+        )),
         atom_uri: None,
         attachment: Some(Vec::new()),
         attributed_to: None,
-        cc: None,
+        cc: Some(vec![format!(
+            "https://{domain}/users/{preferred_username}/followers"
+        )]),
         content: Some("test content".to_string()),
         context: activitypub::context::default(),
         conversation: Some(format!(
@@ -42,7 +49,7 @@ async fn main() {
         partition_key: None,
         preferred_username: None,
         public_key: None,
-        published: Some("2023-01-19T00:00:00Z".to_owned()),
+        published: Some(published_time.format(&Rfc3339).unwrap()),
         r#type: Some("Note".to_owned()),
         sensitive: Some(false),
         sort_key: None,
