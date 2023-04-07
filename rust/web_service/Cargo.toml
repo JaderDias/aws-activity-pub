@@ -3,9 +3,9 @@ categories = ["webservice"]
 description = "WebService that implements ActivityPub"
 edition = "2021"
 keywords = ["aws", "aws-lambda", "amazon dynamodb"]
-license-file = "LICENSE"
+license-file = "../../LICENSE"
 name = "web_service"
-readme = "README.md"
+readme = "../../README.md"
 repository = "https://github.com/JaderDias/aws-activity-pub"
 version = "0.1.0"
 
@@ -24,7 +24,7 @@ version = "0.1.0"
 aws-sdk-dynamodb = "0.25"
 lambda_runtime = "0.7.3"
 lambda-web = { version = "0.2.1", features = ["rocket05"] }
-library = { path = "../library/" }
+library = { path = "../library/", version = "0.1.0" }
 rocket = { version = "0.5.0-rc.3", features = ["json"] }
 serde_dynamo = { version = "4.2", features = ["aws-sdk-dynamodb+0_25"] }
 serde_json = { version = "1.0.93", features = ["raw_value"] }

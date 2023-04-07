@@ -3,8 +3,8 @@ categories = ["webservice"]
 description = "Lambda that consumes the stream of changes to a DynamoDb table"
 edition = "2021"
 keywords = ["aws", "aws-lambda", "amazon dynamodb"]
-license-file = "LICENSE"
-readme = "README.md"
+license-file = "../../LICENSE"
+readme = "../../README.md"
 name = "dynamodb_stream"
 repository = "https://github.com/JaderDias/aws-activity-pub"
 version = "0.1.0"
@@ -25,7 +25,7 @@ aws_lambda_events_extended = "0.1.0"
 aws-sdk-dynamodb = "0.25"
 http = "0.2.9"
 lambda_runtime = "0.7.3"
-library = { path = "../library/" }
+library = { path = "../library/", version = "0.1.0" }
 reqwest = { version = "0.11.14", default-features = false, features = [
     "rustls-tls",
 ] }

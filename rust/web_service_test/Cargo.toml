@@ -3,8 +3,8 @@ categories = ["integration tests"]
 description = "Integration tests for any ActivityPub implementation"
 edition = "2021"
 keywords = ["aws", "aws-lambda", "amazon dynamodb"]
-license-file = "LICENSE"
-readme = "README.md"
+license-file = "../../LICENSE"
+readme = "../../README.md"
 name = "web_service_test"
 repository = "https://github.com/JaderDias/aws-activity-pub"
 version = "0.1.0"
@@ -23,7 +23,7 @@ version = "0.1.0"
 [dependencies]
 aws_lambda_events = "0.8.2"
 aws-sdk-dynamodb = "0.25"
-library = { path = "../library/" }
+library = { path = "../library/", version = "0.1.0" }
 regex = "1.7.1"
 reqwest = { version = "0.11.14", default-features = false, features = [
     "rustls-tls",
