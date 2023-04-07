@@ -1,16 +1,6 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Lambda function with dynamodb table.
-Parameters:
-  CodeBucket:
-    Type: String
-    Description: The name of the S3 bucket
-  DynamodbStreamCodeObjectKey:
-    Type: String
-    Description: The key of the S3 object containing the DynamodbStream lambda code
-  WebServiceCodeObjectKey:
-    Type: String
-    Description: The key of the S3 object containing the WebService lambda code
 Resources:
   # DynamoDB Table
   DynamoDBTable:
@@ -105,9 +95,7 @@ Resources:
   WebServiceLambdaFunction:
     Type: "AWS::Lambda::Function"
     Properties:
-      Code:
-        S3Bucket: !Ref "CodeBucket"
-        S3Key: !Ref "WebServiceCodeObjectKey"
+      Code: ./dist/web_service
       Handler: "function.handler"
       Role: !GetAtt ["WebServiceLambdaExecutionRole", "Arn"]
       Runtime: "provided.al2"
@@ -128,9 +116,7 @@ Resources:
   DynamodbStreamLambdaFunction:
     Type: "AWS::Lambda::Function"
     Properties:
-      Code:
-        S3Bucket: !Ref "CodeBucket"
-        S3Key: !Ref "DynamodbStreamCodeObjectKey"
+      Code: ./dist/dynamodb_stream
       Handler: "function.handler"
       Role: !GetAtt ["DynamodbStreamLambdaExecutionRole", "Arn"]
       Runtime: "provided.al2"

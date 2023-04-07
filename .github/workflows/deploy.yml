@@ -27,8 +27,6 @@ jobs:
           mkdir -p dist/web_service
           cp target/release/web_service dist/web_service/bootstrap
           cp target/release/dynamodb_stream dist/dynamodb_stream/bootstrap
-          zip -jr dist/web_service.zip dist/web_service
-          zip -jr dist/dynamodb_stream.zip dist/dynamodb_stream
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -37,13 +35,12 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
       - name: Upload
         run: |
-          DYNAMODB_STREAM_CODE_OBJECT_KEY=$(md5sum dist/dynamodb_stream.zip | cut -d' ' -f1)
-          WEB_SERVICE_CODE_OBJECT_KEY=$(md5sum dist/web_service.zip | cut -d' ' -f1)
-          aws s3 cp dist/dynamodb_stream.zip "s3://$S3_BUCKET/$DYNAMODB_STREAM_CODE_OBJECT_KEY"
-          aws s3 cp dist/web_service.zip "s3://$S3_BUCKET/$WEB_SERVICE_CODE_OBJECT_KEY"
+          aws cloudformation package \
+            --template-file cloudformation.yml \
+            --s3-bucket "$S3_BUCKET" \
+            --output-template-file packaged.yml
       - name: Deploy to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: rust-lambda
-          template: cloudformation.yml
-          parameter-overrides: "CodeBucket=${{ env.S3_BUCKET }},DynamodbStreamCodeObjectKey=${{ env.DYNAMODB_STREAM_CODE_OBJECT_KEY }},WebServiceCodeObjectKey=${{ env.WEB_SERVICE_CODE_OBJECT_KEY }}"
+          template: packaged.yml
