@@ -1,0 +1,135 @@
+[
+  {
+    "name": "federation sends a follow request for a known actor",
+    "request": {
+      "version": "2.0",
+      "routeKey": "$default",
+      "rawPath": "/users/TARGET_USERNAME_PLACEHOLDER/outbox",
+      "rawQueryString": "",
+      "headers": {
+        "x-amzn-tls-version": "TLSv1.2",
+        "x-forwarded-proto": "https",
+        "x-forwarded-port": "443",
+        "x-forwarded-for": "162.19.31.97",
+        "via": "1.1 449a51e3fb5bfe1fe97ced981c9a5b4e.cloudfront.net (CloudFront)",
+        "x-amzn-tls-cipher-suite": "ECDHE-RSA-AES128-GCM-SHA256",
+        "x-amzn-trace-id": "Root=1-63f3e787-5625d0b94c7acdc91dc25d74",
+        "host": "TARGET_URN_PLACEHOLDER",
+        "content-type": "application/activity+json",
+        "accept-encoding": "gzip",
+        "x-amz-cf-id": "8o65jbh76x7rSXVSN0vL0tXyoShuczOQSf8WYL3ueK_ALpBwAn_lUw==",
+        "user-agent": "http.rb/5.1.1 (Mastodon/4.1.0; +SIGNER_URL_PLACEHOLDER/)"
+      },
+      "requestContext": {
+        "accountId": "anonymous",
+        "http": {
+          "method": "GET",
+          "path": "/users/TARGET_USERNAME_PLACEHOLDER/outbox",
+          "protocol": "HTTP/1.1",
+          "sourceIp": "15.158.44.245",
+          "userAgent": "http.rb/5.1.1 (Mastodon/4.1.0; +SIGNER_URL_PLACEHOLDER/)"
+        },
+        "requestId": "249deea0-ccc6-4771-a7b5-cc8dd454a7f6",
+        "routeKey": "$default",
+        "stage": "$default",
+        "time": "20/Feb/2023:21:35:03 +0000",
+        "timeEpoch": 1676928903060
+      },
+      "isBase64Encoded": false
+    },
+    "expected_response": {
+      "cookies": [],
+      "headers": {
+        "content-type": "application/activity+json; charset=utf-8"
+      },
+      "isBase64Encoded": false,
+      "multiValueHeaders": {},
+      "statusCode": 200
+    },
+    "expected_body_json": {
+      "@context": "https://www.w3.org/ns/activitystreams",
+      "id": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER/outbox",
+      "type": "OrderedCollection",
+      "totalItems": 0,
+      "first": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER/outbox?page=true",
+      "last": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER/outbox?min_id=0&page=true"
+    }
+  },
+  {
+    "name": "federation sends a follow request for a known actor",
+    "request": {
+      "version": "2.0",
+      "routeKey": "$default",
+      "rawPath": "/users/TARGET_USERNAME_PLACEHOLDER/outbox",
+      "rawQueryString": "page=true",
+      "queryStringParameters": {
+        "page": "true"
+      },
+      "headers": {
+        "x-amzn-tls-version": "TLSv1.2",
+        "x-forwarded-proto": "https",
+        "x-forwarded-port": "443",
+        "x-forwarded-for": "162.19.31.97",
+        "via": "1.1 449a51e3fb5bfe1fe97ced981c9a5b4e.cloudfront.net (CloudFront)",
+        "x-amzn-tls-cipher-suite": "ECDHE-RSA-AES128-GCM-SHA256",
+        "x-amzn-trace-id": "Root=1-63f3e787-5625d0b94c7acdc91dc25d74",
+        "host": "TARGET_URN_PLACEHOLDER",
+        "content-type": "application/activity+json",
+        "accept-encoding": "gzip",
+        "x-amz-cf-id": "8o65jbh76x7rSXVSN0vL0tXyoShuczOQSf8WYL3ueK_ALpBwAn_lUw==",
+        "user-agent": "http.rb/5.1.1 (Mastodon/4.1.0; +SIGNER_URL_PLACEHOLDER/)"
+      },
+      "requestContext": {
+        "accountId": "anonymous",
+        "http": {
+          "method": "GET",
+          "path": "/users/TARGET_USERNAME_PLACEHOLDER/outbox",
+          "protocol": "HTTP/1.1",
+          "sourceIp": "15.158.44.245",
+          "userAgent": "http.rb/5.1.1 (Mastodon/4.1.0; +SIGNER_URL_PLACEHOLDER/)"
+        },
+        "requestId": "249deea0-ccc6-4771-a7b5-cc8dd454a7f6",
+        "routeKey": "$default",
+        "stage": "$default",
+        "time": "20/Feb/2023:21:35:03 +0000",
+        "timeEpoch": 1676928903060
+      },
+      "isBase64Encoded": false
+    },
+    "expected_response": {
+      "cookies": [],
+      "headers": {
+        "content-type": "application/activity+json; charset=utf-8"
+      },
+      "isBase64Encoded": false,
+      "multiValueHeaders": {},
+      "statusCode": 200
+    },
+    "expected_body_json": {
+      "@context":[
+        "https://www.w3.org/ns/activitystreams",
+        {
+          "ostatus": "http://ostatus.org#",
+          "atomUri": "ostatus:atomUri",
+          "inReplyToAtomUri": "ostatus:inReplyToAtomUri",
+          "conversation": "ostatus:conversation",
+          "sensitive": "as:sensitive",
+          "toot": "http://joinmastodon.org/ns#",
+          "votersCount": "toot:votersCount",
+          "blurhash": "toot:blurhash",
+          "focalPoint": {
+            "@container": "@list",
+            "@id": "toot:focalPoint"
+          },
+          "Hashtag": "as:Hashtag"
+        }
+      ],
+      "id": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER/outbox?page=true",
+      "type": "OrderedCollectionPage",
+      "next": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER/outbox?max_id=109635460763016637&page=true",
+      "prev": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER/outbox?min_id=109757651111534104&page=true",
+      "partOf": "TARGET_URL_PLACEHOLDER/users/TARGET_USERNAME_PLACEHOLDER/outbox",
+      "orderedItems": []
+    }
+  }
+]

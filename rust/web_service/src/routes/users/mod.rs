@@ -15,6 +15,7 @@ pub fn routes() -> Vec<rocket::Route> {
         following::handler,
         inbox::handler,
         outbox::handler,
+        outbox::page,
         statuses::handler,
     ]
 }
