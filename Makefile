@@ -5,9 +5,11 @@
 	clippy \
 	grcov \
 	integration_test \
+	nightly_toolchain \
 	refresh_database \
 	run_service_in_background \
 	scan_table \
+	stable_toolchain \
 	test_with_coverage \
 	test_with_html_coverage \
 	test_with_lcov \
@@ -29,7 +31,7 @@ build_with_profile:
 check: clippy
 	cargo fmt --all -- --check
 
-clippy:
+clippy: stable_toolchain
 	cargo clippy --all -- \
 		-D "clippy::all" \
 		-D clippy::pedantic \
@@ -58,6 +60,10 @@ integration_test:
 	LOCAL_DYNAMODB_URL=http://localhost:8000 \
 		./target/debug/web_service_test localhost:8080 target_username localhost:8080 signer_username LocalDynamodbTable
 
+nightly_toolchain:
+	rustup update nightly
+	rustup default nightly
+
 refresh_database:
 	docker-compose -f docker/test/docker-compose.yml kill
 	docker-compose -f docker/test/docker-compose.yml up --build --detach
@@ -81,7 +87,11 @@ scan_table:
 	fi
 	aws dynamodb scan --table-name LocalDynamodbTable --endpoint-url http://localhost:8000 --profile localhost
 
+stable_toolchain:
+	rustup update stable
+	
 test: \
+	stable_toolchain \
 	refresh_database \
 	build \
 	unit_test \
@@ -89,6 +99,7 @@ test: \
 	integration_test
 
 test_with_coverage: \
+	nightly_toolchain \
 	refresh_database \
 	build_with_profile \
 	unit_test \
@@ -104,8 +115,8 @@ test_with_lcov: \
 	test_with_coverage
 	$(MAKE) grcov TYPE_PARAM=lcov OUTPUT=lcov.info
 
-unit_test:
+unit_test: stable_toolchain
 	cargo test --workspace || true
 
-watch:
+watch: stable_toolchain
 	cargo watch --clear -x 'build --workspace --all-targets'
