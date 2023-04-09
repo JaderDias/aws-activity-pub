@@ -108,4 +108,4 @@ unit_test:
 	cargo test --workspace || true
 
 watch:
-	cargo watch --clear -x 'build --all-targets'
+	cargo watch --clear -x 'build --workspace --all-targets'
