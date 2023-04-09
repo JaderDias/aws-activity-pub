@@ -47,4 +47,4 @@ make test
 
 ## Test coverage
 
-![sunburst](https://codecov.io/gh/JaderDias/aws-activity-pub/branch/main/graphs/sunburst.svg?token=RBY2XLZV9G)
+[![sunburst](https://codecov.io/gh/JaderDias/aws-activity-pub/branch/main/graphs/sunburst.svg?token=RBY2XLZV9G)](https://coveralls.io/github/JaderDias/aws-activity-pub)
