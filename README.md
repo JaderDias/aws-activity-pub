@@ -1,7 +1,8 @@
 # aws-activity-pub
 [![build status](https://github.com/JaderDias/aws-activity-pub/workflows/Rust/badge.svg)](https://github.com/JaderDias/aws-activity-pub/actions?query=workflow%3ARust)
 [![lint status](https://github.com/JaderDias/aws-activity-pub/workflows/Linter/badge.svg)](https://github.com/JaderDias/aws-activity-pub/actions?query=workflow%3ALinter)
-[![dependency status](https://deps.rs/repo/github/JaderDias/aws-activity-pub/status.svg)](https://deps.rs/repo/github/JaderDias/aws-activity-pub)
+[![dependency status](https://github.com/JaderDias/aws-activity-pub/workflows/Dependencies/badge.svg)](https://github.com/JaderDias/aws-activity-pub/actions?query=workflow%3ADependencies)
+[![deps.rs](https://deps.rs/repo/github/JaderDias/aws-activity-pub/status.svg)](https://deps.rs/repo/github/JaderDias/aws-activity-pub)
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/JaderDias/aws-activity-pub.svg)](http://isitmaintained.com/project/JaderDias/aws-activity-pub "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/JaderDias/aws-activity-pub.svg)](http://isitmaintained.com/project/JaderDias/aws-activity-pub "Percentage of issues still open")
 

@@ -39,4 +39,4 @@ path = "rust/create_user.rs"
 library = { path = "rust/library/", version = "0.1.0" }
 serde_json = { version = "1.0.93" }
 time = "0.3"
-tokio = { version = "1", features = ["macros"] }
+tokio = { version = "1.27", features = ["macros"] }
