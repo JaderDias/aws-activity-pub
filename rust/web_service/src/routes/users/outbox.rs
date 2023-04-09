@@ -37,8 +37,8 @@ pub async fn handler(username: &str, settings: &rocket::State<Settings>) -> Outb
     Outbox(body, content_type)
 }
 
-#[rocket::get("/users/<username>/outbox?page=true")]
-pub async fn page(username: &str, settings: &rocket::State<Settings>) -> Outbox {
+#[rocket::get("/users/<username>/outbox?<page>")]
+pub async fn page(username: &str, page: &str, settings: &rocket::State<Settings>) -> Outbox {
     let partition = format!("users/{username}/statuses");
     let response = settings
         .db_client
@@ -92,7 +92,7 @@ pub async fn page(username: &str, settings: &rocket::State<Settings>) -> Outbox 
               "Hashtag": "as:Hashtag"
             }
           ],
-        "id": format!("{id}?page=true"),
+        "id": format!("{id}?page={page}"),
         "type": "OrderedCollectionPage",
         "next": format!("{id}?max_id=109635460763016637&page=true"),
         "prev": format!("{id}?min_id=109757651111534104&page=true"),
