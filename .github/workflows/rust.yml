@@ -20,5 +20,5 @@ jobs:
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
       - run: make test_with_lcov
-      - name: Coveralls Finished
+      - name: upload coverage report to Coveralls
         uses: coverallsapp/github-action@v2
