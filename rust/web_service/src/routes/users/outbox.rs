@@ -34,7 +34,7 @@ pub async fn handler(username: &str, settings: &rocket::State<Settings>) -> Outb
     }));
     let content_type =
         ContentType::new("application", "activity+json").with_params([("charset", "utf-8")]);
-    return Outbox(body, content_type);
+    Outbox(body, content_type)
 }
 
 #[rocket::get("/users/<username>/outbox?page=true")]
@@ -101,5 +101,5 @@ pub async fn page(username: &str, settings: &rocket::State<Settings>) -> Outbox 
     }));
     let content_type =
         ContentType::new("application", "activity+json").with_params([("charset", "utf-8")]);
-    return Outbox(body, content_type);
+    Outbox(body, content_type)
 }
