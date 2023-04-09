@@ -14,8 +14,14 @@
 	test_with_html_coverage \
 	test_with_lcov \
 	unit_test \
+	unit_test_with_coverage \
 	watch
 .SHELLFLAGS = -ec # -e for exiting on errors and -c so that -e doesn't cause unwanted side effects
+CUSTOM_DOMAIN = localhost:8080
+GCOV_ENV = CARGO_INCREMENTAL=0 \
+	RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort" \
+	RUSTDOCFLAGS="-Cpanic=abort"
+LOCAL_DYNAMODB_URL = http://localhost:8000
 
 build:
 	cargo clean -p web_service || true
@@ -23,10 +29,7 @@ build:
 
 build_with_profile:
 	cargo clean
-	CARGO_INCREMENTAL=0 \
-		RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort" \
-		RUSTDOCFLAGS="-Cpanic=abort" \
-		cargo build --workspace --all-targets
+	 $(GCOV_ENV) cargo build --workspace --all-targets
 
 check: clippy
 	cargo fmt --all -- --check
@@ -58,8 +61,8 @@ grcov:
 
 integration_test:
 	RUST_LOG="web_service_test=info" \
-	LOCAL_DYNAMODB_URL=http://localhost:8000 \
-		./target/debug/web_service_test localhost:8080 target_username localhost:8080 signer_username LocalDynamodbTable
+	LOCAL_DYNAMODB_URL=$(LOCAL_DYNAMODB_URL) \
+		./target/debug/web_service_test $(CUSTOM_DOMAIN) target_username $(CUSTOM_DOMAIN) signer_username LocalDynamodbTable
 
 nightly_toolchain:
 	rustup update nightly
@@ -71,9 +74,9 @@ refresh_database:
 
 run_service_in_background:
 	@./kill_web_service.sh
-	CUSTOM_DOMAIN=localhost:8080 \
+	CUSTOM_DOMAIN=$(CUSTOM_DOMAIN) \
 		DYNAMODB_TABLE=LocalDynamodbTable \
-		LOCAL_DYNAMODB_URL=http://localhost:8000 \
+		LOCAL_DYNAMODB_URL=$(LOCAL_DYNAMODB_URL) \
 		PROTOCOL=http \
 		REGION=eu-west-1 \
 		RUST_LOG="rocket=warn,web_service=info" \
@@ -86,7 +89,7 @@ scan_table:
 	@if ! grep -F '[localhost]' <~/.aws/credentials; then \
 		echo "[localhost]\naws_access_key_id = ANY_ACCESS_KEY_WILL_DO\naws_secret_access_key = ANY_SECRET_KEY_WILL_DO" >>~/.aws/credentials; \
 	fi
-	aws dynamodb scan --table-name LocalDynamodbTable --endpoint-url http://localhost:8000 --profile localhost
+	aws dynamodb scan --table-name LocalDynamodbTable --endpoint-url $(LOCAL_DYNAMODB_URL) --profile localhost
 
 stable_toolchain:
 	rustup override set stable
@@ -103,7 +106,7 @@ test_with_coverage: \
 	nightly_toolchain \
 	refresh_database \
 	build_with_profile \
-	unit_test \
+	unit_test_with_coverage \
 	run_service_in_background \
 	integration_test
 	@./kill_web_service.sh
@@ -118,6 +121,9 @@ test_with_lcov: \
 
 unit_test:
 	cargo test --workspace || true
+
+unit_test_with_coverage:
+	$(GCOV_ENV) cargo test --workspace || true
 
 watch: stable_toolchain
 	cargo watch --clear -x 'build --workspace --all-targets'
