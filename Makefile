@@ -63,7 +63,7 @@ integration_test:
 
 nightly_toolchain:
 	rustup update nightly
-	rustup default nightly
+	rustup override set nightly
 
 refresh_database:
 	docker-compose -f docker/test/docker-compose.yml kill
@@ -89,7 +89,7 @@ scan_table:
 	aws dynamodb scan --table-name LocalDynamodbTable --endpoint-url http://localhost:8000 --profile localhost
 
 stable_toolchain:
-	rustup update stable
+	rustup override set stable
 	
 test: \
 	stable_toolchain \
@@ -116,7 +116,7 @@ test_with_lcov: \
 	test_with_coverage
 	$(MAKE) grcov TYPE_PARAM=lcov OUTPUT=lcov.info
 
-unit_test: stable_toolchain
+unit_test:
 	cargo test --workspace || true
 
 watch: stable_toolchain
