@@ -14,7 +14,7 @@
 Example infrastructure as code (IaC) of how to
 deploy an ActivityPub server to AWS
 
-## Supported hosts
+## Supported development hosts
 
 * Linux
 * MacOS
