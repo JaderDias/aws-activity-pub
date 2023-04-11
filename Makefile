@@ -54,7 +54,6 @@ grcov:
 		-s . \
 		--binary-path ./target/debug/ \
 		-t $(TYPE_PARAM) \
-		--branch \
 		--ignore "/*" \
 		--ignore-not-existing \
 		-o ./target/debug/$(OUTPUT)
