@@ -9,19 +9,16 @@ pub struct FocalPoint {
 }
 
 #[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Context {
     pub ostatus: String,
-    #[serde(rename = "atomUri")]
     pub atom_uri: String,
-    #[serde(rename = "inReplyToAtomUri")]
     pub in_reply_to_atom_uri: String,
     pub conversation: String,
     pub sensitive: String,
     pub toot: String,
-    #[serde(rename = "votersCount")]
     pub voters_count: String,
     pub blurhash: String,
-    #[serde(rename = "focalPoint")]
     pub focal_point: FocalPoint,
     #[serde(rename = "Hashtag")]
     #[serde(skip_serializing_if = "Option::is_none")]

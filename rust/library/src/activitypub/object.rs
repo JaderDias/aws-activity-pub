@@ -5,14 +5,15 @@ use std::fmt::Debug;
 // TODO: use activitystreams = "0.6.2"
 
 #[derive(Clone, Serialize, Deserialize, PartialEq, Eq, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Object {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor: Option<String>,
-    #[serde(rename = "atomUri", skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub atom_uri: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attachment: Option<Vec<Attachment>>,
-    #[serde(rename = "attributedTo", skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub attributed_to: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cc: Option<Vec<String>>,
@@ -32,16 +33,13 @@ pub struct Object {
     pub following: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
-    #[serde(rename = "inReplyTo", skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub in_reply_to: Option<String>,
-    #[serde(rename = "inReplyToAtomUri", skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub in_reply_to_atom_uri: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inbox: Option<String>,
-    #[serde(
-        rename = "manuallyApprovesFollowers",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub manually_approves_followers: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -49,12 +47,11 @@ pub struct Object {
     pub object: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub outbox: Option<String>,
-    #[serde(skip_serializing)]
+    #[serde(rename = "partition_key", skip_serializing)]
     pub partition_key: Option<String>,
-    #[serde(rename = "preferredUsername", skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub preferred_username: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "publicKey")]
     pub public_key: Option<PublicKey>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published: Option<String>,
@@ -62,7 +59,7 @@ pub struct Object {
     pub r#type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sensitive: Option<bool>,
-    #[serde(skip_serializing)]
+    #[serde(rename = "sort_key", skip_serializing)]
     pub sort_key: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub summary: Option<String>,
@@ -77,18 +74,18 @@ pub struct Object {
 }
 
 #[derive(Clone, Serialize, Deserialize, PartialEq, Eq, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Attachment {
     pub r#type: String,
-    #[serde(rename = "mediaType")]
     pub media_type: String,
     pub url: String,
     pub name: String,
 }
 
 #[derive(Clone, Serialize, Deserialize, PartialEq, Eq, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct PublicKey {
     pub id: String,
     pub owner: String,
-    #[serde(rename = "publicKeyPem")]
     pub public_key_pem: String,
 }
