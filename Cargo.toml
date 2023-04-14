@@ -9,12 +9,7 @@ repository = "https://github.com/JaderDias/aws-activity-pub"
 version = "0.1.0"
 
 [workspace]
-members = [
-    "rust/dynamodb_stream",
-    "rust/library",
-    "rust/web_service",
-    "rust/web_service_test",
-]
+members = ["rust/*"]
 
 [[example]]
 name = "create_status"

@@ -9,6 +9,10 @@ name = "dynamodb_stream"
 repository = "https://github.com/JaderDias/aws-activity-pub"
 version = "0.1.0"
 
+[[bin]]
+name = "dynamodb_stream"
+path = "main.rs"
+
 # Starting in Rust 1.62 you can use `cargo add` to add dependencies 
 # to your project.
 #
